@@ -1,0 +1,12 @@
+{
+  "name": "infra-deploy-aws-app",
+  "version": "1.0.0",
+  "description": "Simple Node.js application for AWS infrastructure project",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
