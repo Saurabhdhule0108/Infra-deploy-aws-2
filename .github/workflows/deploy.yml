@@ -36,5 +36,9 @@ jobs:
       - name: Terraform Validate
         working-directory: terraform
         run: terraform validate
+        
+      - name: Terraform Plan
+        working-directory: terraform
+        run: terraform plan -var="ami_id=${{ vars.AWS_AMI_ID }}" -var="key_name=${{ vars.AWS_KEY_NAME }}"
 
-        # OIDC authentication test
+        
