@@ -36,3 +36,5 @@ jobs:
       - name: Terraform Validate
         working-directory: terraform
         run: terraform validate
+
+        # OIDC authentication test
