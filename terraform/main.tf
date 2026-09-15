@@ -5,13 +5,18 @@ terraform {
       version = "~> 6.0"
     }
   }
-}
 
+  backend "s3" {
+    bucket       = "infra-deploy-aws-2-terraform-state-2026"
+    key          = "terraform.tfstate"
+    region       = "ap-south-1"
+    use_lockfile = true
+  }
+}
 
 provider "aws" {
   region = var.aws_region
 }
-
 
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
@@ -22,7 +27,6 @@ resource "aws_vpc" "main" {
     Name = "infra-deploy-aws-vpc"
   }
 }
-
 
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
@@ -35,7 +39,6 @@ resource "aws_subnet" "public" {
   }
 }
 
-
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -43,7 +46,6 @@ resource "aws_internet_gateway" "main" {
     Name = "infra-deploy-aws-igw"
   }
 }
-
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
@@ -58,12 +60,10 @@ resource "aws_route_table" "public" {
   }
 }
 
-
 resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
-
 
 resource "aws_security_group" "ec2" {
   name        = "infra-deploy-aws-ec2-sg"
@@ -98,7 +98,6 @@ resource "aws_security_group" "ec2" {
   }
 }
 
-
 resource "aws_instance" "app" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
@@ -112,7 +111,6 @@ resource "aws_instance" "app" {
   }
 }
 
-
 resource "aws_ecr_repository" "app" {
   name                 = "infra-deploy-aws-app"
   image_tag_mutability = "MUTABLE"
@@ -124,4 +122,9 @@ resource "aws_ecr_repository" "app" {
   tags = {
     Name = "infra-deploy-aws-app"
   }
+}
+
+output "instance_public_ip" {
+  description = "Public IP address of the EC2 instance"
+  value       = aws_instance.app.public_ip
 }

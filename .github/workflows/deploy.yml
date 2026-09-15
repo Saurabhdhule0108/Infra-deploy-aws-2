@@ -36,7 +36,7 @@ jobs:
       - name: Terraform Validate
         working-directory: terraform
         run: terraform validate
-        
+
       - name: Terraform Plan
         working-directory: terraform
         run: terraform plan -var="ami_id=${{ vars.AWS_AMI_ID }}" -var="key_name=${{ vars.AWS_KEY_NAME }}"
@@ -44,3 +44,7 @@ jobs:
       - name: Terraform Apply
         working-directory: terraform
         run: terraform apply -auto-approve -var="ami_id=${{ vars.AWS_AMI_ID }}" -var="key_name=${{ vars.AWS_KEY_NAME }}"
+
+      - name: Show EC2 public IP
+        working-directory: terraform
+        run: terraform output instance_public_ip
