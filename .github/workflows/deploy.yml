@@ -13,6 +13,10 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    env:
+      TF_VAR_ami_id: ${{ vars.AWS_AMI_ID }}
+      TF_VAR_key_name: ${{ vars.AWS_KEY_NAME }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -33,35 +37,11 @@ jobs:
         working-directory: terraform
         run: terraform init
 
-      - name: Import existing VPC
+      - name: Show Terraform State
         working-directory: terraform
-        run: terraform import aws_vpc.main vpc-01584c0d24bcbecb4
+        run: terraform state list
 
-      - name: Import existing Subnet
-        working-directory: terraform
-        run: terraform import aws_subnet.public subnet-052453b247d1c6787
-
-      - name: Import existing Internet Gateway
-        working-directory: terraform
-        run: terraform import aws_internet_gateway.main igw-06eb58f5035517254
-
-      - name: Import existing Route Table
-        working-directory: terraform
-        run: terraform import aws_route_table.public rtb-0bc3beea4ced09f2d
-
-      - name: Import existing Route Table Association
-        working-directory: terraform
-        run: terraform import aws_route_table_association.public rtbassoc-0139f52823dec6a0a
-
-      - name: Import existing Security Group
-        working-directory: terraform
-        run: terraform import aws_security_group.ec2 sg-0306481f100a8f6bb
-
-      - name: Import existing EC2
-        working-directory: terraform
-        run: terraform import aws_instance.app i-0438bce6f0f312bcf
-
-      - name: Import existing ECR Repository
+      - name: Import existing ECR repository
         working-directory: terraform
         run: terraform import aws_ecr_repository.app infra-deploy-aws-app
 
@@ -71,11 +51,11 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform
-        run: terraform plan -var="ami_id=${{ vars.AWS_AMI_ID }}" -var="key_name=${{ vars.AWS_KEY_NAME }}"
+        run: terraform plan
 
       - name: Terraform Apply
         working-directory: terraform
-        run: terraform apply -auto-approve -var="ami_id=${{ vars.AWS_AMI_ID }}" -var="key_name=${{ vars.AWS_KEY_NAME }}"
+        run: terraform apply -auto-approve
 
       - name: Show EC2 public IP
         working-directory: terraform
