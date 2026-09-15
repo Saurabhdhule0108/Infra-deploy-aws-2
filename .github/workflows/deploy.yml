@@ -49,9 +49,12 @@ jobs:
         working-directory: terraform
         run: terraform apply -auto-approve
 
-      - name: Show EC2 public IP
+      - name: Get EC2 public IP
         working-directory: terraform
-        run: terraform output instance_public_ip
+        run: echo "EC2_PUBLIC_IP=$(terraform output -raw instance_public_ip)" >> "$GITHUB_ENV"
+
+      - name: Show EC2 public IP
+        run: echo "EC2 public IP is $EC2_PUBLIC_IP"
 
       - name: Login to Amazon ECR
         run: |
@@ -65,3 +68,25 @@ jobs:
 
       - name: Push Docker image to ECR
         run: docker push 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+
+      - name: Prepare SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
+          chmod 600 ec2-key.pem
+
+      - name: Login to ECR on EC2
+        run: |
+          aws ecr get-login-password --region ap-south-1 | ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "sudo docker login --username AWS --password-stdin 659364970665.dkr.ecr.ap-south-1.amazonaws.com"
+
+      - name: Deploy application to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "
+            sudo docker pull 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest &&
+            sudo docker stop infra-deploy-aws-app || true &&
+            sudo docker rm infra-deploy-aws-app || true &&
+            sudo docker run -d --name infra-deploy-aws-app -p 80:8080 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+          "
+
+      - name: Verify container
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "sudo docker ps"
