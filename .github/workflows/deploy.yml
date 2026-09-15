@@ -52,3 +52,16 @@ jobs:
       - name: Show EC2 public IP
         working-directory: terraform
         run: terraform output instance_public_ip
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 659364970665.dkr.ecr.ap-south-1.amazonaws.com
+
+      - name: Build Docker image
+        run: docker build -t infra-deploy-aws-app ./nodeapp
+
+      - name: Tag Docker image
+        run: docker tag infra-deploy-aws-app:latest 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+
+      - name: Push Docker image to ECR
+        run: docker push 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
