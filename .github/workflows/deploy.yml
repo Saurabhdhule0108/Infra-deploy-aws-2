@@ -56,6 +56,28 @@ jobs:
       - name: Show EC2 public IP
         run: echo "EC2 public IP is $EC2_PUBLIC_IP"
 
+      - name: Prepare SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
+          chmod 600 ec2-key.pem
+
+      - name: Wait for Docker on EC2
+        run: |
+          echo "Waiting for Docker to become ready on EC2..."
+
+          for i in {1..30}; do
+            if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "sudo docker info >/dev/null 2>&1"; then
+              echo "Docker is ready on EC2."
+              exit 0
+            fi
+
+            echo "Docker is not ready yet. Waiting 10 seconds..."
+            sleep 10
+          done
+
+          echo "Docker did not become ready within 5 minutes."
+          exit 1
+
       - name: Login to Amazon ECR
         run: |
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 659364970665.dkr.ecr.ap-south-1.amazonaws.com
@@ -68,11 +90,6 @@ jobs:
 
       - name: Push Docker image to ECR
         run: docker push 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
-
-      - name: Prepare SSH key
-        run: |
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
-          chmod 600 ec2-key.pem
 
       - name: Login to ECR on EC2
         run: |
