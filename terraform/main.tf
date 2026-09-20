@@ -106,6 +106,20 @@ resource "aws_instance" "app" {
   key_name                    = var.key_name
   associate_public_ip_address = true
 
+  user_data = <<-EOF
+    #!/bin/bash
+
+    apt-get update -y
+    apt-get install -y docker.io
+
+    systemctl enable docker
+    systemctl start docker
+
+    usermod -aG docker ubuntu
+  EOF
+
+  user_data_replace_on_change = false
+
   tags = {
     Name = "infra-deploy-aws-app"
   }
