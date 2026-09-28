@@ -36,13 +36,6 @@ Infra-deploy-aws-2/
 
 ## Features ✨
 
-- **Automated CI/CD**: GitHub Actions automatically builds and deploys the application.
-- **Infrastructure as Code**: Terraform provisions and manages the AWS infrastructure.
-- **Terraform Variables**: Infrastructure values are managed through Terraform variables.
-- **HCL Configuration**: Terraform infrastructure is defined using HCL.
-- **Secure AWS Authentication**: GitHub Actions uses GitHub OIDC and an AWS IAM role with temporary credentials.
-- **Docker Deployment**: The Node.js application is packaged as a Docker image.
-- **Amazon ECR**: Docker images are stored in an Amazon ECR repository.
 - **EC2 Hosting**: The application runs inside a Docker container on Amazon EC2.
 - **Container Auto-Restart**: Docker uses `unless-stopped` so the application container automatically starts after an EC2/Docker restart.
 
@@ -57,7 +50,6 @@ Infra-deploy-aws-2/
 - **GitHub Actions**: [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - **Docker**: [Docker Documentation](https://docs.docker.com/)
 - **HCL / Terraform Language**: [Terraform Configuration Language](https://developer.hashicorp.com/terraform/language)
-- **Terraform Variables**: [Terraform Input Variables](https://developer.hashicorp.com/terraform/language/values/variables)
 
 > Docker and the Node.js runtime are used by the CI/CD environment and EC2 deployment. They do not need to be installed locally for this project.
 
@@ -86,9 +78,6 @@ The project uses `variables.tf` to define configurable infrastructure values suc
 - EC2 instance type
 - EC2 key pair name
 
-More information about Terraform variables:
-
-[Terraform Input Variables](https://developer.hashicorp.com/terraform/language/values/variables)
 
 4. **Trigger the CI/CD pipeline**:
 
@@ -132,10 +121,7 @@ Node.js Application
 - [Terraform](https://developer.hashicorp.com/terraform/)
 - [Terraform Configuration Language / HCL](https://developer.hashicorp.com/terraform/language)
 - [Terraform Variables](https://developer.hashicorp.com/terraform/language/values/variables)
-- [AWS](https://aws.amazon.com/)
-- [Amazon EC2](https://aws.amazon.com/ec2/)
 - [Amazon ECR](https://aws.amazon.com/ecr/)
 - [Docker](https://www.docker.com/)
-- [GitHub](https://github.com/)
 - [GitHub Actions](https://github.com/features/actions)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)

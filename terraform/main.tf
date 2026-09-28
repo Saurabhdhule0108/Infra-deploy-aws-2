@@ -18,6 +18,10 @@ provider "aws" {
   region = var.aws_region
 }
 
+# =========================================================
+# VPC
+# =========================================================
+
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
@@ -27,6 +31,10 @@ resource "aws_vpc" "main" {
     Name = "infra-deploy-aws-vpc"
   }
 }
+
+# =========================================================
+# PUBLIC SUBNET - EC2
+# =========================================================
 
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
@@ -39,6 +47,40 @@ resource "aws_subnet" "public" {
   }
 }
 
+# =========================================================
+# PRIVATE DATABASE SUBNET 1
+# =========================================================
+
+resource "aws_subnet" "db_private_1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "ap-south-1a"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "infra-deploy-aws-db-private-1"
+  }
+}
+
+# =========================================================
+# PRIVATE DATABASE SUBNET 2
+# =========================================================
+
+resource "aws_subnet" "db_private_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24"
+  availability_zone       = "ap-south-1b"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "infra-deploy-aws-db-private-2"
+  }
+}
+
+# =========================================================
+# INTERNET GATEWAY
+# =========================================================
+
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -46,6 +88,10 @@ resource "aws_internet_gateway" "main" {
     Name = "infra-deploy-aws-igw"
   }
 }
+
+# =========================================================
+# PUBLIC ROUTE TABLE
+# =========================================================
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
@@ -64,6 +110,10 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
+
+# =========================================================
+# EC2 SECURITY GROUP
+# =========================================================
 
 resource "aws_security_group" "ec2" {
   name        = "infra-deploy-aws-ec2-sg"
@@ -98,6 +148,10 @@ resource "aws_security_group" "ec2" {
   }
 }
 
+# =========================================================
+# EC2 INSTANCE
+# =========================================================
+
 resource "aws_instance" "app" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
@@ -125,6 +179,10 @@ resource "aws_instance" "app" {
   }
 }
 
+# =========================================================
+# ECR REPOSITORY
+# =========================================================
+
 resource "aws_ecr_repository" "app" {
   name                 = "infra-deploy-aws-app"
   image_tag_mutability = "MUTABLE"
@@ -137,6 +195,10 @@ resource "aws_ecr_repository" "app" {
     Name = "infra-deploy-aws-app"
   }
 }
+
+# =========================================================
+# OUTPUTS
+# =========================================================
 
 output "instance_public_ip" {
   description = "Public IP address of the EC2 instance"
