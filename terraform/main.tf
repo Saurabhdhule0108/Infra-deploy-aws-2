@@ -153,12 +153,11 @@ resource "aws_security_group" "ec2" {
 # =========================================================
 
 resource "aws_instance" "app" {
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  subnet_id                   = aws_subnet.public.id
-  vpc_security_group_ids      = [aws_security_group.ec2.id]
-  key_name                    = var.key_name
-  associate_public_ip_address = true
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.ec2.id]
+  key_name               = var.key_name
 
   user_data = <<-EOF
     #!/bin/bash
@@ -201,6 +200,6 @@ resource "aws_ecr_repository" "app" {
 # =========================================================
 
 output "instance_public_ip" {
-  description = "Public IP address of the EC2 instance"
+  description = "Current public IP address of the EC2 instance"
   value       = aws_instance.app.public_ip
 }
