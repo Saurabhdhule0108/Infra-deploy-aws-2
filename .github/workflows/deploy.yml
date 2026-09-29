@@ -18,8 +18,16 @@ jobs:
       TF_VAR_key_name: ${{ vars.AWS_KEY_NAME }}
 
     steps:
+      # =====================================================
+      # SOURCE CODE
+      # =====================================================
+
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      # =====================================================
+      # AWS AUTHENTICATION USING OIDC
+      # =====================================================
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -29,6 +37,10 @@ jobs:
 
       - name: Verify AWS identity
         run: aws sts get-caller-identity
+
+      # =====================================================
+      # TERRAFORM
+      # =====================================================
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
@@ -49,24 +61,100 @@ jobs:
         working-directory: terraform
         run: terraform apply -auto-approve
 
-      - name: Get EC2 public IP
-        working-directory: terraform
-        run: echo "EC2_PUBLIC_IP=$(terraform output -raw instance_public_ip)" >> "$GITHUB_ENV"
+      # =====================================================
+      # GET EC2 INSTANCE ID FROM TERRAFORM
+      # =====================================================
 
-      - name: Show EC2 public IP
-        run: echo "EC2 public IP is $EC2_PUBLIC_IP"
+      - name: Get EC2 instance ID
+        working-directory: terraform
+        run: |
+          EC2_INSTANCE_ID=$(terraform output -raw instance_id)
+          echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> "$GITHUB_ENV"
+          echo "Terraform EC2 instance ID: $EC2_INSTANCE_ID"
+
+      # =====================================================
+      # START EXISTING EC2
+      # =====================================================
+
+      - name: Check and start EC2
+        run: |
+          EC2_STATE=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --query "Reservations[0].Instances[0].State.Name" \
+            --output text)
+
+          echo "Current EC2 state: $EC2_STATE"
+
+          if [ "$EC2_STATE" = "stopped" ]; then
+            echo "EC2 is stopped. Starting existing EC2..."
+            aws ec2 start-instances --instance-ids "$EC2_INSTANCE_ID"
+          elif [ "$EC2_STATE" = "running" ]; then
+            echo "EC2 is already running."
+          else
+            echo "EC2 is currently in state: $EC2_STATE"
+            echo "Waiting for EC2 to become usable..."
+          fi
+
+      # =====================================================
+      # WAIT FOR EC2
+      # =====================================================
+
+      - name: Wait for EC2 to be running
+        run: |
+          echo "Waiting for EC2 to enter running state..."
+          aws ec2 wait instance-running --instance-ids "$EC2_INSTANCE_ID"
+          echo "EC2 is running."
+
+      - name: Wait for EC2 status checks
+        run: |
+          echo "Waiting for EC2 status checks..."
+          aws ec2 wait instance-status-ok --instance-ids "$EC2_INSTANCE_ID"
+          echo "EC2 status checks passed."
+
+      # =====================================================
+      # DISCOVER NEW PUBLIC IP
+      # =====================================================
+
+      - name: Get current EC2 public IP
+        run: |
+          EC2_PUBLIC_IP=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text)
+
+          if [ -z "$EC2_PUBLIC_IP" ] || [ "$EC2_PUBLIC_IP" = "None" ]; then
+            echo "ERROR: EC2 does not have a public IP."
+            exit 1
+          fi
+
+          echo "EC2_PUBLIC_IP=$EC2_PUBLIC_IP" >> "$GITHUB_ENV"
+          echo "Current EC2 public IP: $EC2_PUBLIC_IP"
+
+      # =====================================================
+      # SSH
+      # =====================================================
 
       - name: Prepare SSH key
         run: |
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
           chmod 600 ec2-key.pem
 
+      # =====================================================
+      # WAIT FOR DOCKER
+      # =====================================================
+
       - name: Wait for Docker on EC2
         run: |
-          echo "Waiting for Docker to become ready on EC2..."
+          echo "Waiting for SSH and Docker to become ready on EC2..."
 
           for i in {1..30}; do
-            if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "sudo docker info >/dev/null 2>&1"; then
+            if ssh \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=10 \
+              -i ec2-key.pem \
+              ubuntu@$EC2_PUBLIC_IP \
+              "sudo docker info >/dev/null 2>&1"; then
+
               echo "Docker is ready on EC2."
               exit 0
             fi
@@ -78,32 +166,115 @@ jobs:
           echo "Docker did not become ready within 5 minutes."
           exit 1
 
+      # =====================================================
+      # BUILD AND PUSH IMAGE TO ECR
+      # =====================================================
+
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 659364970665.dkr.ecr.ap-south-1.amazonaws.com
+          aws ecr get-login-password --region ap-south-1 | \
+          docker login \
+            --username AWS \
+            --password-stdin \
+            659364970665.dkr.ecr.ap-south-1.amazonaws.com
 
       - name: Build Docker image
-        run: docker build -t infra-deploy-aws-app ./nodeapp
+        run: |
+          docker build \
+            -t infra-deploy-aws-app \
+            ./nodeapp
 
       - name: Tag Docker image
-        run: docker tag infra-deploy-aws-app:latest 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+        run: |
+          docker tag \
+            infra-deploy-aws-app:latest \
+            659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
 
       - name: Push Docker image to ECR
-        run: docker push 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+        run: |
+          docker push \
+            659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+
+      # =====================================================
+      # EC2 LOGIN TO ECR
+      # =====================================================
 
       - name: Login to ECR on EC2
         run: |
-          aws ecr get-login-password --region ap-south-1 | ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "sudo docker login --username AWS --password-stdin 659364970665.dkr.ecr.ap-south-1.amazonaws.com"
+          aws ecr get-login-password --region ap-south-1 | \
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@$EC2_PUBLIC_IP \
+            "sudo docker login \
+            --username AWS \
+            --password-stdin \
+            659364970665.dkr.ecr.ap-south-1.amazonaws.com"
+
+      # =====================================================
+      # DEPLOY APPLICATION
+      # =====================================================
 
       - name: Deploy application to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "
-            sudo docker pull 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest &&
-            sudo docker stop infra-deploy-aws-app || true &&
-            sudo docker rm infra-deploy-aws-app || true &&
-            sudo docker run -d --restart unless-stopped --name infra-deploy-aws-app -p 80:8080 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
-          "
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@$EC2_PUBLIC_IP '
+              sudo docker pull 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+
+              sudo docker stop infra-deploy-aws-app || true
+              sudo docker rm infra-deploy-aws-app || true
+
+              sudo docker run \
+                -d \
+                --restart unless-stopped \
+                --name infra-deploy-aws-app \
+                -p 80:8080 \
+                659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+            '
+
+      # =====================================================
+      # VERIFY DEPLOYMENT
+      # =====================================================
 
       - name: Verify container
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@$EC2_PUBLIC_IP "sudo docker ps"
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@$EC2_PUBLIC_IP \
+            "sudo docker ps --filter name=infra-deploy-aws-app"
+
+      - name: Verify application
+        run: |
+          echo "Checking application at http://$EC2_PUBLIC_IP"
+
+          for i in {1..12}; do
+            if curl --fail --silent --show-error \
+              "http://$EC2_PUBLIC_IP" > /dev/null; then
+
+              echo "Application verification successful."
+              exit 0
+            fi
+
+            echo "Application is not ready yet. Waiting 5 seconds..."
+            sleep 5
+          done
+
+          echo "Application verification failed."
+          exit 1
+
+      # =====================================================
+      # STOP EC2 ONLY AFTER SUCCESS
+      # =====================================================
+
+      - name: Stop EC2 after successful deployment
+        run: |
+          echo "All workflow steps completed successfully."
+          echo "Stopping EC2 instance $EC2_INSTANCE_ID..."
+
+          aws ec2 stop-instances \
+            --instance-ids "$EC2_INSTANCE_ID"
+
+          echo "Stop request sent successfully."
