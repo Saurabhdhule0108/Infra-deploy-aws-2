@@ -1,141 +1,141 @@
 const express = require("express");
+const mysql = require("mysql2/promise");
 
 const app = express();
 
 const PORT = 8080;
 
-app.get("/", (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Infra Deploy AWS</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background: #f4f6f8;
-                    margin: 0;
-                    padding: 0;
-                    color: #222;
-                }
+// Allow the application to read JSON request bodies
+app.use(express.json());
 
-                .container {
-                    max-width: 900px;
-                    margin: 50px auto;
-                    background: white;
-                    padding: 40px;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                }
+// =========================================================
+// DATABASE CONNECTION POOL
+// =========================================================
 
-                h1 {
-                    margin-bottom: 10px;
-                }
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT || 3306),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
 
-                .status {
-                    display: inline-block;
-                    padding: 8px 16px;
-                    background: #d4edda;
-                    color: #155724;
-                    border-radius: 20px;
-                    font-weight: bold;
-                    margin: 10px 0 30px;
-                }
-
-                .technologies {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 15px;
-                    margin-top: 20px;
-                }
-
-                .card {
-                    padding: 20px;
-                    background: #f8f9fa;
-                    border-radius: 8px;
-                    text-align: center;
-                    border: 1px solid #ddd;
-                }
-
-                .pipeline {
-                    margin-top: 35px;
-                    padding: 25px;
-                    background: #f8f9fa;
-                    border-radius: 8px;
-                    text-align: center;
-                    font-weight: bold;
-                }
-
-                .footer {
-                    margin-top: 35px;
-                    text-align: center;
-                    color: #666;
-                }
-
-                @media (max-width: 700px) {
-                    .technologies {
-                        grid-template-columns: 1fr;
-                    }
-
-                    .container {
-                        margin: 20px;
-                        padding: 25px;
-                    }
-                }
-            </style>
-        </head>
-
-        <body>
-            <div class="container">
-
-                <h1>🚀 Infra Deploy AWS</h1>
-
-                <p>Infrastructure & CI/CD Project</p>
-
-                <div class="status">
-                    ● APPLICATION RUNNING
-                </div>
-
-                <h2>Technology Stack</h2>
-
-                <div class="technologies">
-                    <div class="card">☁️<br><strong>AWS EC2</strong></div>
-                    <div class="card">🐳<br><strong>Docker</strong></div>
-                    <div class="card">📦<br><strong>Amazon ECR</strong></div>
-                    <div class="card">🏗️<br><strong>Terraform</strong></div>
-                    <div class="card">⚙️<br><strong>GitHub Actions</strong></div>
-                    <div class="card">🔐<br><strong>GitHub OIDC</strong></div>
-                </div>
-
-                <h2>CI/CD Pipeline</h2>
-
-                <div class="pipeline">
-                    GitHub
-                    →
-                    GitHub Actions
-                    →
-                    Terraform
-                    →
-                    Amazon ECR
-                    →
-                    AWS EC2
-                    →
-                    Docker
-                    →
-                    Node.js
-                </div>
-
-                <div class="footer">
-                    <p>Built as an AWS Infrastructure & CI/CD learning project</p>
-                    <p>Created by Saurabh</p>
-                </div>
-
-            </div>
-        </body>
-        </html>
-    `);
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-app.listen(PORT, () => {
+// =========================================================
+// CREATE USERS TABLE
+// =========================================================
+
+async function initializeDatabase() {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(150) NOT NULL UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        console.log("Database connected successfully.");
+        console.log("Users table is ready.");
+    } catch (error) {
+        console.error("Database initialization failed:", error.message);
+    }
+}
+
+// =========================================================
+// HOME ROUTE
+// =========================================================
+
+app.get("/", (req, res) => {
+    res.send("Infra-deploy-aws-2 application is running with RDS MySQL!");
+});
+
+// =========================================================
+// DATABASE HEALTH CHECK
+// =========================================================
+
+app.get("/db", async (req, res) => {
+    try {
+        await pool.query("SELECT 1");
+
+        res.json({
+            status: "success",
+            message: "Connected to Amazon RDS MySQL"
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: "Database connection failed"
+        });
+    }
+});
+
+// =========================================================
+// CREATE USER
+// =========================================================
+
+app.post("/users", async (req, res) => {
+    try {
+        const { name, email } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).json({
+                message: "name and email are required"
+            });
+        }
+
+        const [result] = await pool.execute(
+            "INSERT INTO users (name, email) VALUES (?, ?)",
+            [name, email]
+        );
+
+        res.status(201).json({
+            message: "User created successfully",
+            user: {
+                id: result.insertId,
+                name,
+                email
+            }
+        });
+    } catch (error) {
+        console.error("Create user error:", error.message);
+
+        res.status(500).json({
+            message: "Failed to create user"
+        });
+    }
+});
+
+// =========================================================
+// GET ALL USERS
+// =========================================================
+
+app.get("/users", async (req, res) => {
+    try {
+        const [users] = await pool.query(
+            "SELECT id, name, email, created_at FROM users ORDER BY id"
+        );
+
+        res.json(users);
+    } catch (error) {
+        console.error("Get users error:", error.message);
+
+        res.status(500).json({
+            message: "Failed to retrieve users"
+        });
+    }
+});
+
+// =========================================================
+// START APPLICATION
+// =========================================================
+
+app.listen(PORT, async () => {
     console.log(`Application running on port ${PORT}`);
+
+    await initializeDatabase();
 });

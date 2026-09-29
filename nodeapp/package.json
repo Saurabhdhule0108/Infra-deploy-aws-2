@@ -1,12 +1,13 @@
 {
   "name": "infra-deploy-aws-app",
   "version": "1.0.0",
-  "description": "Simple Node.js application for AWS infrastructure project",
+  "description": "Node.js application connected to Amazon RDS MySQL",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mysql2": "^3.15.0"
   }
 }

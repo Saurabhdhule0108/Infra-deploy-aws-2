@@ -63,15 +63,23 @@ jobs:
         run: terraform apply -auto-approve
 
       # =====================================================
-      # GET EC2 INSTANCE ID FROM TERRAFORM
+      # GET TERRAFORM OUTPUTS
       # =====================================================
 
-      - name: Get EC2 instance ID
+      - name: Get Terraform outputs
         working-directory: terraform
         run: |
           EC2_INSTANCE_ID=$(terraform output -raw instance_id)
+          RDS_ENDPOINT=$(terraform output -raw rds_endpoint)
+          RDS_PORT=$(terraform output -raw rds_port)
+
           echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> "$GITHUB_ENV"
-          echo "Terraform EC2 instance ID: $EC2_INSTANCE_ID"
+          echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> "$GITHUB_ENV"
+          echo "RDS_PORT=$RDS_PORT" >> "$GITHUB_ENV"
+
+          echo "EC2 instance ID received from Terraform."
+          echo "RDS endpoint received from Terraform."
+          echo "RDS port received from Terraform."
 
       # =====================================================
       # START EXISTING EC2
@@ -213,30 +221,34 @@ jobs:
             659364970665.dkr.ecr.ap-south-1.amazonaws.com"
 
       # =====================================================
-      # DEPLOY APPLICATION
+      # DEPLOY APPLICATION WITH RDS CONFIGURATION
       # =====================================================
 
       - name: Deploy application to EC2
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           ssh \
             -o StrictHostKeyChecking=no \
             -i ec2-key.pem \
-            ubuntu@$EC2_PUBLIC_IP '
-              sudo docker pull 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
-
-              sudo docker stop infra-deploy-aws-app || true
-              sudo docker rm infra-deploy-aws-app || true
-
-              sudo docker run \
-                -d \
-                --restart unless-stopped \
-                --name infra-deploy-aws-app \
-                -p 80:8080 \
-                659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
-            '
+            ubuntu@$EC2_PUBLIC_IP \
+            "sudo docker pull 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest && \
+             sudo docker stop infra-deploy-aws-app || true; \
+             sudo docker rm infra-deploy-aws-app || true; \
+             sudo docker run \
+               -d \
+               --restart unless-stopped \
+               --name infra-deploy-aws-app \
+               -p 80:8080 \
+               -e DB_HOST='$RDS_ENDPOINT' \
+               -e DB_PORT='$RDS_PORT' \
+               -e DB_USER='adminuser' \
+               -e DB_PASSWORD='$DB_PASSWORD' \
+               -e DB_NAME='appdb' \
+               659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest"
 
       # =====================================================
-      # VERIFY DEPLOYMENT
+      # VERIFY CONTAINER
       # =====================================================
 
       - name: Verify container
@@ -246,6 +258,10 @@ jobs:
             -i ec2-key.pem \
             ubuntu@$EC2_PUBLIC_IP \
             "sudo docker ps --filter name=infra-deploy-aws-app"
+
+      # =====================================================
+      # VERIFY APPLICATION
+      # =====================================================
 
       - name: Verify application
         run: |
@@ -264,6 +280,37 @@ jobs:
           done
 
           echo "Application verification failed."
+          exit 1
+
+      # =====================================================
+      # VERIFY DATABASE CONNECTION
+      # =====================================================
+
+      - name: Verify RDS connection
+        run: |
+          echo "Checking Node.js to RDS MySQL connection..."
+
+          for i in {1..12}; do
+            if curl --fail --silent --show-error \
+              "http://$EC2_PUBLIC_IP/db"; then
+
+              echo ""
+              echo "RDS connection verification successful."
+              exit 0
+            fi
+
+            echo "Database connection is not ready yet. Waiting 5 seconds..."
+            sleep 5
+          done
+
+          echo "RDS connection verification failed."
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@$EC2_PUBLIC_IP \
+            "sudo docker logs infra-deploy-aws-app"
+
           exit 1
 
       # =====================================================
