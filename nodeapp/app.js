@@ -67,6 +67,8 @@ app.get("/db", async (req, res) => {
             message: "Connected to Amazon RDS MySQL"
         });
     } catch (error) {
+        console.error("Database health check failed:", error.message);
+
         res.status(500).json({
             status: "error",
             message: "Database connection failed"
@@ -76,6 +78,7 @@ app.get("/db", async (req, res) => {
 
 // =========================================================
 // CREATE USER
+// POST /users
 // =========================================================
 
 app.post("/users", async (req, res) => {
@@ -104,6 +107,12 @@ app.post("/users", async (req, res) => {
     } catch (error) {
         console.error("Create user error:", error.message);
 
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                message: "Email already exists"
+            });
+        }
+
         res.status(500).json({
             message: "Failed to create user"
         });
@@ -112,6 +121,7 @@ app.post("/users", async (req, res) => {
 
 // =========================================================
 // GET ALL USERS
+// GET /users
 // =========================================================
 
 app.get("/users", async (req, res) => {
@@ -126,6 +136,119 @@ app.get("/users", async (req, res) => {
 
         res.status(500).json({
             message: "Failed to retrieve users"
+        });
+    }
+});
+
+// =========================================================
+// GET ONE USER
+// GET /users/:id
+// =========================================================
+
+app.get("/users/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [users] = await pool.execute(
+            "SELECT id, name, email, created_at FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.json(users[0]);
+    } catch (error) {
+        console.error("Get user error:", error.message);
+
+        res.status(500).json({
+            message: "Failed to retrieve user"
+        });
+    }
+});
+
+// =========================================================
+// UPDATE USER
+// PUT /users/:id
+// =========================================================
+
+app.put("/users/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).json({
+                message: "name and email are required"
+            });
+        }
+
+        const [result] = await pool.execute(
+            "UPDATE users SET name = ?, email = ? WHERE id = ?",
+            [name, email, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            message: "User updated successfully",
+            user: {
+                id: Number(id),
+                name,
+                email
+            }
+        });
+    } catch (error) {
+        console.error("Update user error:", error.message);
+
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                message: "Email already exists"
+            });
+        }
+
+        res.status(500).json({
+            message: "Failed to update user"
+        });
+    }
+});
+
+// =========================================================
+// DELETE USER
+// DELETE /users/:id
+// =========================================================
+
+app.delete("/users/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [result] = await pool.execute(
+            "DELETE FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            message: "User deleted successfully",
+            id: Number(id)
+        });
+    } catch (error) {
+        console.error("Delete user error:", error.message);
+
+        res.status(500).json({
+            message: "Failed to delete user"
         });
     }
 });
