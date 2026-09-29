@@ -16,6 +16,7 @@ jobs:
     env:
       TF_VAR_ami_id: ${{ vars.AWS_AMI_ID }}
       TF_VAR_key_name: ${{ vars.AWS_KEY_NAME }}
+      TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
 
     steps:
       # =====================================================
@@ -112,7 +113,7 @@ jobs:
           echo "EC2 status checks passed."
 
       # =====================================================
-      # DISCOVER NEW PUBLIC IP
+      # DISCOVER CURRENT PUBLIC IP
       # =====================================================
 
       - name: Get current EC2 public IP
