@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InfraCloud | AWS Infrastructure Platform</title>
+
+    <meta
+        name="description"
+        content="AWS infrastructure and deployment platform powered by Terraform, Docker, GitHub Actions and Amazon RDS."
+    >
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <div class="background-grid"></div>
+    <div class="glow glow-one"></div>
+    <div class="glow glow-two"></div>
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <header class="navbar">
+        <div class="container nav-content">
+
+            <a href="/" class="brand">
+                <div class="brand-icon">IC</div>
+
+                <div>
+                    <span class="brand-name">InfraCloud</span>
+                    <span class="brand-subtitle">AWS DEPLOYMENT PLATFORM</span>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#overview">Overview</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#database">Database</a>
+            </nav>
+
+            <div class="live-pill">
+                <span class="pulse-dot"></span>
+                SYSTEM LIVE
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section class="hero" id="overview">
+
+            <div class="container hero-grid">
+
+                <div class="hero-content">
+
+                    <div class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        CLOUD INFRASTRUCTURE • CI/CD • DEVOPS
+                    </div>
+
+                    <h1>
+                        Infrastructure built to
+                        <span>deploy with confidence.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        A production-style AWS infrastructure platform automated
+                        with Terraform and GitHub Actions, running a Dockerized
+                        Node.js application connected securely to Amazon RDS MySQL.
+                    </p>
+
+                    <div class="hero-actions">
+
+                        <a href="#architecture" class="button button-primary">
+                            Explore Infrastructure
+                            <span>→</span>
+                        </a>
+
+                        <button
+                            class="button button-secondary"
+                            id="databaseHealthButton"
+                            type="button"
+                        >
+                            <span class="button-status-dot"></span>
+                            Database Status
+                        </button>
+
+                    </div>
+
+                    <div class="technology-row">
+
+                        <div class="technology">
+                            <span class="technology-symbol">AWS</span>
+                            Amazon Web Services
+                        </div>
+
+                        <div class="technology">
+                            <span class="technology-symbol">TF</span>
+                            Terraform
+                        </div>
+
+                        <div class="technology">
+                            <span class="technology-symbol">DK</span>
+                            Docker
+                        </div>
+
+                        <div class="technology">
+                            <span class="technology-symbol">GH</span>
+                            GitHub Actions
+                        </div>
+
+                        <div class="technology">
+                            <span class="technology-symbol">SQL</span>
+                            MySQL
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="hero-panel">
+
+                    <div class="terminal">
+
+                        <div class="terminal-header">
+
+                            <div class="terminal-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+
+                            <span>deployment.pipeline</span>
+
+                            <span class="terminal-secure">
+                                SECURE
+                            </span>
+
+                        </div>
+
+                        <div class="terminal-body">
+
+                            <div class="terminal-line">
+                                <span class="terminal-muted">$</span>
+                                git push origin main
+                            </div>
+
+                            <div class="terminal-line">
+                                <span class="terminal-success">✓</span>
+                                GitHub Actions triggered
+                            </div>
+
+                            <div class="terminal-line">
+                                <span class="terminal-success">✓</span>
+                                OIDC authentication successful
+                            </div>
+
+                            <div class="terminal-line">
+                                <span class="terminal-success">✓</span>
+                                Terraform infrastructure verified
+                            </div>
+
+                            <div class="terminal-line">
+                                <span class="terminal-success">✓</span>
+                                Docker image pushed to ECR
+                            </div>
+
+                            <div class="terminal-line">
+                                <span class="terminal-success">✓</span>
+                                Application deployed to EC2
+                            </div>
+
+                            <div class="terminal-line">
+                                <span class="terminal-success">✓</span>
+                                RDS connection verified
+                            </div>
+
+                            <div class="terminal-complete">
+                                DEPLOYMENT SUCCESSFUL
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="hero-mini-stats">
+
+                        <div>
+                            <span>AUTH</span>
+                            <strong>OIDC</strong>
+                        </div>
+
+                        <div>
+                            <span>IaC</span>
+                            <strong>Terraform</strong>
+                        </div>
+
+                        <div>
+                            <span>REGISTRY</span>
+                            <strong>ECR</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             SYSTEM HEALTH
+        ================================================== -->
+
+        <section class="section">
+
+            <div class="container">
+
+                <div class="section-heading">
+                    <div>
+                        <span class="section-label">SYSTEM HEALTH</span>
+                        <h2>Infrastructure status</h2>
+                    </div>
+
+                    <p>
+                        Live application and database connectivity checks.
+                    </p>
+                </div>
+
+                <div class="health-grid">
+
+                    <article class="health-card">
+                        <div class="health-icon">APP</div>
+
+                        <div>
+                            <span class="health-label">APPLICATION</span>
+                            <h3>Online</h3>
+                        </div>
+
+                        <span class="status-indicator status-online">
+                            <span></span>
+                            HEALTHY
+                        </span>
+                    </article>
+
+                    <article class="health-card">
+                        <div class="health-icon">DB</div>
+
+                        <div>
+                            <span class="health-label">DATABASE</span>
+                            <h3 id="databaseStatusText">Checking...</h3>
+                        </div>
+
+                        <span
+                            class="status-indicator"
+                            id="databaseStatusBadge"
+                        >
+                            <span></span>
+                            CHECKING
+                        </span>
+                    </article>
+
+                    <article class="health-card">
+                        <div class="health-icon">API</div>
+
+                        <div>
+                            <span class="health-label">REST API</span>
+                            <h3>Available</h3>
+                        </div>
+
+                        <span class="status-indicator status-online">
+                            <span></span>
+                            READY
+                        </span>
+                    </article>
+
+                    <article class="health-card">
+                        <div class="health-icon">CI</div>
+
+                        <div>
+                            <span class="health-label">DEPLOYMENT</span>
+                            <h3>Automated</h3>
+                        </div>
+
+                        <span class="status-indicator status-online">
+                            <span></span>
+                            ACTIVE
+                        </span>
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             ARCHITECTURE
+        ================================================== -->
+
+        <section class="section architecture-section" id="architecture">
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="section-label">ARCHITECTURE</span>
+                        <h2>From code to cloud.</h2>
+                    </div>
+
+                    <p>
+                        Source code, secure authentication, infrastructure
+                        automation, container deployment and persistent storage.
+                    </p>
+
+                </div>
+
+                <div class="architecture-card">
+
+                    <div class="architecture-flow">
+
+                        <div class="architecture-node">
+                            <span class="node-number">01</span>
+                            <div class="node-icon">GH</div>
+                            <strong>GitHub</strong>
+                            <span>Source Code</span>
+                        </div>
+
+                        <div class="flow-arrow">→</div>
+
+                        <div class="architecture-node">
+                            <span class="node-number">02</span>
+                            <div class="node-icon">CI</div>
+                            <strong>Actions</strong>
+                            <span>CI/CD</span>
+                        </div>
+
+                        <div class="flow-arrow">→</div>
+
+                        <div class="architecture-node">
+                            <span class="node-number">03</span>
+                            <div class="node-icon">ID</div>
+                            <strong>OIDC</strong>
+                            <span>AWS Auth</span>
+                        </div>
+
+                        <div class="flow-arrow">→</div>
+
+                        <div class="architecture-node">
+                            <span class="node-number">04</span>
+                            <div class="node-icon">TF</div>
+                            <strong>Terraform</strong>
+                            <span>Infrastructure</span>
+                        </div>
+
+                        <div class="flow-arrow">→</div>
+
+                        <div class="architecture-node">
+                            <span class="node-number">05</span>
+                            <div class="node-icon">EC2</div>
+                            <strong>EC2</strong>
+                            <span>Docker Host</span>
+                        </div>
+
+                        <div class="flow-arrow">→</div>
+
+                        <div class="architecture-node">
+                            <span class="node-number">06</span>
+                            <div class="node-icon">SQL</div>
+                            <strong>RDS</strong>
+                            <span>MySQL</span>
+                        </div>
+
+                    </div>
+
+                    <div class="architecture-details">
+
+                        <div class="detail-card">
+                            <span>NETWORK</span>
+                            <strong>Custom VPC</strong>
+                            <p>
+                                Public application subnet with private database
+                                subnets across Availability Zones.
+                            </p>
+                        </div>
+
+                        <div class="detail-card">
+                            <span>CONTAINER</span>
+                            <strong>Docker + ECR</strong>
+                            <p>
+                                Application images are built automatically,
+                                stored in ECR and deployed to EC2.
+                            </p>
+                        </div>
+
+                        <div class="detail-card">
+                            <span>DATABASE</span>
+                            <strong>Private RDS</strong>
+                            <p>
+                                MySQL is not publicly accessible and accepts
+                                traffic from the application security group.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             DATABASE MANAGEMENT
+        ================================================== -->
+
+        <section class="section" id="database">
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="section-label">RDS MYSQL</span>
+                        <h2>Database management</h2>
+                    </div>
+
+                    <div
+                        class="database-connected-badge"
+                        id="databaseConnectionBadge"
+                    >
+                        <span></span>
+                        CHECKING CONNECTION
+                    </div>
+
+                </div>
+
+                <div class="database-layout">
+
+                    <!-- ADD USER -->
+
+                    <aside class="user-form-card">
+
+                        <div class="form-card-header">
+                            <span class="form-icon">+</span>
+
+                            <div>
+                                <span class="section-label">CREATE</span>
+                                <h3>Add new user</h3>
+                            </div>
+                        </div>
+
+                        <p>
+                            Create a user record directly in the Amazon RDS
+                            MySQL database.
+                        </p>
+
+                        <form id="userForm">
+
+                            <div class="form-group">
+                                <label for="name">Full name</label>
+
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    placeholder="Enter full name"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email address</label>
+
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="name@example.com"
+                                    maxlength="150"
+                                    required
+                                >
+                            </div>
+
+                            <button
+                                class="button button-primary form-submit"
+                                type="submit"
+                                id="submitButton"
+                            >
+                                <span>+</span>
+                                Add User
+                            </button>
+
+                        </form>
+
+                        <div class="form-note">
+                            <span>SECURE</span>
+                            Data is sent to the Node.js API and stored in
+                            private Amazon RDS MySQL.
+                        </div>
+
+                    </aside>
+
+                    <!-- USER TABLE -->
+
+                    <div class="users-card">
+
+                        <div class="users-header">
+
+                            <div>
+                                <span class="section-label">READ / UPDATE / DELETE</span>
+                                <h3>Application users</h3>
+                            </div>
+
+                            <div class="user-count">
+                                <span id="userCount">0</span>
+                                RECORDS
+                            </div>
+
+                        </div>
+
+                        <div class="table-wrapper">
+
+                            <table>
+
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>NAME</th>
+                                        <th>EMAIL</th>
+                                        <th>CREATED</th>
+                                        <th>ACTIONS</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="usersTableBody">
+
+                                    <tr>
+                                        <td colspan="5" class="table-loading">
+                                            Loading database records...
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <div class="empty-state hidden" id="emptyState">
+                            <div class="empty-icon">DB</div>
+                            <h4>No users found</h4>
+                            <p>
+                                Create your first user using the form.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =====================================================
+         EDIT USER MODAL
+    ====================================================== -->
+
+    <div class="modal-overlay hidden" id="editModal">
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+                    <span class="section-label">UPDATE RECORD</span>
+                    <h3>Edit user</h3>
+                </div>
+
+                <button
+                    class="modal-close"
+                    id="closeEditModal"
+                    type="button"
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <form id="editUserForm">
+
+                <input type="hidden" id="editUserId">
+
+                <div class="form-group">
+                    <label for="editName">Full name</label>
+
+                    <input
+                        id="editName"
+                        type="text"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="editEmail">Email address</label>
+
+                    <input
+                        id="editEmail"
+                        type="email"
+                        maxlength="150"
+                        required
+                    >
+                </div>
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="button button-secondary"
+                        id="cancelEdit"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="button button-primary"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         DELETE CONFIRMATION MODAL
+    ====================================================== -->
+
+    <div class="modal-overlay hidden" id="deleteModal">
+
+        <div class="modal delete-modal">
+
+            <div class="delete-warning">!</div>
+
+            <h3>Delete user?</h3>
+
+            <p>
+                This will permanently remove
+                <strong id="deleteUserName">this user</strong>
+                from the RDS database.
+            </p>
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="button button-secondary"
+                    id="cancelDelete"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="button button-danger"
+                    id="confirmDelete"
+                >
+                    Delete User
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <div class="container footer-content">
+
+            <div>
+                <strong>InfraCloud</strong>
+                <span>AWS Infrastructure & Deployment Platform</span>
+            </div>
+
+            <div class="footer-tech">
+                Terraform • GitHub Actions • Docker • EC2 • ECR • RDS
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="/script.js"></script>
+
+</body>
+</html>

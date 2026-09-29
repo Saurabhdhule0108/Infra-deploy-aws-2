@@ -1,12 +1,14 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const path = require("path");
 
 const app = express();
-
 const PORT = 8080;
 
-// Allow the application to read JSON request bodies
 app.use(express.json());
+
+// Serve frontend files from public/
+app.use(express.static(path.join(__dirname, "public")));
 
 // =========================================================
 // DATABASE CONNECTION POOL
@@ -18,14 +20,13 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
 
 // =========================================================
-// CREATE USERS TABLE
+// INITIALIZE DATABASE
 // =========================================================
 
 async function initializeDatabase() {
@@ -45,14 +46,6 @@ async function initializeDatabase() {
         console.error("Database initialization failed:", error.message);
     }
 }
-
-// =========================================================
-// HOME ROUTE
-// =========================================================
-
-app.get("/", (req, res) => {
-    res.send("Infra-deploy-aws-2 application is running with RDS MySQL!");
-});
 
 // =========================================================
 // DATABASE HEALTH CHECK
@@ -78,7 +71,6 @@ app.get("/db", async (req, res) => {
 
 // =========================================================
 // CREATE USER
-// POST /users
 // =========================================================
 
 app.post("/users", async (req, res) => {
@@ -93,15 +85,15 @@ app.post("/users", async (req, res) => {
 
         const [result] = await pool.execute(
             "INSERT INTO users (name, email) VALUES (?, ?)",
-            [name, email]
+            [name.trim(), email.trim()]
         );
 
         res.status(201).json({
             message: "User created successfully",
             user: {
                 id: result.insertId,
-                name,
-                email
+                name: name.trim(),
+                email: email.trim()
             }
         });
     } catch (error) {
@@ -121,7 +113,6 @@ app.post("/users", async (req, res) => {
 
 // =========================================================
 // GET ALL USERS
-// GET /users
 // =========================================================
 
 app.get("/users", async (req, res) => {
@@ -142,7 +133,6 @@ app.get("/users", async (req, res) => {
 
 // =========================================================
 // GET ONE USER
-// GET /users/:id
 // =========================================================
 
 app.get("/users/:id", async (req, res) => {
@@ -172,7 +162,6 @@ app.get("/users/:id", async (req, res) => {
 
 // =========================================================
 // UPDATE USER
-// PUT /users/:id
 // =========================================================
 
 app.put("/users/:id", async (req, res) => {
@@ -188,7 +177,7 @@ app.put("/users/:id", async (req, res) => {
 
         const [result] = await pool.execute(
             "UPDATE users SET name = ?, email = ? WHERE id = ?",
-            [name, email, id]
+            [name.trim(), email.trim(), id]
         );
 
         if (result.affectedRows === 0) {
@@ -201,8 +190,8 @@ app.put("/users/:id", async (req, res) => {
             message: "User updated successfully",
             user: {
                 id: Number(id),
-                name,
-                email
+                name: name.trim(),
+                email: email.trim()
             }
         });
     } catch (error) {
@@ -222,7 +211,6 @@ app.put("/users/:id", async (req, res) => {
 
 // =========================================================
 // DELETE USER
-// DELETE /users/:id
 // =========================================================
 
 app.delete("/users/:id", async (req, res) => {
@@ -259,6 +247,5 @@ app.delete("/users/:id", async (req, res) => {
 
 app.listen(PORT, async () => {
     console.log(`Application running on port ${PORT}`);
-
     await initializeDatabase();
 });
