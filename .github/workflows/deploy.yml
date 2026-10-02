@@ -79,10 +79,8 @@ jobs:
           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> "$GITHUB_ENV"
           echo "RDS_PORT=$RDS_PORT" >> "$GITHUB_ENV"
 
-          echo "App-1 instance ID received from Terraform."
-          echo "App-2 instance ID received from Terraform."
-          echo "RDS endpoint received from Terraform."
-          echo "RDS port received from Terraform."
+          echo "App-1 ID: $EC2_INSTANCE_ID"
+          echo "App-2 ID: $EC2_INSTANCE_2_ID"
 
       # =====================================================
       # START BOTH EC2 INSTANCES
@@ -97,7 +95,7 @@ jobs:
               --query "Reservations[0].Instances[0].State.Name" \
               --output text)
 
-            echo "Instance $INSTANCE_ID state: $EC2_STATE"
+            echo "$INSTANCE_ID state: $EC2_STATE"
 
             if [ "$EC2_STATE" = "stopped" ]; then
               echo "Starting $INSTANCE_ID..."
@@ -108,7 +106,7 @@ jobs:
               echo "$INSTANCE_ID is already running."
 
             else
-              echo "$INSTANCE_ID is currently in state: $EC2_STATE"
+              echo "$INSTANCE_ID is currently $EC2_STATE."
             fi
 
           done
@@ -117,7 +115,7 @@ jobs:
       # WAIT FOR BOTH EC2 INSTANCES
       # =====================================================
 
-      - name: Wait for both EC2 instances to be running
+      - name: Wait for both EC2 instances
         run: |
           echo "Waiting for App-1 and App-2..."
 
@@ -126,33 +124,37 @@ jobs:
             "$EC2_INSTANCE_ID" \
             "$EC2_INSTANCE_2_ID"
 
-          echo "Both EC2 instances are running."
-
-      - name: Wait for both EC2 status checks
-        run: |
-          echo "Waiting for EC2 status checks..."
-
           aws ec2 wait instance-status-ok \
             --instance-ids \
             "$EC2_INSTANCE_ID" \
             "$EC2_INSTANCE_2_ID"
 
-          echo "Both EC2 instances passed status checks."
+          echo "Both EC2 instances are healthy."
 
       # =====================================================
-      # DISCOVER CURRENT PUBLIC IPS
+      # DISCOVER PUBLIC + PRIVATE IPS
       # =====================================================
 
-      - name: Get current EC2 public IPs
+      - name: Get EC2 network information
         run: |
           EC2_PUBLIC_IP=$(aws ec2 describe-instances \
             --instance-ids "$EC2_INSTANCE_ID" \
             --query "Reservations[0].Instances[0].PublicIpAddress" \
             --output text)
 
+          EC2_PRIVATE_IP=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --query "Reservations[0].Instances[0].PrivateIpAddress" \
+            --output text)
+
           EC2_PUBLIC_IP_2=$(aws ec2 describe-instances \
             --instance-ids "$EC2_INSTANCE_2_ID" \
             --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text)
+
+          EC2_PRIVATE_IP_2=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_2_ID" \
+            --query "Reservations[0].Instances[0].PrivateIpAddress" \
             --output text)
 
           if [ -z "$EC2_PUBLIC_IP" ] || [ "$EC2_PUBLIC_IP" = "None" ]; then
@@ -166,13 +168,18 @@ jobs:
           fi
 
           echo "EC2_PUBLIC_IP=$EC2_PUBLIC_IP" >> "$GITHUB_ENV"
+          echo "EC2_PRIVATE_IP=$EC2_PRIVATE_IP" >> "$GITHUB_ENV"
           echo "EC2_PUBLIC_IP_2=$EC2_PUBLIC_IP_2" >> "$GITHUB_ENV"
+          echo "EC2_PRIVATE_IP_2=$EC2_PRIVATE_IP_2" >> "$GITHUB_ENV"
 
-          echo "App-1 public IP: $EC2_PUBLIC_IP"
-          echo "App-2 public IP: $EC2_PUBLIC_IP_2"
+          echo "App-1 public IP:  $EC2_PUBLIC_IP"
+          echo "App-1 private IP: $EC2_PRIVATE_IP"
+
+          echo "App-2 public IP:  $EC2_PUBLIC_IP_2"
+          echo "App-2 private IP: $EC2_PRIVATE_IP_2"
 
       # =====================================================
-      # SSH
+      # SSH KEY
       # =====================================================
 
       - name: Prepare SSH key
@@ -181,14 +188,14 @@ jobs:
           chmod 600 ec2-key.pem
 
       # =====================================================
-      # WAIT FOR DOCKER ON BOTH SERVERS
+      # WAIT FOR DOCKER
       # =====================================================
 
       - name: Wait for Docker on both EC2 instances
         run: |
           for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
 
-            echo "Waiting for SSH and Docker on $SERVER_IP..."
+            echo "Waiting for Docker on $SERVER_IP..."
 
             READY=false
 
@@ -201,25 +208,25 @@ jobs:
                 ubuntu@"$SERVER_IP" \
                 "sudo docker info >/dev/null 2>&1"; then
 
-                echo "Docker is ready on $SERVER_IP."
+                echo "Docker ready on $SERVER_IP."
                 READY=true
                 break
               fi
 
-              echo "Docker not ready on $SERVER_IP. Waiting 10 seconds..."
+              echo "Waiting 10 seconds..."
               sleep 10
 
             done
 
             if [ "$READY" != "true" ]; then
-              echo "ERROR: Docker did not become ready on $SERVER_IP."
+              echo "ERROR: Docker not ready on $SERVER_IP."
               exit 1
             fi
 
           done
 
       # =====================================================
-      # BUILD AND PUSH IMAGE TO ECR
+      # BUILD + PUSH IMAGE
       # =====================================================
 
       - name: Login to Amazon ECR
@@ -248,7 +255,7 @@ jobs:
             659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
 
       # =====================================================
-      # LOGIN BOTH EC2 SERVERS TO ECR
+      # LOGIN BOTH SERVERS TO ECR
       # =====================================================
 
       - name: Login to ECR on both EC2 instances
@@ -270,7 +277,7 @@ jobs:
           done
 
       # =====================================================
-      # DEPLOY APPLICATION TO BOTH SERVERS
+      # DEPLOY NODE APPLICATION TO BOTH SERVERS
       # =====================================================
 
       - name: Deploy application to both EC2 instances
@@ -279,7 +286,7 @@ jobs:
         run: |
           for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
 
-            echo "Deploying application to $SERVER_IP..."
+            echo "Deploying Node.js application to $SERVER_IP..."
 
             ssh \
               -o StrictHostKeyChecking=no \
@@ -292,7 +299,7 @@ jobs:
                  -d \
                  --restart unless-stopped \
                  --name infra-deploy-aws-app \
-                 -p 80:8080 \
+                 -p 8080:8080 \
                  -e DB_HOST='$RDS_ENDPOINT' \
                  -e DB_PORT='$RDS_PORT' \
                  -e DB_USER='adminuser' \
@@ -303,105 +310,193 @@ jobs:
           done
 
       # =====================================================
-      # VERIFY CONTAINERS
+      # VERIFY NODE APPLICATIONS DIRECTLY
       # =====================================================
 
-      - name: Verify containers on both EC2 instances
+      - name: Verify Node.js application on App-1
         run: |
-          for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "for i in {1..12}; do
+               if curl --fail --silent http://127.0.0.1:8080 >/dev/null; then
+                 echo 'App-1 Node.js application is healthy.'
+                 exit 0
+               fi
+               echo 'Waiting for App-1 application...'
+               sleep 5
+             done
+             exit 1"
 
-            echo "Checking container on $SERVER_IP..."
-
-            ssh \
-              -o StrictHostKeyChecking=no \
-              -i ec2-key.pem \
-              ubuntu@"$SERVER_IP" \
-              "sudo docker ps --filter name=infra-deploy-aws-app"
-
-          done
-
-      # =====================================================
-      # VERIFY APPLICATIONS
-      # =====================================================
-
-      - name: Verify application on both EC2 instances
+      - name: Verify Node.js application on App-2
         run: |
-          for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP_2" \
+            "for i in {1..12}; do
+               if curl --fail --silent http://127.0.0.1:8080 >/dev/null; then
+                 echo 'App-2 Node.js application is healthy.'
+                 exit 0
+               fi
+               echo 'Waiting for App-2 application...'
+               sleep 5
+             done
+             exit 1"
 
-            echo "Checking application at http://$SERVER_IP"
+      # =====================================================
+      # VERIFY APP-1 CAN REACH APP-2 PRIVATELY
+      # =====================================================
 
-            SUCCESS=false
+      - name: Verify private connection from App-1 to App-2
+        run: |
+          echo "Testing App-1 -> App-2 using private IP..."
 
-            for i in {1..12}; do
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "curl \
+              --fail \
+              --silent \
+              --show-error \
+              http://$EC2_PRIVATE_IP_2:8080 >/dev/null"
 
-              if curl \
-                --fail \
-                --silent \
-                --show-error \
-                "http://$SERVER_IP" > /dev/null; then
+          echo "Private App-1 to App-2 connection successful."
 
-                echo "Application verification successful on $SERVER_IP."
-                SUCCESS=true
-                break
-              fi
+      # =====================================================
+      # INSTALL NGINX ON APP-1
+      # =====================================================
 
-              echo "Application not ready on $SERVER_IP. Waiting 5 seconds..."
-              sleep 5
+      - name: Install Nginx on App-1
+        run: |
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "sudo apt-get update -y && \
+             sudo apt-get install -y nginx"
 
-            done
+      # =====================================================
+      # CONFIGURE NGINX ACTIVE-PASSIVE
+      # =====================================================
 
-            if [ "$SUCCESS" != "true" ]; then
-              echo "ERROR: Application verification failed on $SERVER_IP."
-              exit 1
+      - name: Configure Nginx active-passive
+        run: |
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "sudo tee /etc/nginx/sites-available/infra-deploy-aws-app > /dev/null <<'NGINXEOF'
+          upstream application_backend {
+              server 127.0.0.1:8080 max_fails=2 fail_timeout=10s;
+              server $EC2_PRIVATE_IP_2:8080 backup;
+          }
+
+          server {
+              listen 80 default_server;
+              listen [::]:80 default_server;
+
+              server_name _;
+
+              location / {
+                  proxy_pass http://application_backend;
+
+                  proxy_http_version 1.1;
+
+                  proxy_set_header Host \$host;
+                  proxy_set_header X-Real-IP \$remote_addr;
+                  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto \$scheme;
+
+                  proxy_connect_timeout 5s;
+                  proxy_read_timeout 60s;
+                  proxy_send_timeout 60s;
+              }
+          }
+          NGINXEOF
+
+          sudo rm -f /etc/nginx/sites-enabled/default
+
+          sudo ln -sfn \
+            /etc/nginx/sites-available/infra-deploy-aws-app \
+            /etc/nginx/sites-enabled/infra-deploy-aws-app
+
+          sudo nginx -t
+
+          sudo systemctl enable nginx
+          sudo systemctl restart nginx"
+
+      # =====================================================
+      # VERIFY NGINX
+      # =====================================================
+
+      - name: Verify Nginx
+        run: |
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "sudo systemctl is-active nginx && sudo nginx -t"
+
+      # =====================================================
+      # VERIFY PUBLIC APPLICATION THROUGH NGINX
+      # =====================================================
+
+      - name: Verify application through Nginx
+        run: |
+          echo "Checking application through Nginx:"
+          echo "http://$EC2_PUBLIC_IP"
+
+          for i in {1..12}; do
+
+            if curl \
+              --fail \
+              --silent \
+              --show-error \
+              "http://$EC2_PUBLIC_IP" > /dev/null; then
+
+              echo "Nginx application verification successful."
+              exit 0
             fi
 
+            echo "Application not ready through Nginx. Waiting 5 seconds..."
+            sleep 5
+
           done
 
+          echo "ERROR: Nginx application verification failed."
+          exit 1
+
       # =====================================================
-      # VERIFY RDS CONNECTION FROM BOTH SERVERS
+      # VERIFY RDS THROUGH NGINX
       # =====================================================
 
-      - name: Verify RDS connection from both EC2 instances
+      - name: Verify RDS connection through Nginx
         run: |
-          for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
+          echo "Testing application -> RDS through Nginx..."
 
-            echo "Checking RDS connection through $SERVER_IP..."
+          for i in {1..12}; do
 
-            SUCCESS=false
+            if curl \
+              --fail \
+              --silent \
+              --show-error \
+              "http://$EC2_PUBLIC_IP/db"; then
 
-            for i in {1..12}; do
-
-              if curl \
-                --fail \
-                --silent \
-                --show-error \
-                "http://$SERVER_IP/db"; then
-
-                echo ""
-                echo "RDS verification successful through $SERVER_IP."
-                SUCCESS=true
-                break
-              fi
-
-              echo "Database connection not ready on $SERVER_IP. Waiting 5 seconds..."
-              sleep 5
-
-            done
-
-            if [ "$SUCCESS" != "true" ]; then
-
-              echo "ERROR: RDS verification failed through $SERVER_IP."
-
-              ssh \
-                -o StrictHostKeyChecking=no \
-                -i ec2-key.pem \
-                ubuntu@"$SERVER_IP" \
-                "sudo docker logs infra-deploy-aws-app"
-
-              exit 1
+              echo ""
+              echo "RDS verification through Nginx successful."
+              exit 0
             fi
 
+            echo "RDS connection not ready. Waiting 5 seconds..."
+            sleep 5
+
           done
+
+          echo "ERROR: RDS verification failed."
+          exit 1
 
       # =====================================================
       # STOP BOTH EC2 INSTANCES ONLY AFTER SUCCESS
@@ -409,7 +504,7 @@ jobs:
 
       - name: Stop both EC2 instances after successful deployment
         run: |
-          echo "All deployment and verification steps completed successfully."
+          echo "All deployment and Nginx verification steps completed successfully."
 
           echo "Stopping App-1: $EC2_INSTANCE_ID"
           echo "Stopping App-2: $EC2_INSTANCE_2_ID"
