@@ -167,6 +167,7 @@ resource "aws_security_group" "ec2" {
   description = "Security group for infrastructure project EC2"
   vpc_id      = aws_vpc.main.id
 
+  # Public HTTP traffic reaches Nginx on port 80.
   ingress {
     description = "HTTP"
     from_port   = 80
@@ -175,12 +176,23 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # GitHub Actions connects through SSH for deployment.
   ingress {
     description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Internal application traffic between EC2 application servers.
+  # Source is this same security group, NOT the internet.
+  ingress {
+    description = "Node.js between application servers"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    self        = true
   }
 
   egress {
