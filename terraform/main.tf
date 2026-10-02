@@ -1,3 +1,7 @@
+# ============================================================
+# TERRAFORM CONFIGURATION
+# ============================================================
+
 terraform {
   required_providers {
     aws = {
@@ -14,13 +18,19 @@ terraform {
   }
 }
 
+
+# ============================================================
+# AWS PROVIDER
+# ============================================================
+
 provider "aws" {
   region = var.aws_region
 }
 
-# =========================================================
+
+# ============================================================
 # VPC
-# =========================================================
+# ============================================================
 
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
@@ -32,9 +42,10 @@ resource "aws_vpc" "main" {
   }
 }
 
-# =========================================================
-# PUBLIC SUBNET - EC2
-# =========================================================
+
+# ============================================================
+# PUBLIC APPLICATION SUBNET 1 - AZ 1
+# ============================================================
 
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
@@ -43,13 +54,30 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "infra-deploy-aws-public-subnet"
+    Name = "infra-deploy-aws-public-subnet-1"
   }
 }
 
-# =========================================================
-# PRIVATE DATABASE SUBNET 1
-# =========================================================
+
+# ============================================================
+# PUBLIC APPLICATION SUBNET 2 - AZ 2
+# ============================================================
+
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.4.0/24"
+  availability_zone       = "ap-south-1b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "infra-deploy-aws-public-subnet-2"
+  }
+}
+
+
+# ============================================================
+# PRIVATE DATABASE SUBNET 1 - AZ 1
+# ============================================================
 
 resource "aws_subnet" "db_private_1" {
   vpc_id                  = aws_vpc.main.id
@@ -62,9 +90,10 @@ resource "aws_subnet" "db_private_1" {
   }
 }
 
-# =========================================================
-# PRIVATE DATABASE SUBNET 2
-# =========================================================
+
+# ============================================================
+# PRIVATE DATABASE SUBNET 2 - AZ 2
+# ============================================================
 
 resource "aws_subnet" "db_private_2" {
   vpc_id                  = aws_vpc.main.id
@@ -77,9 +106,10 @@ resource "aws_subnet" "db_private_2" {
   }
 }
 
-# =========================================================
+
+# ============================================================
 # INTERNET GATEWAY
-# =========================================================
+# ============================================================
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
@@ -89,9 +119,10 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# =========================================================
+
+# ============================================================
 # PUBLIC ROUTE TABLE
-# =========================================================
+# ============================================================
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
@@ -106,18 +137,34 @@ resource "aws_route_table" "public" {
   }
 }
 
+
+# ============================================================
+# PUBLIC SUBNET 1 ROUTE TABLE ASSOCIATION
+# ============================================================
+
 resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
 
-# =========================================================
+
+# ============================================================
+# PUBLIC SUBNET 2 ROUTE TABLE ASSOCIATION
+# ============================================================
+
+resource "aws_route_table_association" "public_2" {
+  subnet_id      = aws_subnet.public_2.id
+  route_table_id = aws_route_table.public.id
+}
+
+
+# ============================================================
 # EC2 SECURITY GROUP
-# =========================================================
+# ============================================================
 
 resource "aws_security_group" "ec2" {
   name        = "infra-deploy-aws-ec2-sg"
-  description = "Security group for infrastructure project EC2"
+  description = "Security group for infrastructure project application servers"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -148,9 +195,10 @@ resource "aws_security_group" "ec2" {
   }
 }
 
-# =========================================================
-# EC2 INSTANCE
-# =========================================================
+
+# ============================================================
+# APPLICATION EC2 INSTANCE 1
+# ============================================================
 
 resource "aws_instance" "app" {
   ami                    = var.ami_id
@@ -160,27 +208,25 @@ resource "aws_instance" "app" {
   key_name               = var.key_name
 
   user_data = <<-EOF
-    #!/bin/bash
-
-    apt-get update -y
-    apt-get install -y docker.io
-
-    systemctl enable docker
-    systemctl start docker
-
-    usermod -aG docker ubuntu
-  EOF
+              #!/bin/bash
+              apt-get update -y
+              apt-get install -y docker.io
+              systemctl enable docker
+              systemctl start docker
+              usermod -aG docker ubuntu
+              EOF
 
   user_data_replace_on_change = false
 
   tags = {
-    Name = "infra-deploy-aws-app"
+    Name = "infra-deploy-aws-app-1"
   }
 }
 
-# =========================================================
+
+# ============================================================
 # ECR REPOSITORY
-# =========================================================
+# ============================================================
 
 resource "aws_ecr_repository" "app" {
   name                 = "infra-deploy-aws-app"
@@ -195,16 +241,22 @@ resource "aws_ecr_repository" "app" {
   }
 }
 
-# =========================================================
+
+# ============================================================
 # OUTPUTS
-# =========================================================
+# ============================================================
 
 output "instance_id" {
-  description = "EC2 instance ID"
+  description = "Application EC2 instance 1 ID"
   value       = aws_instance.app.id
 }
 
 output "instance_public_ip" {
-  description = "Current public IP address of the EC2 instance"
+  description = "Application EC2 instance 1 public IP"
   value       = aws_instance.app.public_ip
+}
+
+output "public_subnet_2_id" {
+  description = "Public application subnet 2 ID"
+  value       = aws_subnet.public_2.id
 }
