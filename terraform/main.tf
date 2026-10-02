@@ -225,6 +225,34 @@ resource "aws_instance" "app" {
 
 
 # ============================================================
+# APPLICATION EC2 INSTANCE 2
+# ============================================================
+
+resource "aws_instance" "app_2" {
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.public_2.id
+  vpc_security_group_ids = [aws_security_group.ec2.id]
+  key_name               = var.key_name
+
+  user_data = <<-EOF
+              #!/bin/bash
+              apt-get update -y
+              apt-get install -y docker.io
+              systemctl enable docker
+              systemctl start docker
+              usermod -aG docker ubuntu
+              EOF
+
+  user_data_replace_on_change = false
+
+  tags = {
+    Name = "infra-deploy-aws-app-2"
+  }
+}
+
+
+# ============================================================
 # ECR REPOSITORY
 # ============================================================
 
@@ -254,6 +282,16 @@ output "instance_id" {
 output "instance_public_ip" {
   description = "Application EC2 instance 1 public IP"
   value       = aws_instance.app.public_ip
+}
+
+output "instance_2_id" {
+  description = "Application EC2 instance 2 ID"
+  value       = aws_instance.app_2.id
+}
+
+output "instance_2_public_ip" {
+  description = "Application EC2 instance 2 public IP"
+  value       = aws_instance.app_2.public_ip
 }
 
 output "public_subnet_2_id" {
