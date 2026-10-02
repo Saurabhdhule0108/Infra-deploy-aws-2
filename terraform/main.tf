@@ -164,7 +164,7 @@ resource "aws_route_table_association" "public_2" {
 
 resource "aws_security_group" "ec2" {
   name        = "infra-deploy-aws-ec2-sg"
-  description = "Security group for infrastructure project application servers"
+  description = "Security group for infrastructure project EC2"
   vpc_id      = aws_vpc.main.id
 
   ingress {
