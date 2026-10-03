@@ -1,0 +1,517 @@
+name: Active-Passive Failover Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  failover-test:
+    name: Test Nginx Active-Passive Failover
+    runs-on: ubuntu-latest
+
+    steps:
+      # =====================================================
+      # SOURCE CODE
+      # =====================================================
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # =====================================================
+      # AWS AUTHENTICATION USING OIDC
+      # =====================================================
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ap-south-1
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      # =====================================================
+      # TERRAFORM
+      # We only use Terraform OUTPUTS here.
+      # We do NOT run plan/apply.
+      # =====================================================
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Get existing infrastructure information
+        working-directory: terraform
+        run: |
+          EC2_INSTANCE_ID=$(terraform output -raw instance_id)
+          EC2_INSTANCE_2_ID=$(terraform output -raw instance_2_id)
+
+          echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> "$GITHUB_ENV"
+          echo "EC2_INSTANCE_2_ID=$EC2_INSTANCE_2_ID" >> "$GITHUB_ENV"
+
+          echo "Primary App-1 ID: $EC2_INSTANCE_ID"
+          echo "Backup App-2 ID: $EC2_INSTANCE_2_ID"
+
+      # =====================================================
+      # START BOTH EC2 INSTANCES
+      # =====================================================
+
+      - name: Start both EC2 instances if stopped
+        run: |
+          for INSTANCE_ID in "$EC2_INSTANCE_ID" "$EC2_INSTANCE_2_ID"; do
+
+            STATE=$(aws ec2 describe-instances \
+              --instance-ids "$INSTANCE_ID" \
+              --query "Reservations[0].Instances[0].State.Name" \
+              --output text)
+
+            echo "$INSTANCE_ID current state: $STATE"
+
+            if [ "$STATE" = "stopped" ]; then
+
+              echo "Starting $INSTANCE_ID..."
+
+              aws ec2 start-instances \
+                --instance-ids "$INSTANCE_ID"
+
+            elif [ "$STATE" = "running" ]; then
+
+              echo "$INSTANCE_ID is already running."
+
+            else
+
+              echo "ERROR: $INSTANCE_ID is currently in state: $STATE"
+              exit 1
+
+            fi
+
+          done
+
+      # =====================================================
+      # WAIT UNTIL BOTH SERVERS ARE HEALTHY
+      # =====================================================
+
+      - name: Wait for both EC2 instances
+        run: |
+          echo "Waiting for both EC2 instances to enter running state..."
+
+          aws ec2 wait instance-running \
+            --instance-ids \
+            "$EC2_INSTANCE_ID" \
+            "$EC2_INSTANCE_2_ID"
+
+          echo "Waiting for AWS instance status checks..."
+
+          aws ec2 wait instance-status-ok \
+            --instance-ids \
+            "$EC2_INSTANCE_ID" \
+            "$EC2_INSTANCE_2_ID"
+
+          echo "Both EC2 instances are healthy."
+
+      # =====================================================
+      # GET FRESH PUBLIC + PRIVATE IP ADDRESSES
+      # Public IP can change after stop/start.
+      # =====================================================
+
+      - name: Get current EC2 IP addresses
+        run: |
+          EC2_PUBLIC_IP=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text)
+
+          EC2_PRIVATE_IP=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --query "Reservations[0].Instances[0].PrivateIpAddress" \
+            --output text)
+
+          EC2_PUBLIC_IP_2=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_2_ID" \
+            --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text)
+
+          EC2_PRIVATE_IP_2=$(aws ec2 describe-instances \
+            --instance-ids "$EC2_INSTANCE_2_ID" \
+            --query "Reservations[0].Instances[0].PrivateIpAddress" \
+            --output text)
+
+          echo "EC2_PUBLIC_IP=$EC2_PUBLIC_IP" >> "$GITHUB_ENV"
+          echo "EC2_PRIVATE_IP=$EC2_PRIVATE_IP" >> "$GITHUB_ENV"
+
+          echo "EC2_PUBLIC_IP_2=$EC2_PUBLIC_IP_2" >> "$GITHUB_ENV"
+          echo "EC2_PRIVATE_IP_2=$EC2_PRIVATE_IP_2" >> "$GITHUB_ENV"
+
+          echo "=========================================="
+          echo "PRIMARY APP-1"
+          echo "Public IP : $EC2_PUBLIC_IP"
+          echo "Private IP: $EC2_PRIVATE_IP"
+          echo ""
+          echo "BACKUP APP-2"
+          echo "Public IP : $EC2_PUBLIC_IP_2"
+          echo "Private IP: $EC2_PRIVATE_IP_2"
+          echo "=========================================="
+
+      # =====================================================
+      # SSH KEY
+      # =====================================================
+
+      - name: Prepare SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
+          chmod 600 ec2-key.pem
+
+      # =====================================================
+      # WAIT FOR SSH
+      # =====================================================
+
+      - name: Wait for SSH on both servers
+        run: |
+          for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
+
+            echo "Waiting for SSH on $SERVER_IP..."
+
+            READY=false
+
+            for i in {1..30}; do
+
+              if ssh \
+                -o StrictHostKeyChecking=no \
+                -o ConnectTimeout=10 \
+                -i ec2-key.pem \
+                ubuntu@"$SERVER_IP" \
+                "echo SSH_READY" >/dev/null 2>&1; then
+
+                echo "SSH ready on $SERVER_IP."
+                READY=true
+                break
+
+              fi
+
+              echo "Waiting 10 seconds..."
+              sleep 10
+
+            done
+
+            if [ "$READY" != "true" ]; then
+              echo "ERROR: SSH not available on $SERVER_IP."
+              exit 1
+            fi
+
+          done
+
+      # =====================================================
+      # CHECK APPLICATION CONTAINERS
+      # =====================================================
+
+      - name: Verify both application containers are running
+        run: |
+          echo "Checking App-1 container..."
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "sudo docker ps \
+              --filter name=infra-deploy-aws-app \
+              --filter status=running \
+              --format '{{.Names}}' | grep -x infra-deploy-aws-app"
+
+          echo "App-1 container is running."
+
+          echo "Checking App-2 container..."
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP_2" \
+            "sudo docker ps \
+              --filter name=infra-deploy-aws-app \
+              --filter status=running \
+              --format '{{.Names}}' | grep -x infra-deploy-aws-app"
+
+          echo "App-2 container is running."
+
+      # =====================================================
+      # CHECK NGINX
+      # =====================================================
+
+      - name: Verify Nginx on App-1
+        run: |
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "sudo nginx -t && sudo systemctl is-active nginx"
+
+          echo "Nginx is healthy on App-1."
+
+      # =====================================================
+      # PHASE 1 - NORMAL PRIMARY OPERATION
+      # =====================================================
+
+      - name: Phase 1 - Verify primary application
+        run: |
+          echo "=========================================="
+          echo "PHASE 1 - NORMAL OPERATION"
+          echo "=========================================="
+          echo ""
+          echo "Expected path:"
+          echo "Nginx -> App-1 Node.js container"
+          echo ""
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            "http://$EC2_PUBLIC_IP" > /dev/null
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            "http://$EC2_PUBLIC_IP/db"
+
+          echo ""
+          echo "PRIMARY APPLICATION IS HEALTHY."
+          echo "=========================================="
+
+      # =====================================================
+      # VERIFY BACKUP IS REACHABLE BEFORE FAILURE
+      # =====================================================
+
+      - name: Verify App-2 is reachable from App-1
+        run: |
+          echo "Testing private connection:"
+          echo "App-1 -> App-2:$EC2_PRIVATE_IP_2:8080"
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "curl \
+              --fail \
+              --silent \
+              --show-error \
+              http://$EC2_PRIVATE_IP_2:8080 > /dev/null"
+
+          echo "Backup App-2 is reachable."
+
+      # =====================================================
+      # PHASE 2 - SIMULATE PRIMARY APPLICATION FAILURE
+      # IMPORTANT:
+      # EC2 stays running.
+      # Nginx stays running.
+      # ONLY the App-1 Node.js container is stopped.
+      # =====================================================
+
+      - name: Phase 2 - Stop primary App-1 container
+        run: |
+          echo "=========================================="
+          echo "PHASE 2 - SIMULATING PRIMARY FAILURE"
+          echo "=========================================="
+          echo ""
+          echo "Stopping ONLY the App-1 application container..."
+          echo "Nginx will remain running."
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "sudo docker stop infra-deploy-aws-app"
+
+          echo ""
+          echo "App-1 application container stopped intentionally."
+
+      # =====================================================
+      # CONFIRM PRIMARY REALLY FAILED
+      # =====================================================
+
+      - name: Confirm primary application is unavailable
+        run: |
+          echo "Checking App-1 local Node.js port..."
+
+          if ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "curl \
+              --fail \
+              --silent \
+              --connect-timeout 3 \
+              http://127.0.0.1:8080 > /dev/null"; then
+
+            echo "ERROR: Primary application is still responding."
+            exit 1
+
+          else
+
+            echo "Confirmed:"
+            echo "App-1 Node.js application is unavailable."
+
+          fi
+
+      # =====================================================
+      # PHASE 3 - TEST NGINX FAILOVER
+      # =====================================================
+
+      - name: Phase 3 - Verify failover to App-2
+        run: |
+          echo "=========================================="
+          echo "PHASE 3 - TESTING FAILOVER"
+          echo "=========================================="
+          echo ""
+          echo "Requesting the SAME App-1 public URL:"
+          echo "http://$EC2_PUBLIC_IP"
+          echo ""
+          echo "App-1 Node.js is DOWN."
+          echo "Nginx should use App-2 backup."
+
+          SUCCESS=false
+
+          for i in {1..10}; do
+
+            if curl \
+              --fail \
+              --silent \
+              --show-error \
+              "http://$EC2_PUBLIC_IP" > /dev/null; then
+
+              SUCCESS=true
+              break
+
+            fi
+
+            echo "Waiting for Nginx failover..."
+            sleep 3
+
+          done
+
+          if [ "$SUCCESS" != "true" ]; then
+
+            echo "ERROR: Application unavailable after primary failure."
+            exit 1
+
+          fi
+
+          echo ""
+          echo "Website remained available."
+          echo "FAILOVER TO APP-2 SUCCESSFUL."
+          echo "=========================================="
+
+      # =====================================================
+      # TEST DATABASE DURING FAILOVER
+      # This proves App-2 can also communicate with RDS.
+      # =====================================================
+
+      - name: Verify database during failover
+        run: |
+          echo "Testing /db while App-1 application is DOWN..."
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            "http://$EC2_PUBLIC_IP/db"
+
+          echo ""
+          echo "Database request succeeded during failover."
+          echo "App-2 -> RDS communication is working."
+
+      # =====================================================
+      # PHASE 4 - RESTORE PRIMARY
+      # =====================================================
+
+      - name: Phase 4 - Restore App-1 application
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "PHASE 4 - RESTORING PRIMARY"
+          echo "=========================================="
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ec2-key.pem \
+            ubuntu@"$EC2_PUBLIC_IP" \
+            "sudo docker start infra-deploy-aws-app"
+
+          echo "App-1 container start requested."
+
+      # =====================================================
+      # VERIFY PRIMARY RECOVERY
+      # =====================================================
+
+      - name: Verify App-1 recovery
+        run: |
+          echo "Waiting for App-1 Node.js application..."
+
+          RECOVERED=false
+
+          for i in {1..12}; do
+
+            if ssh \
+              -o StrictHostKeyChecking=no \
+              -i ec2-key.pem \
+              ubuntu@"$EC2_PUBLIC_IP" \
+              "curl \
+                --fail \
+                --silent \
+                http://127.0.0.1:8080 > /dev/null"; then
+
+              RECOVERED=true
+              break
+
+            fi
+
+            echo "Waiting 5 seconds..."
+            sleep 5
+
+          done
+
+          if [ "$RECOVERED" != "true" ]; then
+
+            echo "ERROR: App-1 did not recover."
+            exit 1
+
+          fi
+
+          echo "App-1 application recovered successfully."
+
+      # =====================================================
+      # FINAL VERIFICATION
+      # =====================================================
+
+      - name: Final application verification
+        run: |
+          echo "Testing final public application..."
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            "http://$EC2_PUBLIC_IP" > /dev/null
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            "http://$EC2_PUBLIC_IP/db"
+
+          echo ""
+          echo "=========================================="
+          echo "ACTIVE-PASSIVE FAILOVER TEST PASSED"
+          echo "=========================================="
+          echo ""
+          echo "Primary App-1     : RECOVERED"
+          echo "Backup App-2      : HEALTHY"
+          echo "Nginx             : HEALTHY"
+          echo "RDS               : HEALTHY"
+          echo ""
+          echo "Both EC2 instances will remain RUNNING."
+          echo "=========================================="
