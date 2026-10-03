@@ -12,7 +12,12 @@ jobs:
     name: Test Nginx Active-Passive Failover
     runs-on: ubuntu-latest
 
+    env:
+      AWS_REGION: ap-south-1
+      RDS_IDENTIFIER: infra-deploy-aws-mysql
+
     steps:
+
       # =====================================================
       # SOURCE CODE
       # =====================================================
@@ -21,7 +26,7 @@ jobs:
         uses: actions/checkout@v6
 
       # =====================================================
-      # AWS AUTHENTICATION USING OIDC
+      # AWS OIDC AUTHENTICATION
       # =====================================================
 
       - name: Configure AWS credentials
@@ -34,9 +39,7 @@ jobs:
         run: aws sts get-caller-identity
 
       # =====================================================
-      # TERRAFORM
-      # We only use Terraform OUTPUTS here.
-      # We do NOT run plan/apply.
+      # GET EXISTING INFRASTRUCTURE INFORMATION
       # =====================================================
 
       - name: Setup Terraform
@@ -57,6 +60,77 @@ jobs:
 
           echo "Primary App-1 ID: $EC2_INSTANCE_ID"
           echo "Backup App-2 ID: $EC2_INSTANCE_2_ID"
+
+      # =====================================================
+      # RDS LIFECYCLE
+      # =====================================================
+
+      - name: Check and start RDS if required
+        run: |
+          echo "Checking RDS state..."
+
+          RDS_STATUS=$(aws rds describe-db-instances \
+            --db-instance-identifier "$RDS_IDENTIFIER" \
+            --query "DBInstances[0].DBInstanceStatus" \
+            --output text)
+
+          echo "Current RDS state: $RDS_STATUS"
+
+          if [ "$RDS_STATUS" = "available" ]; then
+
+            echo "RDS is already available."
+
+          elif [ "$RDS_STATUS" = "stopped" ]; then
+
+            echo "RDS is stopped. Starting database..."
+
+            aws rds start-db-instance \
+              --db-instance-identifier "$RDS_IDENTIFIER"
+
+          elif [ "$RDS_STATUS" = "starting" ]; then
+
+            echo "RDS is already starting."
+
+          elif [ "$RDS_STATUS" = "stopping" ]; then
+
+            echo "RDS is currently stopping."
+            echo "Waiting until it is completely stopped..."
+
+            aws rds wait db-instance-stopped \
+              --db-instance-identifier "$RDS_IDENTIFIER"
+
+            echo "Starting RDS..."
+
+            aws rds start-db-instance \
+              --db-instance-identifier "$RDS_IDENTIFIER"
+
+          else
+
+            echo "RDS is currently in state: $RDS_STATUS"
+            echo "Waiting for it to become available."
+
+          fi
+
+      - name: Wait for RDS to become available
+        run: |
+          echo "Waiting for RDS..."
+
+          aws rds wait db-instance-available \
+            --db-instance-identifier "$RDS_IDENTIFIER"
+
+          RDS_STATUS=$(aws rds describe-db-instances \
+            --db-instance-identifier "$RDS_IDENTIFIER" \
+            --query "DBInstances[0].DBInstanceStatus" \
+            --output text)
+
+          echo "RDS final state: $RDS_STATUS"
+
+          if [ "$RDS_STATUS" != "available" ]; then
+            echo "ERROR: RDS is not available."
+            exit 1
+          fi
+
+          echo "RDS is ready for the failover test."
 
       # =====================================================
       # START BOTH EC2 INSTANCES
@@ -86,27 +160,19 @@ jobs:
 
             else
 
-              echo "ERROR: $INSTANCE_ID is currently in state: $STATE"
+              echo "ERROR: $INSTANCE_ID is currently $STATE"
               exit 1
 
             fi
 
           done
 
-      # =====================================================
-      # WAIT UNTIL BOTH SERVERS ARE HEALTHY
-      # =====================================================
-
       - name: Wait for both EC2 instances
         run: |
-          echo "Waiting for both EC2 instances to enter running state..."
-
           aws ec2 wait instance-running \
             --instance-ids \
             "$EC2_INSTANCE_ID" \
             "$EC2_INSTANCE_2_ID"
-
-          echo "Waiting for AWS instance status checks..."
 
           aws ec2 wait instance-status-ok \
             --instance-ids \
@@ -116,8 +182,7 @@ jobs:
           echo "Both EC2 instances are healthy."
 
       # =====================================================
-      # GET FRESH PUBLIC + PRIVATE IP ADDRESSES
-      # Public IP can change after stop/start.
+      # CURRENT IP ADDRESSES
       # =====================================================
 
       - name: Get current EC2 IP addresses
@@ -159,7 +224,7 @@ jobs:
           echo "=========================================="
 
       # =====================================================
-      # SSH KEY
+      # SSH
       # =====================================================
 
       - name: Prepare SSH key
@@ -167,17 +232,13 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
           chmod 600 ec2-key.pem
 
-      # =====================================================
-      # WAIT FOR SSH
-      # =====================================================
-
       - name: Wait for SSH on both servers
         run: |
           for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
 
-            echo "Waiting for SSH on $SERVER_IP..."
-
             READY=false
+
+            echo "Waiting for SSH on $SERVER_IP..."
 
             for i in {1..30}; do
 
@@ -188,13 +249,12 @@ jobs:
                 ubuntu@"$SERVER_IP" \
                 "echo SSH_READY" >/dev/null 2>&1; then
 
-                echo "SSH ready on $SERVER_IP."
                 READY=true
+                echo "SSH ready on $SERVER_IP."
                 break
 
               fi
 
-              echo "Waiting 10 seconds..."
               sleep 10
 
             done
@@ -207,7 +267,7 @@ jobs:
           done
 
       # =====================================================
-      # CHECK APPLICATION CONTAINERS
+      # PRE-FAILOVER HEALTH CHECKS
       # =====================================================
 
       - name: Verify both application containers are running
@@ -238,10 +298,6 @@ jobs:
 
           echo "App-2 container is running."
 
-      # =====================================================
-      # CHECK NGINX
-      # =====================================================
-
       - name: Verify Nginx on App-1
         run: |
           ssh \
@@ -250,21 +306,18 @@ jobs:
             ubuntu@"$EC2_PUBLIC_IP" \
             "sudo nginx -t && sudo systemctl is-active nginx"
 
-          echo "Nginx is healthy on App-1."
+          echo "Nginx is healthy."
 
       # =====================================================
-      # PHASE 1 - NORMAL PRIMARY OPERATION
+      # PHASE 1 - NORMAL OPERATION
       # =====================================================
 
       - name: Phase 1 - Verify primary application
         run: |
           echo "=========================================="
           echo "PHASE 1 - NORMAL OPERATION"
+          echo "Nginx -> App-1 Node.js"
           echo "=========================================="
-          echo ""
-          echo "Expected path:"
-          echo "Nginx -> App-1 Node.js container"
-          echo ""
 
           curl \
             --fail \
@@ -279,18 +332,10 @@ jobs:
             "http://$EC2_PUBLIC_IP/db"
 
           echo ""
-          echo "PRIMARY APPLICATION IS HEALTHY."
-          echo "=========================================="
-
-      # =====================================================
-      # VERIFY BACKUP IS REACHABLE BEFORE FAILURE
-      # =====================================================
+          echo "Primary application and database are healthy."
 
       - name: Verify App-2 is reachable from App-1
         run: |
-          echo "Testing private connection:"
-          echo "App-1 -> App-2:$EC2_PRIVATE_IP_2:8080"
-
           ssh \
             -o StrictHostKeyChecking=no \
             -i ec2-key.pem \
@@ -301,14 +346,10 @@ jobs:
               --show-error \
               http://$EC2_PRIVATE_IP_2:8080 > /dev/null"
 
-          echo "Backup App-2 is reachable."
+          echo "Backup App-2 is reachable through the private network."
 
       # =====================================================
       # PHASE 2 - SIMULATE PRIMARY APPLICATION FAILURE
-      # IMPORTANT:
-      # EC2 stays running.
-      # Nginx stays running.
-      # ONLY the App-1 Node.js container is stopped.
       # =====================================================
 
       - name: Phase 2 - Stop primary App-1 container
@@ -316,9 +357,10 @@ jobs:
           echo "=========================================="
           echo "PHASE 2 - SIMULATING PRIMARY FAILURE"
           echo "=========================================="
-          echo ""
-          echo "Stopping ONLY the App-1 application container..."
-          echo "Nginx will remain running."
+
+          echo "Stopping App-1 Node.js container."
+          echo "App-1 EC2 remains running."
+          echo "Nginx remains running."
 
           ssh \
             -o StrictHostKeyChecking=no \
@@ -326,17 +368,10 @@ jobs:
             ubuntu@"$EC2_PUBLIC_IP" \
             "sudo docker stop infra-deploy-aws-app"
 
-          echo ""
-          echo "App-1 application container stopped intentionally."
-
-      # =====================================================
-      # CONFIRM PRIMARY REALLY FAILED
-      # =====================================================
+          echo "Primary application stopped intentionally."
 
       - name: Confirm primary application is unavailable
         run: |
-          echo "Checking App-1 local Node.js port..."
-
           if ssh \
             -o StrictHostKeyChecking=no \
             -i ec2-key.pem \
@@ -352,13 +387,12 @@ jobs:
 
           else
 
-            echo "Confirmed:"
-            echo "App-1 Node.js application is unavailable."
+            echo "Confirmed: App-1 application is unavailable."
 
           fi
 
       # =====================================================
-      # PHASE 3 - TEST NGINX FAILOVER
+      # PHASE 3 - VERIFY FAILOVER
       # =====================================================
 
       - name: Phase 3 - Verify failover to App-2
@@ -366,12 +400,6 @@ jobs:
           echo "=========================================="
           echo "PHASE 3 - TESTING FAILOVER"
           echo "=========================================="
-          echo ""
-          echo "Requesting the SAME App-1 public URL:"
-          echo "http://$EC2_PUBLIC_IP"
-          echo ""
-          echo "App-1 Node.js is DOWN."
-          echo "Nginx should use App-2 backup."
 
           SUCCESS=false
 
@@ -394,25 +422,16 @@ jobs:
           done
 
           if [ "$SUCCESS" != "true" ]; then
-
             echo "ERROR: Application unavailable after primary failure."
             exit 1
-
           fi
 
-          echo ""
           echo "Website remained available."
           echo "FAILOVER TO APP-2 SUCCESSFUL."
-          echo "=========================================="
-
-      # =====================================================
-      # TEST DATABASE DURING FAILOVER
-      # This proves App-2 can also communicate with RDS.
-      # =====================================================
 
       - name: Verify database during failover
         run: |
-          echo "Testing /db while App-1 application is DOWN..."
+          echo "Testing /db while App-1 application is down..."
 
           curl \
             --fail \
@@ -430,6 +449,7 @@ jobs:
 
       - name: Phase 4 - Restore App-1 application
         if: always()
+
         run: |
           echo "=========================================="
           echo "PHASE 4 - RESTORING PRIMARY"
@@ -443,15 +463,11 @@ jobs:
 
           echo "App-1 container start requested."
 
-      # =====================================================
-      # VERIFY PRIMARY RECOVERY
-      # =====================================================
-
       - name: Verify App-1 recovery
         run: |
-          echo "Waiting for App-1 Node.js application..."
-
           RECOVERED=false
+
+          echo "Waiting for App-1 application..."
 
           for i in {1..12}; do
 
@@ -475,10 +491,8 @@ jobs:
           done
 
           if [ "$RECOVERED" != "true" ]; then
-
             echo "ERROR: App-1 did not recover."
             exit 1
-
           fi
 
           echo "App-1 application recovered successfully."
@@ -489,8 +503,6 @@ jobs:
 
       - name: Final application verification
         run: |
-          echo "Testing final public application..."
-
           curl \
             --fail \
             --silent \
@@ -508,10 +520,11 @@ jobs:
           echo "ACTIVE-PASSIVE FAILOVER TEST PASSED"
           echo "=========================================="
           echo ""
-          echo "Primary App-1     : RECOVERED"
-          echo "Backup App-2      : HEALTHY"
-          echo "Nginx             : HEALTHY"
-          echo "RDS               : HEALTHY"
+          echo "Primary App-1 : RECOVERED"
+          echo "Backup App-2  : HEALTHY"
+          echo "Nginx         : HEALTHY"
+          echo "RDS           : HEALTHY"
           echo ""
-          echo "Both EC2 instances will remain RUNNING."
+          echo "Both EC2 instances remain RUNNING."
+          echo "RDS remains RUNNING."
           echo "=========================================="

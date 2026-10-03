@@ -18,7 +18,13 @@ jobs:
       TF_VAR_key_name: ${{ vars.AWS_KEY_NAME }}
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
 
+      AWS_REGION: ap-south-1
+      RDS_IDENTIFIER: infra-deploy-aws-mysql
+      ECR_REGISTRY: 659364970665.dkr.ecr.ap-south-1.amazonaws.com
+      ECR_REPOSITORY: infra-deploy-aws-app
+
     steps:
+
       # =====================================================
       # SOURCE CODE
       # =====================================================
@@ -27,7 +33,7 @@ jobs:
         uses: actions/checkout@v6
 
       # =====================================================
-      # AWS AUTHENTICATION USING OIDC
+      # AWS OIDC AUTHENTICATION
       # =====================================================
 
       - name: Configure AWS credentials
@@ -63,7 +69,7 @@ jobs:
         run: terraform apply -auto-approve
 
       # =====================================================
-      # GET TERRAFORM OUTPUTS
+      # TERRAFORM OUTPUTS
       # =====================================================
 
       - name: Get Terraform outputs
@@ -81,9 +87,81 @@ jobs:
 
           echo "App-1 ID: $EC2_INSTANCE_ID"
           echo "App-2 ID: $EC2_INSTANCE_2_ID"
+          echo "RDS Endpoint: $RDS_ENDPOINT"
 
       # =====================================================
-      # START BOTH EC2 INSTANCES
+      # RDS LIFECYCLE
+      # =====================================================
+
+      - name: Check and start RDS if required
+        run: |
+          echo "Checking RDS state..."
+
+          RDS_STATUS=$(aws rds describe-db-instances \
+            --db-instance-identifier "$RDS_IDENTIFIER" \
+            --query "DBInstances[0].DBInstanceStatus" \
+            --output text)
+
+          echo "Current RDS state: $RDS_STATUS"
+
+          if [ "$RDS_STATUS" = "available" ]; then
+
+            echo "RDS is already available."
+
+          elif [ "$RDS_STATUS" = "stopped" ]; then
+
+            echo "RDS is stopped. Starting database..."
+
+            aws rds start-db-instance \
+              --db-instance-identifier "$RDS_IDENTIFIER"
+
+          elif [ "$RDS_STATUS" = "starting" ]; then
+
+            echo "RDS is already starting."
+
+          elif [ "$RDS_STATUS" = "stopping" ]; then
+
+            echo "RDS is currently stopping."
+            echo "Waiting until RDS is completely stopped..."
+
+            aws rds wait db-instance-stopped \
+              --db-instance-identifier "$RDS_IDENTIFIER"
+
+            echo "RDS stopped. Starting it again..."
+
+            aws rds start-db-instance \
+              --db-instance-identifier "$RDS_IDENTIFIER"
+
+          else
+
+            echo "RDS is currently in state: $RDS_STATUS"
+            echo "Waiting for RDS to become available."
+
+          fi
+
+      - name: Wait for RDS to become available
+        run: |
+          echo "Waiting for RDS: $RDS_IDENTIFIER"
+
+          aws rds wait db-instance-available \
+            --db-instance-identifier "$RDS_IDENTIFIER"
+
+          RDS_STATUS=$(aws rds describe-db-instances \
+            --db-instance-identifier "$RDS_IDENTIFIER" \
+            --query "DBInstances[0].DBInstanceStatus" \
+            --output text)
+
+          echo "RDS final state: $RDS_STATUS"
+
+          if [ "$RDS_STATUS" != "available" ]; then
+            echo "ERROR: RDS is not available."
+            exit 1
+          fi
+
+          echo "RDS is ready for application deployment."
+
+      # =====================================================
+      # EC2 LIFECYCLE
       # =====================================================
 
       - name: Check and start both EC2 instances
@@ -98,22 +176,23 @@ jobs:
             echo "$INSTANCE_ID state: $EC2_STATE"
 
             if [ "$EC2_STATE" = "stopped" ]; then
+
               echo "Starting $INSTANCE_ID..."
+
               aws ec2 start-instances \
                 --instance-ids "$INSTANCE_ID"
 
             elif [ "$EC2_STATE" = "running" ]; then
+
               echo "$INSTANCE_ID is already running."
 
             else
+
               echo "$INSTANCE_ID is currently $EC2_STATE."
+
             fi
 
           done
-
-      # =====================================================
-      # WAIT FOR BOTH EC2 INSTANCES
-      # =====================================================
 
       - name: Wait for both EC2 instances
         run: |
@@ -132,7 +211,7 @@ jobs:
           echo "Both EC2 instances are healthy."
 
       # =====================================================
-      # DISCOVER PUBLIC + PRIVATE IPS
+      # GET CURRENT IPS
       # =====================================================
 
       - name: Get EC2 network information
@@ -179,17 +258,13 @@ jobs:
           echo "App-2 private IP: $EC2_PRIVATE_IP_2"
 
       # =====================================================
-      # SSH KEY
+      # SSH
       # =====================================================
 
       - name: Prepare SSH key
         run: |
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
           chmod 600 ec2-key.pem
-
-      # =====================================================
-      # WAIT FOR DOCKER
-      # =====================================================
 
       - name: Wait for Docker on both EC2 instances
         run: |
@@ -208,9 +283,10 @@ jobs:
                 ubuntu@"$SERVER_IP" \
                 "sudo docker info >/dev/null 2>&1"; then
 
-                echo "Docker ready on $SERVER_IP."
                 READY=true
+                echo "Docker ready on $SERVER_IP."
                 break
+
               fi
 
               echo "Waiting 10 seconds..."
@@ -231,31 +307,31 @@ jobs:
 
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region ap-south-1 | \
+          aws ecr get-login-password --region "$AWS_REGION" | \
           docker login \
             --username AWS \
             --password-stdin \
-            659364970665.dkr.ecr.ap-south-1.amazonaws.com
+            "$ECR_REGISTRY"
 
       - name: Build Docker image
         run: |
           docker build \
-            -t infra-deploy-aws-app \
+            -t "$ECR_REPOSITORY" \
             ./nodeapp
 
       - name: Tag Docker image
         run: |
           docker tag \
-            infra-deploy-aws-app:latest \
-            659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+            "$ECR_REPOSITORY:latest" \
+            "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
       - name: Push Docker image to ECR
         run: |
           docker push \
-            659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest
+            "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
       # =====================================================
-      # LOGIN BOTH SERVERS TO ECR
+      # ECR LOGIN ON EC2
       # =====================================================
 
       - name: Login to ECR on both EC2 instances
@@ -264,35 +340,36 @@ jobs:
 
             echo "Logging $SERVER_IP into ECR..."
 
-            aws ecr get-login-password --region ap-south-1 | \
+            aws ecr get-login-password --region "$AWS_REGION" | \
             ssh \
               -o StrictHostKeyChecking=no \
               -i ec2-key.pem \
               ubuntu@"$SERVER_IP" \
               "sudo docker login \
-              --username AWS \
-              --password-stdin \
-              659364970665.dkr.ecr.ap-south-1.amazonaws.com"
+                --username AWS \
+                --password-stdin \
+                $ECR_REGISTRY"
 
           done
 
       # =====================================================
-      # DEPLOY NODE APPLICATION TO BOTH SERVERS
+      # DEPLOY APPLICATION
       # =====================================================
 
       - name: Deploy application to both EC2 instances
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
         run: |
           for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
 
-            echo "Deploying Node.js application to $SERVER_IP..."
+            echo "Deploying application to $SERVER_IP..."
 
             ssh \
               -o StrictHostKeyChecking=no \
               -i ec2-key.pem \
               ubuntu@"$SERVER_IP" \
-              "sudo docker pull 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest && \
+              "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest && \
                sudo docker stop infra-deploy-aws-app || true; \
                sudo docker rm infra-deploy-aws-app || true; \
                sudo docker run \
@@ -305,12 +382,12 @@ jobs:
                  -e DB_USER='adminuser' \
                  -e DB_PASSWORD='$DB_PASSWORD' \
                  -e DB_NAME='appdb' \
-                 659364970665.dkr.ecr.ap-south-1.amazonaws.com/infra-deploy-aws-app:latest"
+                 $ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
           done
 
       # =====================================================
-      # VERIFY NODE APPLICATIONS DIRECTLY
+      # VERIFY BOTH APPLICATION SERVERS
       # =====================================================
 
       - name: Verify Node.js application on App-1
@@ -324,9 +401,11 @@ jobs:
                  echo 'App-1 Node.js application is healthy.'
                  exit 0
                fi
+
                echo 'Waiting for App-1 application...'
                sleep 5
              done
+
              exit 1"
 
       - name: Verify Node.js application on App-2
@@ -340,14 +419,12 @@ jobs:
                  echo 'App-2 Node.js application is healthy.'
                  exit 0
                fi
+
                echo 'Waiting for App-2 application...'
                sleep 5
              done
-             exit 1"
 
-      # =====================================================
-      # VERIFY APP-1 CAN REACH APP-2 PRIVATELY
-      # =====================================================
+             exit 1"
 
       - name: Verify private connection from App-1 to App-2
         run: |
@@ -366,7 +443,7 @@ jobs:
           echo "Private App-1 to App-2 connection successful."
 
       # =====================================================
-      # INSTALL NGINX ON APP-1
+      # NGINX
       # =====================================================
 
       - name: Install Nginx on App-1
@@ -376,11 +453,7 @@ jobs:
             -i ec2-key.pem \
             ubuntu@"$EC2_PUBLIC_IP" \
             "sudo apt-get update -y && \
-             sudo apt-get install -y nginx"
-
-      # =====================================================
-      # CONFIGURE NGINX ACTIVE-PASSIVE
-      # =====================================================
+             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx"
 
       - name: Configure Nginx active-passive
         run: |
@@ -428,10 +501,6 @@ jobs:
           sudo systemctl enable nginx
           sudo systemctl restart nginx"
 
-      # =====================================================
-      # VERIFY NGINX
-      # =====================================================
-
       - name: Verify Nginx
         run: |
           ssh \
@@ -441,13 +510,12 @@ jobs:
             "sudo systemctl is-active nginx && sudo nginx -t"
 
       # =====================================================
-      # VERIFY PUBLIC APPLICATION THROUGH NGINX
+      # PUBLIC APPLICATION VERIFICATION
       # =====================================================
 
       - name: Verify application through Nginx
         run: |
-          echo "Checking application through Nginx:"
-          echo "http://$EC2_PUBLIC_IP"
+          echo "Checking http://$EC2_PUBLIC_IP"
 
           for i in {1..12}; do
 
@@ -457,25 +525,22 @@ jobs:
               --show-error \
               "http://$EC2_PUBLIC_IP" > /dev/null; then
 
-              echo "Nginx application verification successful."
+              echo "Application verification successful."
               exit 0
+
             fi
 
-            echo "Application not ready through Nginx. Waiting 5 seconds..."
+            echo "Application not ready. Waiting 5 seconds..."
             sleep 5
 
           done
 
-          echo "ERROR: Nginx application verification failed."
+          echo "ERROR: Application verification failed."
           exit 1
-
-      # =====================================================
-      # VERIFY RDS THROUGH NGINX
-      # =====================================================
 
       - name: Verify RDS connection through Nginx
         run: |
-          echo "Testing application -> RDS through Nginx..."
+          echo "Testing application -> RDS..."
 
           for i in {1..12}; do
 
@@ -486,8 +551,9 @@ jobs:
               "http://$EC2_PUBLIC_IP/db"; then
 
               echo ""
-              echo "RDS verification through Nginx successful."
+              echo "RDS verification successful."
               exit 0
+
             fi
 
             echo "RDS connection not ready. Waiting 5 seconds..."
@@ -499,19 +565,18 @@ jobs:
           exit 1
 
       # =====================================================
-      # STOP BOTH EC2 INSTANCES ONLY AFTER SUCCESS
+      # STOP EC2 AFTER SUCCESS
+      # RDS REMAINS RUNNING
       # =====================================================
 
       - name: Stop both EC2 instances after successful deployment
         run: |
-          echo "All deployment and Nginx verification steps completed successfully."
-
-          echo "Stopping App-1: $EC2_INSTANCE_ID"
-          echo "Stopping App-2: $EC2_INSTANCE_2_ID"
+          echo "Deployment completed successfully."
 
           aws ec2 stop-instances \
             --instance-ids \
             "$EC2_INSTANCE_ID" \
             "$EC2_INSTANCE_2_ID"
 
-          echo "Stop requests sent successfully for both EC2 instances."
+          echo "App-1 and App-2 stop requests sent."
+          echo "RDS remains running."
