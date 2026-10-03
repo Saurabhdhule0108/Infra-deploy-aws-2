@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Allura&family=Inter:wght@400;500;600;700;800;900&display=swap");
+
 /* =========================================================
    INFRADEPLOY AWS
    CINEMATIC / EDITORIAL / CLOUD ENGINEERING EXPERIENCE
@@ -6608,3 +6610,583 @@ footer {
     }
 
 }
+
+/* =========================================================
+   32. FINAL TYPOGRAPHY & READABILITY POLISH
+   Purpose:
+   - prevent display-heading collisions
+   - make supporting copy readable at normal zoom
+   - add selective calligraphy accents
+   - preserve the existing cinematic layout and interactions
+========================================================= */
+
+:root {
+    --font-main:
+        "Inter",
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    --font-script:
+        "Allura",
+        "Segoe Script",
+        "Brush Script MT",
+        cursive;
+
+    --text-soft: #e0d5e4;
+    --muted: #b8a8bd;
+}
+
+/* ---------- Global readability ---------- */
+
+body {
+    font-size: 18px;
+    line-height: 1.72;
+}
+
+.section-index,
+.eyebrow {
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.brand-copy span {
+    font-size: 0.68rem;
+}
+
+.nav-links a,
+.nav-cta {
+    font-size: 0.78rem;
+}
+
+.button {
+    font-size: 0.84rem;
+}
+
+.hero-meta span {
+    font-size: 0.72rem;
+}
+
+.hero-meta strong {
+    font-size: 1rem;
+}
+
+.stage-label,
+.stage-status,
+.scroll-cue span {
+    font-size: 0.68rem;
+}
+
+.core-content span {
+    font-size: 0.72rem;
+}
+
+.core-content small {
+    font-size: 0.66rem;
+}
+
+.floating-node span {
+    font-size: 0.68rem;
+}
+
+.floating-node strong {
+    font-size: 0.98rem;
+}
+
+.floating-node small {
+    font-size: 0.64rem;
+}
+
+.feature-number {
+    font-size: 0.78rem;
+}
+
+.feature-tag {
+    font-size: 0.68rem;
+}
+
+.project-feature p {
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.feature-command {
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.tech-index {
+    font-size: 0.72rem;
+}
+
+.tech-card strong {
+    font-size: 1.38rem;
+}
+
+.tech-card small {
+    font-size: 0.68rem;
+    line-height: 1.5;
+}
+
+.pipeline-header {
+    font-size: 0.82rem;
+}
+
+.pipeline-step {
+    font-size: 0.68rem;
+}
+
+.architecture-facts span,
+.architecture-note > span {
+    font-size: 0.68rem;
+}
+
+.architecture-facts strong {
+    font-size: 0.98rem;
+    line-height: 1.5;
+}
+
+.architecture-note p {
+    font-size: 1.02rem;
+    line-height: 1.75;
+}
+
+.simulation-badge {
+    font-size: 0.68rem;
+}
+
+/* ---------- Hero: large, cinematic, but NEVER merged ---------- */
+
+.hero-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.055em;
+
+    font-size:
+        clamp(5.2rem, 9.2vw, 10.5rem);
+
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+}
+
+.hero-word {
+    width: fit-content;
+    max-width: 100%;
+
+    line-height: 0.88;
+}
+
+.hero-word-one,
+.hero-word-two,
+.hero-word-three {
+    margin-left: 0;
+}
+
+.hero-word-two {
+    margin-left: 0.06em;
+}
+
+.hero-word-three {
+    margin-left: 0.16em;
+}
+
+.hero-lead {
+    margin-top: 52px;
+
+    color: #e7dce9;
+
+    font-size:
+        clamp(1.12rem, 1.35vw, 1.34rem);
+
+    line-height: 1.8;
+}
+
+/* ---------- Main section headings ---------- */
+
+.section-intro h2,
+.architecture-title h2,
+.database-intro h2,
+.failover-intro h2 {
+    max-width: 100%;
+
+    font-size:
+        clamp(4.2rem, 7.5vw, 8.2rem);
+
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+}
+
+/*
+   Selected second-line words become the elegant handwritten accent.
+   This intentionally affects only heading spans, not technical/body copy.
+*/
+.section-intro h2 span,
+.architecture-title h2 span,
+.database-intro h2 span,
+.failover-intro h2 span {
+    display: block;
+
+    margin-top: 0.12em;
+    padding:
+        0.02em 0.08em
+        0.08em 0.03em;
+
+    overflow: visible;
+
+    font-family: var(--font-script);
+    font-size: 0.78em;
+    font-style: normal;
+    font-weight: 400;
+
+    line-height: 1.15;
+    letter-spacing: 0;
+
+    text-transform: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--pink-bright),
+            var(--purple-bright) 58%,
+            var(--cyan)
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+
+    filter:
+        drop-shadow(
+            0 0 22px rgba(255, 22, 120, 0.12)
+        );
+}
+
+.section-intro > p,
+.architecture-title > p,
+.database-intro > p,
+.failover-intro > p {
+    color: #e1d6e4;
+
+    font-size:
+        clamp(1.08rem, 1.25vw, 1.28rem);
+
+    line-height: 1.85;
+}
+
+/* ---------- Manifesto: calligraphy + engineering contrast ---------- */
+
+.manifesto-copy span {
+    font-size: 0.76rem;
+}
+
+.manifesto-copy h3 {
+    max-width: 980px;
+
+    font-family: var(--font-script);
+
+    font-size:
+        clamp(3.2rem, 5.2vw, 5.8rem);
+
+    font-style: normal;
+    font-weight: 400;
+
+    line-height: 1.05;
+    letter-spacing: 0;
+}
+
+.manifesto-copy h3 strong {
+    display: block;
+
+    margin-top: 0.08em;
+
+    font-family: var(--font-display);
+
+    font-size: 0.88em;
+    font-style: normal;
+    font-weight: 900;
+
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+
+    text-transform: uppercase;
+}
+
+.manifesto-copy p {
+    color: #e1d6e4;
+
+    font-size: 1.14rem;
+    line-height: 1.8;
+}
+
+/* ---------- Failover editorial title ---------- */
+
+.failover-header h3 {
+    font-family: var(--font-script);
+
+    font-size:
+        clamp(2.8rem, 4vw, 4.5rem);
+
+    font-style: normal;
+    font-weight: 400;
+
+    line-height: 1.08;
+    letter-spacing: 0;
+}
+
+/* ---------- Improve technical surfaces ---------- */
+
+code,
+.feature-command,
+.pipeline-header {
+    font-weight: 600;
+}
+
+.project-feature,
+.tech-card,
+.pipeline-node,
+.failover-component,
+.database-health-panel,
+.database-workspace,
+.architecture-console {
+    text-rendering: optimizeLegibility;
+}
+
+input {
+    font-size: 1rem;
+}
+
+/* ---------- Laptop ---------- */
+
+@media (max-width: 1250px) {
+
+    .hero-title {
+        font-size:
+            clamp(4.7rem, 9.2vw, 7.5rem);
+
+        line-height: 0.9;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(3.9rem, 7.4vw, 6.8rem);
+
+        line-height: 0.96;
+    }
+
+    .pipeline-header {
+        font-size: 0.78rem;
+    }
+
+}
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 980px) {
+
+    body {
+        font-size: 17px;
+    }
+
+    .hero-title {
+        gap: 0.075em;
+
+        font-size:
+            clamp(4.6rem, 14vw, 8rem);
+
+        line-height: 0.92;
+    }
+
+    .hero-word-two,
+    .hero-word-three {
+        margin-left: 0;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(3.8rem, 11vw, 6.8rem);
+
+        line-height: 0.98;
+    }
+
+    .section-intro h2 span,
+    .architecture-title h2 span,
+    .database-intro h2 span,
+    .failover-intro h2 span {
+        font-size: 0.82em;
+        line-height: 1.16;
+    }
+
+    .manifesto-copy h3 {
+        font-size:
+            clamp(3rem, 8vw, 5rem);
+
+        line-height: 1.08;
+    }
+
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 700px) {
+
+    body {
+        font-size: 16.5px;
+        line-height: 1.7;
+    }
+
+    .hero-title {
+        gap: 0.09em;
+
+        font-size:
+            clamp(3.65rem, 17vw, 6rem);
+
+        line-height: 0.94;
+        letter-spacing: -0.035em;
+    }
+
+    .hero-word,
+    .hero-word-one,
+    .hero-word-two,
+    .hero-word-three {
+        width: auto;
+        max-width: 100%;
+
+        margin-left: 0;
+    }
+
+    .hero-lead {
+        margin-top: 38px;
+
+        font-size: 1.08rem;
+        line-height: 1.75;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(3.15rem, 14vw, 5.3rem);
+
+        line-height: 1;
+        letter-spacing: -0.025em;
+    }
+
+    .section-intro h2 span,
+    .architecture-title h2 span,
+    .database-intro h2 span,
+    .failover-intro h2 span {
+        margin-top: 0.08em;
+
+        padding-bottom: 0.12em;
+
+        font-size: 0.88em;
+        line-height: 1.18;
+    }
+
+    .section-intro > p,
+    .architecture-title > p,
+    .database-intro > p,
+    .failover-intro > p {
+        font-size: 1.06rem;
+        line-height: 1.75;
+    }
+
+    .manifesto-copy h3 {
+        font-size:
+            clamp(2.8rem, 13vw, 4.4rem);
+
+        line-height: 1.08;
+    }
+
+    .manifesto-copy h3 strong {
+        margin-top: 0.12em;
+
+        font-size: 0.78em;
+        line-height: 1.02;
+    }
+
+    .project-feature p,
+    .architecture-note p {
+        font-size: 1rem;
+    }
+
+    .feature-command {
+        overflow-wrap: anywhere;
+
+        font-size: 0.84rem;
+    }
+
+    .tech-card strong {
+        font-size: 1.15rem;
+    }
+
+    .tech-card small {
+        font-size: 0.68rem;
+    }
+
+    .failover-header h3 {
+        font-size:
+            clamp(2.6rem, 12vw, 4rem);
+
+        line-height: 1.08;
+    }
+
+}
+
+/* ---------- Small mobile ---------- */
+
+@media (max-width: 430px) {
+
+    .hero-title {
+        font-size:
+            clamp(3.15rem, 16vw, 4.5rem);
+
+        line-height: 0.96;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(2.8rem, 13vw, 4.3rem);
+
+        line-height: 1;
+    }
+
+    .section-intro h2 span,
+    .architecture-title h2 span,
+    .database-intro h2 span,
+    .failover-intro h2 span {
+        font-size: 0.92em;
+    }
+
+    .manifesto-copy h3 {
+        font-size:
+            clamp(2.55rem, 13vw, 3.8rem);
+    }
+
+}
+
+/* ---------- Accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .section-intro h2 span,
+    .architecture-title h2 span,
+    .database-intro h2 span,
+    .failover-intro h2 span {
+        filter: none;
+    }
+
+}
+
