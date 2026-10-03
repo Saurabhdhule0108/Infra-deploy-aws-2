@@ -74,25 +74,16 @@
         500ms cubic-bezier(0.16, 1, 0.3, 1);
 
     --font-main:
-        Inter,
-        "Segoe UI",
-        Helvetica,
-        Arial,
-        sans-serif;
+        "Montserrat", "Segoe UI", Arial, sans-serif;
 
-    --font-display:
-        Impact,
-        Haettenschweiler,
-        "Arial Narrow Bold",
-        "Arial Narrow",
-        sans-serif;
+--font-display:
+        "Montserrat", "Segoe UI", Arial, sans-serif;
 
-    --font-editorial:
-        "Baskerville",
-        "Palatino Linotype",
-        "Book Antiqua",
-        Georgia,
-        serif;
+--font-editorial:
+        "Montserrat", "Segoe UI", Arial, sans-serif;
+
+    --font-script:
+        "Allura", cursive;
 }
 
 
@@ -7702,4 +7693,81 @@ pre,
             clamp(2.15rem, 9.5vw, 3.2rem);
     }
 
+}
+
+/* =========================================================
+   FINAL TYPOGRAPHY SYSTEM
+   One stable font family for technical/body/display text.
+   Allura is reserved only for intentional script accents.
+   ========================================================= */
+
+:root {
+    --font-main:
+        "Montserrat",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    --font-display:
+        "Montserrat",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    --font-editorial:
+        "Montserrat",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    --font-script:
+        "Allura",
+        cursive;
+}
+
+/* Prevent synthetic/accidental font substitution from changing the layout. */
+html,
+body,
+button,
+input,
+textarea,
+select {
+    font-family: var(--font-main);
+}
+
+.hero-title,
+.hero-word,
+.hero-word-one,
+.hero-word-two,
+.hero-word-three,
+.section-intro h2,
+.architecture-title h2,
+.database-intro h2,
+.failover-intro h2,
+.manifesto-copy h3 strong {
+    font-family: var(--font-display);
+}
+
+#project .section-intro h2 span,
+#architecture .architecture-title h2 span,
+.failover-header h3 {
+    font-family: var(--font-script);
+}
+
+code,
+pre,
+.feature-command,
+.pipeline-header {
+    font-family:
+        "Cascadia Code",
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+}
+
+/* Keep font rendering consistent across browsers. */
+body {
+    font-synthesis: none;
+    -webkit-font-synthesis: none;
+    text-rendering: optimizeLegibility;
 }
