@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Allura&family=Inter:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Allura&family=Montserrat:wght@400;500;600;700;800;900&display=swap");
 
 /* =========================================================
    INFRADEPLOY AWS
@@ -7190,3 +7190,516 @@ input {
 
 }
 
+/* =========================================================
+   33. FINAL APPROVED TYPOGRAPHY SYSTEM
+   Clean Montserrat everywhere.
+   Calligraphy is reserved for a few meaningful accent lines.
+   Existing layout, colors, animations and functionality remain intact.
+========================================================= */
+
+:root {
+    --font-main:
+        "Montserrat",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    --font-display:
+        "Montserrat",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    --font-editorial:
+        "Montserrat",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    --font-script:
+        "Allura",
+        "Segoe Script",
+        "Brush Script MT",
+        cursive;
+}
+
+/* ---------- One clean readable family across the site ---------- */
+
+body,
+button,
+input,
+textarea,
+select {
+    font-family: var(--font-main);
+}
+
+body {
+    font-size: 18px;
+    line-height: 1.72;
+}
+
+p {
+    line-height: 1.78;
+}
+
+/* ---------- Hero: strong but spacious ---------- */
+
+.hero-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: clamp(14px, 1.5vw, 24px);
+
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(4.7rem, 8.2vw, 9.1rem);
+
+    font-weight: 900;
+
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+}
+
+.hero-word,
+.hero-word-one,
+.hero-word-two,
+.hero-word-three {
+    display: block;
+
+    width: auto;
+    max-width: 100%;
+
+    margin: 0;
+
+    font-family: var(--font-display);
+    font-style: normal;
+    font-weight: 900;
+
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+}
+
+.hero-word-two {
+    color: transparent;
+
+    -webkit-text-stroke:
+        2px rgba(255, 245, 252, 0.82);
+
+    text-stroke:
+        2px rgba(255, 245, 252, 0.82);
+}
+
+.hero-word-three {
+    background:
+        linear-gradient(
+            90deg,
+            var(--pink-bright),
+            var(--purple-bright),
+            var(--cyan)
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+}
+
+.hero-lead {
+    max-width: 720px;
+
+    margin-top: 48px;
+
+    color: #e8dfea;
+
+    font-size:
+        clamp(1.08rem, 1.25vw, 1.28rem);
+
+    font-weight: 500;
+
+    line-height: 1.8;
+}
+
+/* ---------- Standard section headings ---------- */
+
+.section-intro h2,
+.architecture-title h2,
+.database-intro h2,
+.failover-intro h2 {
+    max-width: 100%;
+
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(3.8rem, 6.8vw, 7.4rem);
+
+    font-style: normal;
+    font-weight: 900;
+
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+
+    text-transform: uppercase;
+}
+
+.section-intro h2 span,
+.architecture-title h2 span,
+.database-intro h2 span,
+.failover-intro h2 span {
+    display: block;
+
+    margin-top: 0.1em;
+    padding: 0;
+
+    font-family: var(--font-display);
+
+    font-size: 0.82em;
+    font-style: normal;
+    font-weight: 800;
+
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+
+    text-transform: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--pink-bright),
+            var(--purple-bright),
+            var(--cyan)
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+
+    filter: none;
+}
+
+/*
+   Intentional calligraphy accents only.
+   These are visual accent lines, never technical labels or body copy.
+*/
+#project .section-intro h2 span,
+#architecture .architecture-title h2 span {
+    padding:
+        0.02em 0.08em
+        0.12em 0.02em;
+
+    font-family: var(--font-script);
+
+    font-size: 0.92em;
+    font-style: normal;
+    font-weight: 400;
+
+    line-height: 1.12;
+    letter-spacing: 0;
+
+    text-transform: none;
+}
+
+/* ---------- Manifesto / Infrastructure-as-Code block ---------- */
+
+.manifesto-copy h3 {
+    max-width: 980px;
+
+    font-family: var(--font-main);
+
+    font-size:
+        clamp(2.7rem, 4.2vw, 4.8rem);
+
+    font-style: normal;
+    font-weight: 700;
+
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+}
+
+.manifesto-copy h3 strong {
+    display: block;
+
+    margin-top: 0.18em;
+
+    font-family: var(--font-display);
+
+    font-size: 0.94em;
+    font-style: normal;
+    font-weight: 900;
+
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+
+    text-transform: uppercase;
+}
+
+.manifesto-copy p,
+.section-intro > p,
+.architecture-title > p,
+.database-intro > p,
+.failover-intro > p,
+.project-feature p,
+.architecture-note p {
+    color: #e4dae7;
+
+    font-family: var(--font-main);
+    font-style: normal;
+    font-weight: 500;
+
+    font-size:
+        clamp(1.02rem, 1.12vw, 1.18rem);
+
+    line-height: 1.8;
+}
+
+/* ---------- Cards and technical information ---------- */
+
+.project-feature h3,
+.tech-card strong,
+.pipeline-node strong,
+.failover-component strong,
+.database-workspace h3,
+.database-health-copy h3,
+.identity-node strong,
+.server-card strong,
+.rds-card strong {
+    font-family: var(--font-main);
+    font-style: normal;
+}
+
+.feature-command,
+code,
+pre,
+.pipeline-header {
+    font-family:
+        "Cascadia Code",
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+}
+
+.feature-command {
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+.feature-number,
+.feature-tag,
+.tech-index,
+.tech-card small,
+.pipeline-step,
+.architecture-facts span,
+.architecture-note > span,
+.simulation-badge,
+.section-index,
+.eyebrow {
+    font-family: var(--font-main);
+    font-style: normal;
+    font-weight: 800;
+}
+
+.feature-number,
+.feature-tag,
+.tech-index,
+.pipeline-step,
+.architecture-facts span,
+.architecture-note > span,
+.simulation-badge {
+    font-size: 0.7rem;
+}
+
+.tech-card small {
+    font-size: 0.72rem;
+    line-height: 1.55;
+}
+
+.architecture-facts strong {
+    font-size: 0.98rem;
+    line-height: 1.5;
+}
+
+/* ---------- Failover heading: clean, not italic/script ---------- */
+
+.failover-header h3 {
+    font-family: var(--font-main);
+
+    font-size:
+        clamp(2rem, 3vw, 3.2rem);
+
+    font-style: normal;
+    font-weight: 700;
+
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+}
+
+/* ---------- Laptop ---------- */
+
+@media (max-width: 1250px) {
+
+    .hero-title {
+        gap: 16px;
+
+        font-size:
+            clamp(4.4rem, 8.5vw, 7.3rem);
+
+        line-height: 0.94;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(3.6rem, 6.6vw, 6.3rem);
+
+        line-height: 1;
+    }
+
+}
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 980px) {
+
+    body {
+        font-size: 17px;
+    }
+
+    .hero-title {
+        gap: 15px;
+
+        font-size:
+            clamp(4.1rem, 13vw, 7.2rem);
+
+        line-height: 0.96;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(3.4rem, 10vw, 6.2rem);
+
+        line-height: 1.02;
+    }
+
+    .manifesto-copy h3 {
+        font-size:
+            clamp(2.6rem, 7vw, 4.3rem);
+
+        line-height: 1.14;
+    }
+
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 700px) {
+
+    body {
+        font-size: 16px;
+    }
+
+    .hero-title {
+        gap: 13px;
+
+        font-size:
+            clamp(3.35rem, 15vw, 5.4rem);
+
+        line-height: 0.98;
+        letter-spacing: -0.045em;
+    }
+
+    .hero-word,
+    .hero-word-one,
+    .hero-word-two,
+    .hero-word-three {
+        margin: 0;
+
+        line-height: 0.98;
+    }
+
+    .hero-word-two {
+        -webkit-text-stroke:
+            1.5px rgba(255, 245, 252, 0.82);
+    }
+
+    .hero-lead {
+        margin-top: 34px;
+
+        font-size: 1.04rem;
+        line-height: 1.72;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(2.9rem, 12vw, 4.8rem);
+
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+    }
+
+    .section-intro h2 span,
+    .architecture-title h2 span,
+    .database-intro h2 span,
+    .failover-intro h2 span {
+        font-size: 0.88em;
+        line-height: 1.06;
+    }
+
+    #project .section-intro h2 span,
+    #architecture .architecture-title h2 span {
+        font-size: 1em;
+        line-height: 1.15;
+    }
+
+    .manifesto-copy h3 {
+        font-size:
+            clamp(2.35rem, 10vw, 3.8rem);
+
+        line-height: 1.15;
+    }
+
+    .manifesto-copy h3 strong {
+        font-size: 0.88em;
+        line-height: 1.06;
+    }
+
+}
+
+/* ---------- Small mobile ---------- */
+
+@media (max-width: 430px) {
+
+    .hero-title {
+        gap: 11px;
+
+        font-size:
+            clamp(2.9rem, 14.5vw, 4.1rem);
+
+        line-height: 1;
+    }
+
+    .section-intro h2,
+    .architecture-title h2,
+    .database-intro h2,
+    .failover-intro h2 {
+        font-size:
+            clamp(2.55rem, 11.5vw, 3.9rem);
+
+        line-height: 1.05;
+    }
+
+    .manifesto-copy h3 {
+        font-size:
+            clamp(2.15rem, 9.5vw, 3.2rem);
+    }
+
+}
