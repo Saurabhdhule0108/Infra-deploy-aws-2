@@ -1,0 +1,28 @@
+<svg width="1200" height="430" viewBox="0 0 1200 430" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="430" rx="22" fill="#0D1117"/>
+<text x="600" y="50" text-anchor="middle" font-family="Segoe UI" font-size="27" font-weight="700" fill="#F0F6FC">SECURITY GROUP TRAFFIC FLOW</text>
+
+<g font-family="Segoe UI" text-anchor="middle">
+<rect x="60" y="150" width="190" height="110" rx="15" fill="#111827" stroke="#58A6FF"/>
+<text x="155" y="195" font-size="18" fill="#F0F6FC">Internet</text>
+<text x="155" y="225" font-size="12" fill="#8B949E">HTTP / SSH</text>
+
+<rect x="370" y="125" width="300" height="160" rx="15" fill="#111827" stroke="#58A6FF"/>
+<text x="520" y="165" font-size="19" fill="#F0F6FC">EC2 Security Group</text>
+<text x="520" y="200" font-size="12" fill="#58A6FF">80 → HTTP</text>
+<text x="520" y="225" font-size="12" fill="#58A6FF">22 → SSH</text>
+<text x="520" y="250" font-size="12" fill="#E3B341">8080 → SAME SG ONLY</text>
+
+<rect x="790" y="145" width="330" height="120" rx="15" fill="#111827" stroke="#3FB950"/>
+<text x="955" y="185" font-size="19" fill="#F0F6FC">RDS Security Group</text>
+<text x="955" y="220" font-size="12" fill="#7EE787">3306 ← EC2 SECURITY GROUP</text>
+</g>
+
+<path d="M250 205H370" stroke="#58A6FF" stroke-width="2"/>
+<path d="M670 205H790" stroke="#3FB950" stroke-width="2"/>
+
+<circle r="6" fill="#58A6FF"><animateMotion path="M250 205H370" dur="2s" repeatCount="indefinite"/></circle>
+<circle r="6" fill="#3FB950"><animateMotion path="M670 205H790" dur="2.2s" repeatCount="indefinite"/></circle>
+
+<text x="600" y="350" text-anchor="middle" font-family="Consolas" font-size="12" fill="#8B949E">RDS IS NOT OPEN TO THE INTERNET • DATABASE ACCESS COMES FROM THE EC2 SECURITY GROUP</text>
+</svg>

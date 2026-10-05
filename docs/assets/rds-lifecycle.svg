@@ -1,0 +1,31 @@
+<svg width="1200" height="450" viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="450" rx="22" fill="#0D1117"/>
+<text x="600" y="50" text-anchor="middle" font-family="Segoe UI" font-size="27" font-weight="700" fill="#F0F6FC">RDS AUTOMATED LIFECYCLE</text>
+
+<rect x="70" y="170" width="170" height="85" rx="14" fill="#111827" stroke="#58A6FF"/>
+<text x="155" y="205" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">Check RDS</text>
+<text x="155" y="230" text-anchor="middle" font-family="Consolas" font-size="11" fill="#58A6FF">STATUS</text>
+
+<rect x="330" y="100" width="190" height="80" rx="14" fill="#111827" stroke="#3FB950"/>
+<text x="425" y="148" text-anchor="middle" font-family="Segoe UI" fill="#7EE787">Available</text>
+
+<rect x="330" y="260" width="190" height="80" rx="14" fill="#111827" stroke="#E3B341"/>
+<text x="425" y="308" text-anchor="middle" font-family="Segoe UI" fill="#E3B341">Stopped</text>
+
+<rect x="620" y="260" width="190" height="80" rx="14" fill="#111827" stroke="#E3B341"/>
+<text x="715" y="308" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">Start RDS</text>
+
+<rect x="900" y="170" width="220" height="85" rx="14" fill="#111827" stroke="#3FB950"/>
+<text x="1010" y="205" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">RDS Available</text>
+<text x="1010" y="230" text-anchor="middle" font-family="Consolas" font-size="11" fill="#7EE787">CONTINUE DEPLOYMENT</text>
+
+<path d="M240 195C280 195 290 140 330 140" fill="none" stroke="#3FB950" stroke-width="2"/>
+<path d="M240 230C280 230 290 300 330 300" fill="none" stroke="#E3B341" stroke-width="2"/>
+<path d="M520 300H620M810 300C860 300 850 212 900 212" fill="none" stroke="#E3B341" stroke-width="2"/>
+<path d="M520 140C700 140 760 212 900 212" fill="none" stroke="#3FB950" stroke-width="2"/>
+
+<circle r="6" fill="#3FB950"><animateMotion path="M240 195C280 195 290 140 330 140" dur="2s" repeatCount="indefinite"/></circle>
+<circle r="6" fill="#E3B341"><animateMotion path="M520 300H620" dur="2s" repeatCount="indefinite"/></circle>
+
+<text x="600" y="405" text-anchor="middle" font-family="Consolas" font-size="11" fill="#8B949E">IF RDS IS STOPPED, THE WORKFLOW STARTS IT AND WAITS UNTIL THE DATABASE BECOMES AVAILABLE</text>
+</svg>

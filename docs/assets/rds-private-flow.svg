@@ -1,0 +1,27 @@
+<svg width="1200" height="450" viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="450" rx="22" fill="#0D1117"/>
+<text x="600" y="50" text-anchor="middle" font-family="Segoe UI" font-size="27" font-weight="700" fill="#F0F6FC">PRIVATE DATABASE ARCHITECTURE</text>
+
+<rect x="70" y="120" width="1060" height="260" rx="18" fill="#0B101B" stroke="#8B5CF6"/>
+<text x="95" y="150" font-family="Consolas" fill="#C4B5FD">CUSTOM VPC</text>
+
+<rect x="130" y="190" width="230" height="100" rx="14" fill="#111827" stroke="#58A6FF"/>
+<text x="245" y="230" text-anchor="middle" font-family="Segoe UI" font-size="18" fill="#F0F6FC">EC2 App-1</text>
+<text x="245" y="258" text-anchor="middle" font-family="Consolas" font-size="11" fill="#58A6FF">APPLICATION</text>
+
+<rect x="840" y="190" width="230" height="100" rx="14" fill="#111827" stroke="#E3B341"/>
+<text x="955" y="230" text-anchor="middle" font-family="Segoe UI" font-size="18" fill="#F0F6FC">EC2 App-2</text>
+<text x="955" y="258" text-anchor="middle" font-family="Consolas" font-size="11" fill="#E3B341">APPLICATION</text>
+
+<rect x="440" y="170" width="320" height="145" rx="15" fill="#111827" stroke="#3FB950"/>
+<text x="600" y="205" text-anchor="middle" font-family="Segoe UI" font-size="19" fill="#F0F6FC">Amazon RDS MySQL</text>
+<text x="600" y="235" text-anchor="middle" font-family="Consolas" font-size="11" fill="#7EE787">PRIVATE • PORT 3306</text>
+<text x="600" y="260" text-anchor="middle" font-family="Consolas" font-size="11" fill="#8B949E">DB SUBNET GROUP</text>
+<text x="600" y="285" text-anchor="middle" font-family="Consolas" font-size="10" fill="#8B949E">PRIVATE SUBNET 1 + PRIVATE SUBNET 2</text>
+
+<path d="M360 240H440M840 240H760" stroke="#3FB950" stroke-width="2"/>
+<circle r="6" fill="#3FB950"><animateMotion path="M360 240H440" dur="2s" repeatCount="indefinite"/></circle>
+<circle r="6" fill="#3FB950"><animateMotion path="M840 240H760" dur="2.3s" repeatCount="indefinite"/></circle>
+
+<text x="600" y="415" text-anchor="middle" font-family="Consolas" font-size="11" fill="#7EE787">NO PUBLIC DATABASE ACCESS • APPLICATION TRAFFIC STAYS INSIDE THE VPC</text>
+</svg>

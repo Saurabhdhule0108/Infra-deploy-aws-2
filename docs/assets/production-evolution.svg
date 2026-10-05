@@ -1,0 +1,64 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<filter id="g"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+
+<rect width="1200" height="560" rx="22" fill="#0D1117"/>
+
+<text x="600" y="48" text-anchor="middle" font-family="Segoe UI" font-size="27" font-weight="700" fill="#F0F6FC">PRODUCTION EVOLUTION</text>
+<text x="600" y="77" text-anchor="middle" font-family="Consolas" font-size="12" letter-spacing="2" fill="#A78BFA">CURRENT LAB ARCHITECTURE → PRODUCTION-ORIENTED ARCHITECTURE</text>
+
+<!-- Current -->
+
+<rect x="60" y="115" width="430" height="370" rx="18" fill="#0B101B" stroke="#E3B341"/>
+<text x="275" y="150" text-anchor="middle" font-family="Segoe UI" font-size="19" font-weight="700" fill="#E3B341">CURRENT PROJECT</text>
+
+<rect x="150" y="185" width="250" height="65" rx="12" fill="#111827" stroke="#58A6FF"/>
+<text x="275" y="225" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">App-1 + Nginx</text>
+
+<rect x="150" y="280" width="250" height="65" rx="12" fill="#111827" stroke="#E3B341"/>
+<text x="275" y="320" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">App-2 Backup</text>
+
+<rect x="150" y="375" width="250" height="65" rx="12" fill="#111827" stroke="#3FB950"/>
+<text x="275" y="415" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">Single-AZ RDS</text>
+
+<path d="M275 250V280M275 345V375" stroke="#58A6FF" stroke-width="2"/>
+
+<!-- Arrow -->
+
+<path d="M520 300H650" stroke="#A78BFA" stroke-width="4"/>
+<polygon points="650,300 630,288 630,312" fill="#A78BFA"/>
+
+<circle r="7" fill="#A78BFA" filter="url(#g)">
+<animateMotion path="M520 300H640" dur="2s" repeatCount="indefinite"/>
+</circle>
+
+<text x="585" y="280" text-anchor="middle" font-family="Consolas" font-size="11" fill="#C4B5FD">EVOLVE</text>
+
+<!-- Production -->
+
+<rect x="680" y="115" width="460" height="370" rx="18" fill="#0B101B" stroke="#3FB950"/>
+<text x="910" y="150" text-anchor="middle" font-family="Segoe UI" font-size="19" font-weight="700" fill="#7EE787">PRODUCTION DIRECTION</text>
+
+<rect x="790" y="175" width="240" height="55" rx="12" fill="#111827" stroke="#58A6FF"/>
+<text x="910" y="209" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">Application Load Balancer</text>
+
+<rect x="735" y="270" width="165" height="65" rx="12" fill="#111827" stroke="#58A6FF"/>
+<text x="817" y="298" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">Private App</text>
+<text x="817" y="319" text-anchor="middle" font-family="Consolas" font-size="10" fill="#58A6FF">AZ-1</text>
+
+<rect x="920" y="270" width="165" height="65" rx="12" fill="#111827" stroke="#58A6FF"/>
+<text x="1002" y="298" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">Private App</text>
+<text x="1002" y="319" text-anchor="middle" font-family="Consolas" font-size="10" fill="#58A6FF">AZ-2</text>
+
+<rect x="790" y="385" width="240" height="60" rx="12" fill="#111827" stroke="#3FB950"/>
+<text x="910" y="421" text-anchor="middle" font-family="Segoe UI" fill="#7EE787">RDS Multi-AZ</text>
+
+<path d="M910 230V250H817V270M910 250H1002V270" fill="none" stroke="#58A6FF" stroke-width="2"/>
+<path d="M817 335V365H910V385M1002 335V365H910" fill="none" stroke="#3FB950" stroke-width="2"/>
+
+<circle r="5" fill="#58A6FF"><animateMotion path="M910 230V250H817V270" dur="2.5s" repeatCount="indefinite"/></circle>
+<circle r="5" fill="#58A6FF"><animateMotion path="M910 230V250H1002V270" dur="2.8s" repeatCount="indefinite"/></circle>
+
+<text x="600" y="525" text-anchor="middle" font-family="Consolas" font-size="11" fill="#8B949E">ALB • AUTO SCALING • PRIVATE APPLICATION SERVERS • SYSTEMS MANAGER • HTTPS • RDS MULTI-AZ • CLOUDWATCH</text>
+</svg>

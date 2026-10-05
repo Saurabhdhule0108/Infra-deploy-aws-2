@@ -1,0 +1,26 @@
+<svg width="1200" height="470" viewBox="0 0 1200 470" xmlns="http://www.w3.org/2000/svg">
+<defs><filter id="g"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="1200" height="470" rx="22" fill="#0D1117"/>
+<text x="600" y="50" text-anchor="middle" font-family="Segoe UI" font-size="27" font-weight="700" fill="#F0F6FC">CI/CD DEPLOYMENT PIPELINE</text>
+<text x="600" y="78" text-anchor="middle" font-family="Consolas" font-size="12" fill="#58A6FF">PUSH → AUTHENTICATE → PROVISION → BUILD → DEPLOY → VERIFY</text>
+
+<g font-family="Segoe UI" text-anchor="middle" font-size="14">
+<g><rect x="45" y="165" width="130" height="70" rx="12" fill="#111827" stroke="#58A6FF"/><text x="110" y="205" fill="#F0F6FC">Git Push</text></g>
+<g><rect x="205" y="165" width="130" height="70" rx="12" fill="#111827" stroke="#A78BFA"/><text x="270" y="205" fill="#F0F6FC">OIDC / STS</text></g>
+<g><rect x="365" y="165" width="130" height="70" rx="12" fill="#111827" stroke="#A78BFA"/><text x="430" y="205" fill="#F0F6FC">Terraform</text></g>
+<g><rect x="525" y="165" width="130" height="70" rx="12" fill="#111827" stroke="#22D3EE"/><text x="590" y="205" fill="#F0F6FC">Docker Build</text></g>
+<g><rect x="685" y="165" width="130" height="70" rx="12" fill="#111827" stroke="#22D3EE"/><text x="750" y="205" fill="#F0F6FC">ECR Push</text></g>
+<g><rect x="845" y="165" width="130" height="70" rx="12" fill="#111827" stroke="#E3B341"/><text x="910" y="205" fill="#F0F6FC">Deploy EC2</text></g>
+<g><rect x="1005" y="165" width="150" height="70" rx="12" fill="#111827" stroke="#3FB950"/><text x="1080" y="205" fill="#7EE787">Verify ✓</text></g>
+</g>
+
+<path d="M175 200H205M335 200H365M495 200H525M655 200H685M815 200H845M975 200H1005" stroke="#58A6FF" stroke-width="2"/>
+
+<circle r="7" fill="#58A6FF" filter="url(#g)">
+<animateMotion path="M175 200H205M335 200H365M495 200H525M655 200H685M815 200H845M975 200H1005" dur="7s" repeatCount="indefinite"/>
+</circle>
+
+<text x="600" y="320" text-anchor="middle" font-family="Segoe UI" font-size="17" fill="#F0F6FC">Successful Deployment</text>
+<path d="M600 335V380" stroke="#3FB950" stroke-width="2"/>
+<text x="600" y="410" text-anchor="middle" font-family="Consolas" font-size="12" fill="#7EE787">STOP APP-1 + APP-2 FOR LAB COST CONTROL</text>
+</svg>

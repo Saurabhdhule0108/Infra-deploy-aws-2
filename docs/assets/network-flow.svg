@@ -1,0 +1,36 @@
+<svg width="1200" height="600" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="bg"><stop stop-color="#070B14"/><stop offset="1" stop-color="#0D1117"/></linearGradient>
+<filter id="g"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1200" height="600" rx="22" fill="url(#bg)"/>
+<text x="600" y="45" text-anchor="middle" font-family="Segoe UI" font-size="27" font-weight="700" fill="#F0F6FC">AWS NETWORK DESIGN</text>
+
+<rect x="80" y="80" width="1040" height="450" rx="20" fill="#0D1117" stroke="#8B5CF6"/>
+<text x="110" y="110" font-family="Consolas" font-size="12" fill="#C4B5FD">VPC • 10.0.0.0/16</text>
+
+<rect x="450" y="125" width="300" height="60" rx="12" fill="#111827" stroke="#58A6FF"/>
+<text x="600" y="162" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">Internet Gateway + Public Route</text>
+
+<rect x="140" y="225" width="400" height="140" rx="15" fill="#101927" stroke="#58A6FF"/>
+<text x="340" y="255" text-anchor="middle" font-family="Consolas" fill="#58A6FF">ap-south-1a • 10.0.1.0/24</text>
+<text x="340" y="315" text-anchor="middle" font-family="Segoe UI" font-size="20" fill="#F0F6FC">EC2 App-1</text>
+
+<rect x="660" y="225" width="400" height="140" rx="15" fill="#101927" stroke="#A78BFA"/>
+<text x="860" y="255" text-anchor="middle" font-family="Consolas" fill="#A78BFA">ap-south-1b • 10.0.4.0/24</text>
+<text x="860" y="315" text-anchor="middle" font-family="Segoe UI" font-size="20" fill="#F0F6FC">EC2 App-2</text>
+
+<rect x="240" y="410" width="720" height="85" rx="15" fill="#111827" stroke="#3FB950"/>
+<text x="600" y="440" text-anchor="middle" font-family="Consolas" fill="#7EE787">PRIVATE DB SUBNET GROUP</text>
+<text x="600" y="470" text-anchor="middle" font-family="Segoe UI" fill="#F0F6FC">10.0.2.0/24 + 10.0.3.0/24 → RDS MySQL</text>
+
+<path d="M600 185V205H340V225M600 205H860V225" fill="none" stroke="#58A6FF" stroke-width="2"/>
+<path d="M340 365V410M860 365V410" stroke="#3FB950" stroke-width="2"/>
+
+<circle r="6" fill="#58A6FF" filter="url(#g)"><animateMotion path="M600 185V205H340V225" dur="3s" repeatCount="indefinite"/></circle>
+<circle r="6" fill="#58A6FF" filter="url(#g)"><animateMotion path="M600 185V205H860V225" dur="3.4s" repeatCount="indefinite"/></circle>
+<circle r="6" fill="#3FB950" filter="url(#g)"><animateMotion path="M340 365V410" dur="2s" repeatCount="indefinite"/></circle>
+<circle r="6" fill="#3FB950" filter="url(#g)"><animateMotion path="M860 365V410" dur="2.3s" repeatCount="indefinite"/></circle>
+
+<text x="600" y="565" text-anchor="middle" font-family="Consolas" font-size="11" fill="#8B949E">PUBLIC APPLICATION LAYER • PRIVATE DATABASE LAYER • TWO AVAILABILITY ZONES</text>
+</svg>

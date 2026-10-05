@@ -1,0 +1,21 @@
+<svg width="1200" height="430" viewBox="0 0 1200 430" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="430" rx="22" fill="#0D1117"/>
+<text x="600" y="50" text-anchor="middle" font-family="Segoe UI" font-size="27" font-weight="700" fill="#F0F6FC">EC2 AUTOMATED LIFECYCLE</text>
+<text x="600" y="78" text-anchor="middle" font-family="Consolas" font-size="12" fill="#58A6FF">START • DISCOVER • DEPLOY • VERIFY • STOP</text>
+
+<g font-family="Segoe UI" text-anchor="middle">
+<g><rect x="50" y="170" width="160" height="80" rx="13" fill="#111827" stroke="#8B949E"/><text x="130" y="217" fill="#F0F6FC">Stopped</text></g>
+<g><rect x="250" y="170" width="160" height="80" rx="13" fill="#111827" stroke="#E3B341"/><text x="330" y="217" fill="#F0F6FC">Start EC2</text></g>
+<g><rect x="450" y="170" width="160" height="80" rx="13" fill="#111827" stroke="#58A6FF"/><text x="530" y="202" fill="#F0F6FC">Discover</text><text x="530" y="225" font-size="12" fill="#58A6FF">NEW PUBLIC IP</text></g>
+<g><rect x="650" y="170" width="160" height="80" rx="13" fill="#111827" stroke="#22D3EE"/><text x="730" y="217" fill="#F0F6FC">Deploy</text></g>
+<g><rect x="850" y="170" width="160" height="80" rx="13" fill="#111827" stroke="#3FB950"/><text x="930" y="217" fill="#7EE787">Verify ✓</text></g>
+</g>
+
+<path d="M210 210H250M410 210H450M610 210H650M810 210H850" stroke="#58A6FF" stroke-width="2"/>
+<path d="M930 250V315H130V250" fill="none" stroke="#A78BFA" stroke-width="2" stroke-dasharray="8 6"/>
+
+<circle r="6" fill="#58A6FF"><animateMotion path="M210 210H250M410 210H450M610 210H650M810 210H850" dur="6s" repeatCount="indefinite"/></circle>
+<circle r="5" fill="#A78BFA"><animateMotion path="M930 250V315H130V250" dur="4s" repeatCount="indefinite"/></circle>
+
+<text x="600" y="375" text-anchor="middle" font-family="Consolas" font-size="11" fill="#8B949E">PUBLIC IP MAY CHANGE AFTER RESTART • WORKFLOW DISCOVERS THE CURRENT IP AUTOMATICALLY</text>
+</svg>
