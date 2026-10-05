@@ -3546,3 +3546,67 @@ input:focus-visible {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* =========================================================
+   COMPACT ATMOSPHERIC HERO — interactive service hooks stay intact
+========================================================= */
+
+.hero {
+    min-height: 400px;
+    background:
+        radial-gradient(ellipse at 82% 8%, rgba(74, 170, 255, .25), transparent 34%),
+        radial-gradient(ellipse at 74% 96%, rgba(0, 204, 255, .10), transparent 42%),
+        linear-gradient(113deg, #040a14 0%, #081a31 56%, #092342 100%);
+}
+
+.hero-layout { gap: 42px; padding-top: 44px; padding-bottom: 40px; }
+.hero h1 { margin: 17px 0 14px; font-size: clamp(35px, 3.4vw, 54px); }
+.hero-description { max-width: 590px; margin-bottom: 20px; font-size: 15px; line-height: 1.62; }
+.hero-tech-line { margin-top: 22px; }
+
+.cloud-scene {
+    height: 300px;
+    overflow: hidden;
+    border-color: rgba(126, 205, 255, .22);
+    border-radius: 24px;
+    isolation: isolate;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(167, 221, 255, .23), transparent 31%),
+        linear-gradient(180deg, rgba(46, 110, 164, .40), rgba(5, 24, 48, .92) 72%);
+    box-shadow: inset 0 1px 0 rgba(211, 241, 255, .22), inset 0 -60px 80px rgba(0, 8, 24, .42), 0 28px 64px rgba(0, 0, 0, .32);
+}
+
+.cloud-scene::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: .78;
+    background: repeating-linear-gradient(115deg, transparent 0 32px, rgba(133, 209, 255, .04) 33px 34px, transparent 35px 72px);
+}
+
+.cloud-scene::after { bottom: -18px; height: 92px; background: rgba(14, 145, 255, .22); }
+
+.scene-stars { position: absolute; inset: 0; z-index: 1; opacity: .8; background-image: radial-gradient(circle, #d5f3ff 1px, transparent 1.5px), radial-gradient(circle, #8acaff 1px, transparent 1.5px); background-size: 47px 39px, 71px 59px; background-position: 9px 10px, 29px 23px; mask-image: linear-gradient(to bottom, black, transparent 68%); }
+
+.skyline { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 95px; display: flex; align-items: end; gap: 5px; padding: 0 18px; opacity: .55; filter: drop-shadow(0 0 10px rgba(33, 159, 255, .4)); }
+.skyline i { flex: 1; min-width: 15px; height: 44%; border: 1px solid rgba(107, 194, 255, .28); background: repeating-linear-gradient(to bottom, rgba(138, 219, 255, .28) 0 2px, transparent 2px 9px), linear-gradient(90deg, rgba(19, 75, 121, .9), rgba(6, 27, 57, .65)); }
+.skyline i:nth-child(2), .skyline i:nth-child(6) { height: 76%; }.skyline i:nth-child(3) { height: 58%; }.skyline i:nth-child(4) { height: 91%; }.skyline i:nth-child(5) { height: 67%; }.skyline i:nth-child(7) { height: 53%; }
+
+.aws-cloud { top: 24px; z-index: 6; }
+.cloud-shape { width: 146px; height: 60px; border-color: rgba(237, 250, 255, .8); background: linear-gradient(160deg, #f7fdff 0%, #a7d6ff 44%, #4c9ee8 100%); box-shadow: 0 11px 28px rgba(15, 109, 210, .48), inset 0 -10px 18px rgba(13, 83, 166, .24); }
+.cloud-shape::before { width: 62px; height: 62px; left: 18px; top: -27px; }.cloud-shape::after { width: 73px; height: 73px; right: 14px; top: -34px; }
+.cloud-shape span { color: #133c67; font-size: 22px; text-shadow: 0 1px rgba(255,255,255,.8); }.cloud-shape span::after { content: ""; display: block; width: 44px; height: 3px; margin: 1px auto 0; border-radius: 50%; background: #ff9900; box-shadow: 0 0 9px rgba(255,153,0,.7); }.aws-cloud small { margin-top: 7px; color: #d2edff; font-size: 8px; }.aws-cloud small b { display: inline-block; width: 5px; height: 5px; margin-right: 4px; border-radius: 50%; background: #32e6a1; box-shadow: 0 0 8px #32e6a1; }
+
+.cloud-line { top: 105px; height: 78px; z-index: 3; background: linear-gradient(to bottom, rgba(122, 222, 255, .9), rgba(33, 193, 255, .12)); }.cloud-line::before { width: 124px; background: linear-gradient(90deg, transparent, rgba(95, 219, 255, .8), transparent); }.cloud-line-left { left: 25%; }.cloud-line-center { left: 50%; }.cloud-line-right { right: 25%; }.cloud-line-center::before { left: -62px; }
+.flow-packet { width: 6px; height: 6px; background: #d8fbff; box-shadow: 0 0 12px 3px #17c8ff; }.packet-one, .packet-two, .packet-three { top: 109px; animation-duration: 1.8s; }
+@keyframes packetDown { 0% { transform: translateY(0); opacity: 0; } 12%, 78% { opacity: 1; } 100% { transform: translateY(70px); opacity: 0; } }
+
+.architecture-rail { position: absolute; z-index: 4; bottom: 52px; left: 8%; right: 8%; height: 1px; background: linear-gradient(90deg, transparent, rgba(54, 214, 255, .84), transparent); box-shadow: 0 0 13px rgba(45, 202, 255, .7); }
+.architecture-node { width: 98px; min-height: 72px; padding: 8px 5px 7px; border-radius: 12px; border-color: rgba(130, 220, 255, .34); background: linear-gradient(145deg, rgba(22, 70, 112, .92), rgba(5, 25, 53, .95)); box-shadow: 0 9px 18px rgba(0, 0, 0, .28), inset 0 1px rgba(209, 246, 255, .12); }.architecture-node:hover, .architecture-node:focus-visible { transform: translateY(-5px) scale(1.03); border-color: #72dcff; outline: none; box-shadow: 0 14px 25px rgba(0, 0, 0, .35), 0 0 22px rgba(44, 204, 255, .34); }
+.node-icon { width: 26px; height: 26px; margin-bottom: 4px; border-radius: 8px; font-size: 9px; }.architecture-node strong { font-size: 10px; white-space: nowrap; }.architecture-node small { max-width: 88px; overflow: hidden; color: #9ab7d2; font-size: 7px; white-space: nowrap; text-overflow: ellipsis; }.node-github { left: 3%; bottom: 16px; }.node-terraform { left: 23%; bottom: 26px; }.node-docker { left: calc(50% - 49px); bottom: 12px; }.node-ec2 { right: 23%; bottom: 26px; }.node-rds { right: 3%; bottom: 16px; }
+.visual-hint { display: flex; justify-content: center; align-items: center; gap: 7px; margin: 10px 0 0; color: #7f9cb9; font-size: 10px; }.visual-hint span { width: 6px; height: 6px; border-radius: 50%; background: #2ce0a0; box-shadow: 0 0 8px #2ce0a0; }
+
+@media (max-width: 960px) { .hero { min-height: auto; }.hero-layout { gap: 28px; }.cloud-scene { height: 300px; } }
+@media (max-width: 720px) { .hero-layout { padding-top: 36px; padding-bottom: 34px; }.hero-visual { width: 100%; }.cloud-scene { height: 282px; }.architecture-node { width: 78px; }.architecture-node strong { font-size: 8px; }.architecture-node small { font-size: 6px; }.node-github { left: 1%; }.node-terraform { left: 20%; }.node-ec2 { right: 20%; }.node-rds { right: 1%; } }
+@media (max-width: 440px) { .cloud-scene { height: 270px; }.architecture-node { width: 64px; padding-left: 2px; padding-right: 2px; }.architecture-node strong { font-size: 7px; }.node-icon { width: 23px; height: 23px; }.architecture-node small { display: none; }.node-terraform { left: 20%; }.node-ec2 { right: 20%; } }

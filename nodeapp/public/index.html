@@ -127,84 +127,31 @@
                 </div>
 
 
-                <!-- Cloud architecture visual -->
-
-                <div class="hero-visual" aria-label="AWS deployment architecture">
-
+                <!-- Interactive deployment architecture. Service hooks are used by script.js. -->
+                <div class="hero-visual" aria-label="Interactive AWS deployment architecture">
                     <div class="cloud-scene">
-
+                        <div class="skyline" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                        <div class="scene-stars" aria-hidden="true"></div>
                         <div class="aws-cloud">
-                            <div class="cloud-shape">
-                                <span>AWS</span>
-                            </div>
-
-                            <small>ap-south-1</small>
+                            <div class="cloud-shape"><span>AWS</span></div>
+                            <small><b></b> ap-south-1</small>
                         </div>
 
                         <div class="cloud-line cloud-line-left"></div>
                         <div class="cloud-line cloud-line-center"></div>
                         <div class="cloud-line cloud-line-right"></div>
-
                         <div class="flow-packet packet-one"></div>
                         <div class="flow-packet packet-two"></div>
                         <div class="flow-packet packet-three"></div>
 
-                        <button
-                            class="architecture-node node-github"
-                            type="button"
-                            data-service="github"
-                        >
-                            <span class="node-icon">GH</span>
-                            <strong>GitHub</strong>
-                            <small>CI/CD</small>
-                        </button>
-
-                        <button
-                            class="architecture-node node-terraform"
-                            type="button"
-                            data-service="terraform"
-                        >
-                            <span class="node-icon terraform-mark">T</span>
-                            <strong>Terraform</strong>
-                            <small>IaC</small>
-                        </button>
-
-                        <button
-                            class="architecture-node node-docker"
-                            type="button"
-                            data-service="docker"
-                        >
-                            <span class="node-icon">D</span>
-                            <strong>Docker</strong>
-                            <small>Container</small>
-                        </button>
-
-                        <button
-                            class="architecture-node node-ec2"
-                            type="button"
-                            data-service="ec2"
-                        >
-                            <span class="node-icon orange">EC2</span>
-                            <strong>EC2</strong>
-                            <small>2 Servers</small>
-                        </button>
-
-                        <button
-                            class="architecture-node node-rds"
-                            type="button"
-                            data-service="rds"
-                        >
-                            <span class="node-icon database-icon">DB</span>
-                            <strong>RDS</strong>
-                            <small>MySQL</small>
-                        </button>
-
+                        <div class="architecture-rail" aria-hidden="true"></div>
+                        <button class="architecture-node node-github" type="button" data-service="github"><span class="node-icon">GH</span><strong>GitHub Actions</strong><small>CI / CD</small></button>
+                        <button class="architecture-node node-terraform" type="button" data-service="terraform"><span class="node-icon terraform-mark">T</span><strong>Terraform</strong><small>Infrastructure as Code</small></button>
+                        <button class="architecture-node node-docker" type="button" data-service="docker"><span class="node-icon">D</span><strong>Docker</strong><small>Container Build</small></button>
+                        <button class="architecture-node node-ec2" type="button" data-service="ec2"><span class="node-icon orange">EC2</span><strong>Amazon EC2</strong><small>Application Layer</small></button>
+                        <button class="architecture-node node-rds" type="button" data-service="rds"><span class="node-icon database-icon">DB</span><strong>Amazon RDS</strong><small>Private MySQL</small></button>
                     </div>
-
-                    <p class="visual-hint">
-                        Select a service to explore its role in the project
-                    </p>
-
+                    <p class="visual-hint"><span></span>Select an illuminated service node to explore the deployment</p>
                 </div>
 
             </div>
@@ -1181,4 +1128,4 @@
     <script src="script.js"></script>
 
 </body>
-</html>
+</html> 
