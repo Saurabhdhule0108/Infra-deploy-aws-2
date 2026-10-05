@@ -1,752 +1,578 @@
 <div align="center">
 
-<img src="docs/assets/hero-animation.svg"
-     alt="Infrastructure Deployment on AWS"
-     width="100%">
-
-<br>
+<img src="docs/assets/hero-animation.svg" width="100%" alt="Infrastructure Deployment on AWS">
 
 # Infrastructure Deployment on AWS
 
-### ☁️ Infrastructure as Code • CI/CD • Containers • Private Database • Application Resilience
+### Automated AWS Infrastructure • CI/CD • Containers • Database • Application Resilience
+
+A complete cloud infrastructure project built with **Terraform, AWS, GitHub Actions, Docker, Amazon ECR, EC2, RDS, Nginx, OIDC and STS**.
 
 <br>
 
-![Terraform](https://img.shields.io/badge/Terraform-Infrastructure_as_Code-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-Cloud-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Containers-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-Application-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-RDS-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![Nginx](https://img.shields.io/badge/Nginx-Active--Passive-009639?style=for-the-badge&logo=nginx&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?style=for-the-badge&logo=nginx&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 
 <br>
 
-**`BUILD` → `DEPLOY` → `VERIFY` → `FAILOVER` → `RECOVER`**
+**BUILD → AUTOMATE → DEPLOY → VERIFY → FAILOVER → RECOVER**
 
 </div>
 
 ---
 
-## 🌌 Project Overview
+## ☁️ Project Overview
 
-**Infrastructure Deployment on AWS** is an end-to-end cloud infrastructure and CI/CD project designed to demonstrate practical AWS and infrastructure engineering concepts.
+**Infrastructure Deployment on AWS** is an end-to-end cloud infrastructure and CI/CD project.
 
-Instead of manually creating servers and deploying an application, the project automates the complete journey from **source code to running AWS infrastructure**.
+The main goal of this project is to understand how an application moves from **source code to a running AWS environment** using automation.
 
-The solution combines:
+In this project:
 
-> 🌍 **Terraform** for Infrastructure as Code  
-> ⚙️ **GitHub Actions** for CI/CD automation  
-> 🔐 **GitHub OIDC + AWS STS** for temporary AWS credentials  
-> 🐳 **Docker** for application containerization  
-> 📦 **Amazon ECR** for container image storage  
-> 🖥️ **Two EC2 application servers across two Availability Zones**  
-> 🗄️ **Private Amazon RDS MySQL** for persistent application data  
-> 🔀 **Nginx** for active-passive application routing  
-> 🔄 **Automated EC2 and RDS lifecycle handling**  
-> 🧪 **Dedicated failover testing** for application resilience
+- **Terraform** creates and manages the AWS infrastructure.
+- **GitHub Actions** automates infrastructure deployment and application delivery.
+- **GitHub OIDC and AWS STS** provide temporary AWS credentials.
+- **Docker** packages the Node.js application.
+- **Amazon ECR** stores the Docker image.
+- **Two EC2 instances** run the same application across two Availability Zones.
+- **Nginx** provides active-passive application routing.
+- **Amazon RDS MySQL** stores application data inside the private database layer.
+- **Automated workflows** manage deployment, verification and failover testing.
 
-### ⚡ One Project — Complete Cloud Delivery
-
-```text
-Source Code
-     ↓
-GitHub
-     ↓
-GitHub Actions
-     ↓
-OIDC + AWS STS
-     ↓
-Terraform
-     ↓
-AWS Infrastructure
-     ↓
-Docker Build
-     ↓
-Amazon ECR
-     ↓
-EC2 App-1 + App-2
-     ↓
-Nginx Active-Passive Routing
-     ↓
-Private RDS MySQL
-     ↓
-Health + Failover Verification
-```
+The project is designed to show not only **how to deploy an application**, but also how the infrastructure, networking, authentication, containers, database and automation work together.
 
 ---
 
-# 🏗️ Cloud Architecture
+# 🏗️ Complete AWS Architecture
 
 <div align="center">
 
-<img src="docs/assets/architecture.svg"
-     alt="Infrastructure Deployment on AWS Architecture"
-     width="100%">
+<img src="docs/assets/architecture.svg" width="100%" alt="Complete AWS Architecture">
 
 </div>
 
-The infrastructure is deployed in the AWS **Asia Pacific (Mumbai) — `ap-south-1`** region.
+The infrastructure is deployed in:
 
-The architecture separates the project into several responsibilities:
+**AWS Region:** `ap-south-1` — Asia Pacific (Mumbai)
 
-| Layer | Responsibility |
+The project uses a custom VPC with application servers distributed across two Availability Zones and a private database layer.
+
+### Main AWS Resources
+
+| Resource | Purpose |
 |---|---|
-| 🐙 GitHub | Source-code management |
-| ⚙️ GitHub Actions | CI/CD automation |
-| 🔐 OIDC + STS | Secure temporary AWS authentication |
-| 🌍 Terraform | AWS infrastructure provisioning |
-| 💾 Amazon S3 | Remote Terraform state + locking |
-| 📦 Amazon ECR | Docker image registry |
-| 🖥️ EC2 App-1 | Primary application server + Nginx |
-| 🖥️ EC2 App-2 | Backup application server |
-| 🗄️ Amazon RDS | Private MySQL database |
-
----
-
-# ⚡ Technology Stack
-
-| Technology | Purpose |
-|---|---|
-| **Git** | Version control |
-| **GitHub** | Repository and source-code management |
-| **GitHub Actions** | CI/CD automation |
-| **GitHub OIDC** | Passwordless GitHub → AWS authentication |
-| **AWS IAM** | AWS authorization and role permissions |
-| **AWS STS** | Temporary AWS credentials |
-| **Terraform** | Infrastructure as Code |
-| **HCL** | Terraform configuration language |
-| **Amazon S3** | Remote Terraform state and locking |
-| **Amazon VPC** | Isolated cloud network |
-| **Amazon EC2** | Application compute |
-| **Amazon ECR** | Docker image registry |
+| **VPC** | Provides an isolated AWS network |
+| **Public Subnets** | Host the EC2 application servers |
+| **Private DB Subnets** | Provide the network layer for RDS |
+| **Internet Gateway** | Provides internet connectivity to the public application layer |
+| **Route Table** | Controls routing for the public subnets |
+| **Security Groups** | Control allowed network traffic |
+| **EC2 App-1** | Primary application server and Nginx reverse proxy |
+| **EC2 App-2** | Backup application server |
+| **Amazon ECR** | Stores the Docker application image |
 | **Amazon RDS** | Managed MySQL database |
-| **Docker** | Application containerization |
-| **Nginx** | Reverse proxy and active-passive routing |
-| **Node.js / Express** | Application backend |
-| **MySQL** | Relational database engine |
+| **Amazon S3** | Stores Terraform remote state |
+| **IAM / STS** | Provides secure AWS authorization |
 
 ---
 
-# 🌐 AWS Network Design
+# 🌍 Terraform — Infrastructure as Code
 
-The project uses a dedicated custom VPC:
-
-```text
-10.0.0.0/16
-```
-
-The infrastructure is distributed across **two Availability Zones**.
-
-| Network | CIDR | Availability Zone | Purpose |
-|---|---|---|---|
-| 🌍 Public Subnet 1 | `10.0.1.0/24` | `ap-south-1a` | EC2 App-1 |
-| 🌍 Public Subnet 2 | `10.0.4.0/24` | `ap-south-1b` | EC2 App-2 |
-| 🔒 Private DB Subnet 1 | `10.0.2.0/24` | `ap-south-1a` | RDS DB subnet group |
-| 🔒 Private DB Subnet 2 | `10.0.3.0/24` | `ap-south-1b` | RDS DB subnet group |
-
-### Network Layout
-
-```text
-                        INTERNET
-                            │
-                            ▼
-                    Internet Gateway
-                            │
-                    Public Route Table
-                            │
-              ┌─────────────┴─────────────┐
-              │                           │
-              ▼                           ▼
-        Public Subnet 1             Public Subnet 2
-         ap-south-1a                 ap-south-1b
-              │                           │
-              ▼                           ▼
-          EC2 App-1                   EC2 App-2
-          PRIMARY                     BACKUP
-              │                           │
-              └─────────────┬─────────────┘
-                            │
-                      Private VPC
-                         Traffic
-                            │
-                            ▼
-                       RDS MySQL
-                  Publicly Accessible
-                           NO
-```
-
-### 💡 Why No NAT Gateway for RDS?
-
-The application servers and RDS communicate using **private VPC networking**.
-
-EC2 → RDS traffic does not need to travel through the public internet, so a NAT Gateway is not required simply for the application to communicate with the database.
-
----
-
-# 🖥️ Application Servers
-
-Two EC2 instances host the application.
-
-### 🟢 EC2 App-1 — Primary
-
-```text
-Availability Zone : ap-south-1a
-Subnet            : 10.0.1.0/24
-Role              : Primary Application Server
-Nginx             : Port 80
-Node.js Container : Port 8080
-```
-
-### 🟡 EC2 App-2 — Backup
-
-```text
-Availability Zone : ap-south-1b
-Subnet            : 10.0.4.0/24
-Role              : Backup Application Server
-Node.js Container : Port 8080
-```
-
-Both servers run the **same Docker image**, helping maintain a consistent application environment.
-
----
-
-# 🔀 Active-Passive Application Routing
-
-Nginx runs on **App-1** and acts as the public reverse proxy.
-
-### Normal Traffic
-
-```text
-Internet
-   │
-   ▼
-App-1 Public IP :80
-   │
-   ▼
-Nginx
-   │
-   ▼
-App-1 Node.js
-127.0.0.1:8080
-   │
-   ▼
-RDS MySQL
-```
-
-### Primary Application Failure
-
-If the App-1 Node.js container becomes unavailable:
-
-```text
-Internet
-   │
-   ▼
-SAME App-1 Public IP
-   │
-   ▼
-Nginx
-   │
-   ├──── App-1 :8080 ❌
-   │
-   └──── App-2 Private IP :8080 ✅
-                              │
-                              ▼
-                         RDS MySQL
-```
-
-App-2 is marked as the **backup backend** in the Nginx upstream configuration.
-
-The EC2 security group allows the application servers to communicate privately on port `8080`.
-
----
-
-# 🗄️ Private Database Layer
-
-The project uses **Amazon RDS for MySQL**.
-
-```text
-        EC2 APPLICATION SECURITY GROUP
-                    │
-                    │ TCP :3306
-                    ▼
-             RDS SECURITY GROUP
-                    │
-                    ▼
-              AMAZON RDS MYSQL
-                    │
-            PUBLIC ACCESS: NO
-```
-
-### Database Characteristics
-
-- 🔒 Located inside private DB subnets
-- 🚫 Not publicly accessible
-- 🔌 MySQL traffic on port `3306`
-- 🛡️ Database access allowed from the application EC2 security group
-- 💾 Encrypted storage
-- 🌍 DB subnet group spans two Availability Zones
-- 🖥️ Accessible by both application servers
-- 🔑 Database password supplied through GitHub Secrets
-
-Application database functionality includes endpoints such as:
-
-```text
-/db
-/users
-```
-
-> The DB subnet group spans two Availability Zones, while the current RDS database instance itself remains **Single-AZ**. RDS Multi-AZ is listed later as a production improvement.
-
----
-
-# 🔐 Secure GitHub → AWS Authentication
+> **Terraform is an Infrastructure as Code tool. It allows us to create and manage infrastructure using configuration files instead of manually creating resources from the AWS Console.**
 
 <div align="center">
 
-<img src="docs/assets/oidc-flow.svg"
-     alt="GitHub OIDC and AWS STS Authentication Flow"
-     width="100%">
+<img src="docs/assets/terraform-flow.svg" width="100%" alt="Terraform Infrastructure Flow">
 
 </div>
 
-The project does **not require long-lived AWS access keys to be stored in GitHub**.
+### How We Use Terraform
 
-The authentication flow is:
+Our Terraform configuration defines the AWS infrastructure required by the project.
 
-```text
-GitHub Actions
-      │
-      │ requests
-      ▼
-GitHub OIDC Token
-      │
-      │ + IAM Role ARN
-      ▼
-AWS STS
-      │
-      │ checks
-      ▼
-IAM Role Trust Policy
-      │
-      ▼
-Conditions Match
-      │
-      ▼
-Temporary AWS Credentials
-      │
-      ▼
-Authenticated AWS API Calls
-```
+Terraform manages resources such as:
 
-GitHub tells AWS which IAM role it wants to assume by providing the **IAM Role ARN**.
+- VPC
+- Subnets
+- Internet Gateway
+- Route Table
+- Security Groups
+- EC2 instances
+- Amazon ECR
+- RDS DB Subnet Group
+- Amazon RDS MySQL
 
-AWS STS validates the GitHub OIDC token against that role's trust policy.
+The main Terraform execution flow is:
 
-When the trust conditions match, STS provides temporary AWS credentials to the workflow.
+**`init → validate → plan → apply`**
 
----
+### Important Commands
 
-# 🌍 Infrastructure as Code with Terraform
-
-Terraform creates and manages the project's AWS infrastructure.
-
-### Terraform-Managed Infrastructure
-
-```text
-AWS
-│
-├── VPC
-│
-├── Internet Gateway
-│
-├── Public Route Table
-│
-├── Public Subnet 1
-│
-├── Public Subnet 2
-│
-├── Private DB Subnet 1
-│
-├── Private DB Subnet 2
-│
-├── EC2 Security Group
-│
-├── RDS Security Group
-│
-├── EC2 App-1
-│
-├── EC2 App-2
-│
-├── Amazon ECR
-│
-├── RDS DB Subnet Group
-└── RDS MySQL
-```
-
-### Terraform Execution Flow
-
-```text
-terraform init
-      ↓
-terraform validate
-      ↓
-terraform plan
-      ↓
-terraform apply
-```
-
-### Remote Terraform State
-
-Terraform uses an **Amazon S3 backend** for remote state.
-
-```text
-Terraform
-    │
-    ▼
-Amazon S3
-    │
-    ├── terraform.tfstate
-    │
-    └── State Lock
-```
-
-Remote state allows the automated CI/CD workflow to work against a centralized infrastructure state instead of relying on a local state file.
-
----
-
-# 🐳 Container Delivery
-
-<div align="center">
-
-<img src="docs/assets/container-flow.svg"
-     alt="Docker and Amazon ECR Container Delivery Pipeline"
-     width="100%">
-
-</div>
-
-The application is packaged once and deployed consistently to both EC2 servers.
-
-### Container Flow
-
-```text
-Node.js Application
-        │
-        ▼
-Dockerfile
-        │
-        ▼
-Docker Build
-        │
-        ▼
-Docker Image
-        │
-        ▼
-Amazon ECR
-        │
-        ├──────────────┐
-        ▼              ▼
-     App-1          App-2
-     Docker         Docker
-        │              │
-        └──── SAME ─────┘
-             IMAGE
-```
-
-The Node.js containers listen on:
-
-```text
-8080
-```
-
-Nginx listens publicly on:
-
-```text
-80
-```
-
-The application containers use:
-
-```text
---restart unless-stopped
-```
-
-to provide container restart behavior when appropriate.
-
----
-
-# ⚙️ Automated CI/CD Pipeline
-
-The primary deployment workflow is:
-
-```text
-.github/workflows/deploy.yml
-```
-
-A push to the `main` branch starts the CI/CD pipeline.
-
-### 🚀 Deployment Journey
-
-```text
-Developer Push
-      │
-      ▼
-GitHub Actions
-      │
-      ▼
-GitHub OIDC
-      │
-      ▼
-AWS STS
-      │
-      ▼
-Temporary Credentials
-      │
-      ▼
-Terraform Init
-      │
-      ▼
-Terraform Validate
-      │
-      ▼
-Terraform Plan
-      │
-      ▼
-Terraform Apply
-      │
-      ▼
-Read Terraform Outputs
-      │
-      ▼
-Check / Start RDS
-      │
-      ▼
-Wait for RDS
-      │
-      ▼
-Start App-1 + App-2
-      │
-      ▼
-Discover Current IP Addresses
-      │
-      ▼
-Wait for Docker
-      │
-      ▼
-Build Docker Image
-      │
-      ▼
-Push Image → Amazon ECR
-      │
-      ▼
-Deploy Same Image → Both EC2s
-      │
-      ▼
-Verify App-1
-      │
-      ▼
-Verify App-2
-      │
-      ▼
-Verify Private App-1 → App-2 Connection
-      │
-      ▼
-Install / Configure Nginx
-      │
-      ▼
-Verify Public Application
-      │
-      ▼
-Verify /db
-      │
-      ▼
-          ✅ GREEN
-      │
-      ▼
-Stop Both EC2 Instances
-```
-
----
-
-# 🌐 Dynamic EC2 IP Discovery
-
-The project does not depend on Elastic IP addresses.
-
-When stopped EC2 instances start again, their public IP addresses can change.
-
-The CI/CD workflow therefore:
-
-```text
-Start EC2
-   ↓
-Wait Until Running
-   ↓
-Query AWS
-   ↓
-Discover Current Public IP
-   ↓
-Use New IP for Deployment
-```
-
-This allows the deployment workflow to continue without manually updating an EC2 public IP in GitHub every time the instances restart.
-
----
-
-# 🤖 Automated Resource Lifecycle
-
-The workflows understand the state of the infrastructure before attempting deployment or testing.
-
-### 🗄️ RDS Lifecycle
-
-```text
-Check RDS State
-       │
-       ├── AVAILABLE ───────────────► Continue
-       │
-       ├── STOPPED ──► Start ──────► Wait
-       │
-       ├── STARTING ────────────────► Wait
-       │
-       └── STOPPING ─► Wait ─► Start ─► Wait
-                                           │
-                                           ▼
-                                     RDS AVAILABLE
-```
-
-This means the database does not have to be manually started before every workflow.
-
-### 🖥️ EC2 Lifecycle
-
-The deployment workflow also starts the application instances when required and waits for them before continuing.
-
-```text
-Check Instances
-      ↓
-Start Required EC2s
-      ↓
-Wait
-      ↓
-Discover Fresh IPs
-      ↓
-Deploy
-```
-
-After a successful normal deployment, both EC2 application instances are stopped to help control lab costs.
-
----
-
-# 🧪 Automated Failover Testing
-
-<div align="center">
-
-<img src="docs/assets/failover-flow.svg"
-     alt="Active-Passive Application Failover Test"
-     width="100%">
-
-</div>
-
-Application resilience is tested using a separate workflow:
-
-```text
-.github/workflows/failover-test.yml
-```
-
-It is intentionally separate from normal deployment and is manually started using:
-
-```text
-workflow_dispatch
-```
-
-### Failover Test Phases
-
-```text
-PHASE 1
-Normal Operation
-     │
-     ▼
-App-1 Healthy
-Website Healthy
-Database Healthy
-     │
-     ▼
-PHASE 2
-Stop ONLY App-1 Node.js Container
-     │
-     ▼
-Confirm App-1 :8080 is DOWN
-     │
-     ▼
-PHASE 3
-Request SAME Public URL
-     │
-     ▼
-Nginx Detects Primary Failure
-     │
-     ▼
-Traffic → App-2
-     │
-     ▼
-Website Healthy ✅
-     │
-     ▼
-/db Through App-2 ✅
-     │
-     ▼
-PHASE 4
-Restart App-1 Container
-     │
-     ▼
-Verify Recovery
-     │
-     ▼
-🏆 FAILOVER TEST PASSED
-```
-
-### What the Test Proves
-
-The test verifies:
-
-```text
-App-1 Application Failure
-           ↓
-Nginx Failover
-           ↓
-App-2 Application
-           ↓
-Private RDS Connection
-           ↓
-Application Still Available
-           ↓
-App-1 Recovery
-```
-
-After the dedicated failover test, the EC2 instances remain running so the environment can be inspected or demonstrated.
-
----
-
-# 🛡️ Security Design
-
-| Security Area | Implementation |
+| Command | Purpose |
 |---|---|
-| 🔐 GitHub → AWS | GitHub OIDC |
-| 🔑 AWS Credentials | Temporary AWS STS credentials |
-| 🗄️ Database | Private RDS |
-| 🚫 Public RDS Access | Disabled |
-| 🔌 Database Traffic | EC2 SG → RDS SG on `3306` |
-| 🔑 Database Password | GitHub Secret |
-| 🌐 Server-to-Server | Private VPC networking |
-| 💾 Terraform State | Remote Amazon S3 backend |
-| 🔒 RDS Storage | Encryption enabled |
+| `terraform init` | Initializes Terraform and downloads required providers |
+| `terraform validate` | Checks whether the Terraform configuration is valid |
+| `terraform plan` | Shows what Terraform plans to change before making the changes |
+| `terraform apply` | Applies the configuration and creates or updates the infrastructure |
 
-> [!NOTE]
-> Public SSH access is currently used because GitHub-hosted runners connect to the EC2 application servers during deployment.
->
-> This is acceptable for the current learning/lab architecture, but a production environment should use a more restrictive deployment mechanism such as **AWS Systems Manager** and least-privilege network access.
+### Interview Point
+
+**Terraform reads our configuration, compares it with the current infrastructure and state, and uses the AWS provider to communicate with AWS APIs and manage resources.**
 
 ---
 
-# 📂 Repository Structure
+# 💾 Terraform Remote State & Locking
+
+> **Terraform state keeps information about the infrastructure that Terraform manages.**
+
+<div align="center">
+
+<img src="docs/assets/terraform-state-flow.svg" width="100%" alt="Terraform Remote State Flow">
+
+</div>
+
+In this project, Terraform state is stored remotely in **Amazon S3** instead of depending on a local state file.
+
+The backend uses:
+
+- Remote S3 state
+- S3 bucket versioning
+- Server-side encryption
+- Block Public Access
+- Terraform state locking with `use_lockfile = true`
+
+### Why State Is Important
+
+Terraform uses the state to understand the relationship between:
+
+**Terraform configuration ↔ Terraform-managed resources**
+
+State locking helps prevent multiple Terraform operations from changing the same state at the same time.
+
+### Interview Point
+
+**We use an S3 remote backend so the Terraform state is stored centrally and can be used safely by our automated GitHub Actions workflow.**
+
+---
+
+# 🌐 AWS Networking
+
+> **A VPC is an isolated virtual network inside AWS where we can create and control our cloud resources.**
+
+<div align="center">
+
+<img src="docs/assets/network-flow.svg" width="100%" alt="AWS Network Flow">
+
+</div>
+
+Our custom VPC uses:
+
+**VPC CIDR:** `10.0.0.0/16`
+
+### Subnet Design
+
+| Subnet | CIDR | Availability Zone | Used For |
+|---|---|---|---|
+| Public Subnet 1 | `10.0.1.0/24` | `ap-south-1a` | EC2 App-1 |
+| Public Subnet 2 | `10.0.4.0/24` | `ap-south-1b` | EC2 App-2 |
+| Private DB Subnet 1 | `10.0.2.0/24` | `ap-south-1a` | RDS DB subnet group |
+| Private DB Subnet 2 | `10.0.3.0/24` | `ap-south-1b` | RDS DB subnet group |
+
+The two application servers are placed in different Availability Zones.
+
+The database subnet group also contains private subnets from two Availability Zones.
+
+### Interview Point
+
+**We divided the VPC into separate application and database network layers. The EC2 application servers are in public subnets, while the RDS database uses private subnets.**
+
+---
+
+# 🛡️ Security Groups
+
+> **A Security Group is a stateful virtual firewall that controls allowed inbound and outbound traffic for AWS resources.**
+
+<div align="center">
+
+<img src="docs/assets/security-group-flow.svg" width="100%" alt="Security Group Traffic Flow">
+
+</div>
+
+### EC2 Security Group
+
+The EC2 application security group currently allows:
+
+| Port | Purpose |
+|---|---|
+| `80` | Public HTTP traffic |
+| `22` | SSH deployment access |
+| `8080` | Application communication between instances using the same EC2 Security Group |
+
+### RDS Security Group
+
+The database accepts:
+
+**TCP `3306` from the EC2 Security Group**
+
+This means database access is based on the application security group rather than exposing MySQL directly to public clients.
+
+### Interview Point
+
+**The EC2 security group controls application traffic, while the RDS security group allows MySQL traffic only from the application EC2 security group.**
+
+---
+
+# 🔐 GitHub OIDC + AWS STS Authentication
+
+> **OIDC allows GitHub Actions to authenticate with AWS without storing long-term AWS access keys in GitHub.**
+
+<div align="center">
+
+<img src="docs/assets/oidc-flow.svg" width="100%" alt="GitHub OIDC AWS Authentication">
+
+</div>
+
+### Authentication Flow
+
+GitHub Actions receives an **OIDC token** from GitHub.
+
+The workflow also provides the ARN of the IAM role it wants to assume.
+
+AWS STS checks:
+
+- the OIDC token,
+- the IAM role trust policy,
+- the repository conditions defined in that trust relationship.
+
+If the conditions match, AWS STS provides **temporary AWS credentials**.
+
+GitHub Actions can then use those credentials to make authorized AWS API calls.
+
+### Interview Point
+
+**GitHub tells AWS which role it wants to assume. STS verifies the GitHub OIDC token against that role's trust policy. If the conditions match, STS provides temporary credentials for that role.**
+
+---
+
+# ⚙️ GitHub Actions CI/CD
+
+> **GitHub Actions is a CI/CD and automation service provided by GitHub. It allows us to automatically build, deploy and verify our application and infrastructure based on repository events.**
+
+<div align="center">
+
+<img src="docs/assets/cicd-pipeline.svg" width="100%" alt="GitHub Actions CI CD Pipeline">
+
+</div>
+
+The main deployment workflow is:
+
+`/.github/workflows/deploy.yml`
+
+A push to the `main` branch starts the deployment workflow.
+
+### What the Workflow Does
+
+1. Checks out the repository.
+2. Authenticates with AWS using OIDC.
+3. Runs Terraform.
+4. Checks the RDS state.
+5. Starts RDS when required and waits until it becomes available.
+6. Starts both EC2 application servers.
+7. Discovers their current IP addresses.
+8. Builds the Docker image.
+9. Pushes the image to Amazon ECR.
+10. Deploys the same image to both EC2 instances.
+11. Configures Nginx on App-1.
+12. Verifies the application.
+13. Verifies database connectivity.
+14. Stops both EC2 instances after a successful normal deployment.
+
+### Interview Point
+
+**Terraform manages the infrastructure, while GitHub Actions controls the complete automation flow around infrastructure deployment, Docker image delivery, application deployment and verification.**
+
+---
+
+# 🐳 Docker & Amazon ECR
+
+> **Docker packages an application and its dependencies into an image so the application can run in a consistent environment.**
+
+<div align="center">
+
+<img src="docs/assets/container-flow.svg" width="100%" alt="Docker ECR EC2 Flow">
+
+</div>
+
+Our application is built from:
+
+`nodeapp/Dockerfile`
+
+The Docker image contains the Node.js application and the environment required to run it.
+
+The workflow builds the image once and pushes it to:
+
+**Amazon Elastic Container Registry — ECR**
+
+Both EC2 application servers then pull and run the same application image.
+
+The Node.js application listens on:
+
+`8080`
+
+### Interview Point
+
+**ECR stores Docker images; it does not run containers. EC2 pulls the image from ECR, and Docker running on EC2 creates and runs the container.**
+
+---
+
+# 🗄️ Amazon RDS MySQL
+
+> **Amazon RDS is a managed relational database service provided by AWS. In this project, we use the MySQL database engine.**
+
+<div align="center">
+
+<img src="docs/assets/rds-private-flow.svg" width="100%" alt="Private Amazon RDS Architecture">
+
+</div>
+
+Our RDS database:
+
+- Uses MySQL
+- Is not publicly accessible
+- Uses encrypted storage
+- Uses a DB subnet group
+- Accepts application traffic on port `3306`
+- Can be accessed by both application servers
+- Stores application data used by the Node.js application
+
+### DB Subnet Group
+
+> **A DB subnet group is a collection of subnets that tells RDS which network locations are available for the database.**
+
+Our DB subnet group contains:
+
+- Private subnet in `ap-south-1a`
+- Private subnet in `ap-south-1b`
+
+The current RDS database instance itself is **Single-AZ**.
+
+### Interview Point
+
+**RDS is the managed database service, while MySQL is the database engine running through RDS. Our database is private and application access is controlled through security groups.**
+
+---
+
+# 🔀 Nginx Active-Passive Routing
+
+> **Nginx is a web server and reverse proxy. In this project, we use it to receive public HTTP requests and route them to our application containers.**
+
+<div align="center">
+
+<img src="docs/assets/nginx-routing-flow.svg" width="100%" alt="Nginx Active Passive Routing">
+
+</div>
+
+Nginx runs on **EC2 App-1**.
+
+It listens on:
+
+`Port 80`
+
+The Node.js application containers listen on:
+
+`Port 8080`
+
+### Primary Backend
+
+App-1:
+
+`127.0.0.1:8080`
+
+### Backup Backend
+
+App-2:
+
+`Private-IP:8080`
+
+During normal operation, Nginx sends application traffic to App-1.
+
+App-2 is configured as the backup backend.
+
+### Interview Point
+
+**Nginx receives the request on port 80 and forwards it to the Node.js application on port 8080. App-1 is the primary backend and App-2 is configured as the backup backend.**
+
+---
+
+# 🔄 Active-Passive Failover
+
+> **Active-passive means one application server handles normal traffic while another server is available as a backup.**
+
+<div align="center">
+
+<img src="docs/assets/failover-flow.svg" width="100%" alt="Application Failover Flow">
+
+</div>
+
+The project includes a separate workflow:
+
+`/.github/workflows/failover-test.yml`
+
+The workflow tests the application failover automatically.
+
+### Failover Test
+
+The workflow:
+
+1. Makes sure the required infrastructure is running.
+2. Verifies the normal application path.
+3. Verifies database connectivity.
+4. Stops only the App-1 Node.js container.
+5. Keeps App-1 EC2 and Nginx running.
+6. Confirms the App-1 application on port `8080` is unavailable.
+7. Sends a request through the same public Nginx endpoint.
+8. Nginx sends the request to App-2.
+9. Verifies the application through App-2.
+10. Verifies `/db` through the backup application.
+11. Restarts the App-1 container.
+12. Verifies primary application recovery.
+
+### Interview Point
+
+**Nginx performs the actual application failover. GitHub Actions does not perform the routing; it automatically tests whether the failover and recovery work correctly.**
+
+---
+
+# 🖥️ EC2 Lifecycle Automation
+
+> **Our workflow manages the EC2 lifecycle as part of deployment automation.**
+
+<div align="center">
+
+<img src="docs/assets/ec2-lifecycle.svg" width="100%" alt="EC2 Automated Lifecycle">
+
+</div>
+
+The EC2 instances do not use Elastic IP addresses.
+
+Because the public IP can change after an EC2 stop/start cycle, the workflow does not depend on a permanently stored public IP.
+
+It:
+
+- Starts the required EC2 instances
+- Waits until they are running
+- Discovers their current public and private IP addresses
+- Uses those addresses during deployment
+- Verifies the application
+- Stops both instances after a successful normal deployment
+
+### Interview Point
+
+**Our workflow dynamically discovers the current EC2 IP addresses, so deployment does not depend on manually updating the server IP after every restart.**
+
+---
+
+# 🗄️ RDS Lifecycle Automation
+
+> **The workflow checks the database state before trying to deploy or test the application.**
+
+<div align="center">
+
+<img src="docs/assets/rds-lifecycle.svg" width="100%" alt="RDS Automated Lifecycle">
+
+</div>
+
+The workflow checks whether RDS is:
+
+- Available
+- Stopped
+- Starting
+- Stopping
+
+If the database is stopped, the workflow starts it.
+
+If necessary, it waits until RDS becomes:
+
+`available`
+
+Only then does the workflow continue with application deployment or failover testing.
+
+### Interview Point
+
+**This prevents the deployment from failing simply because the database was manually stopped before the workflow started.**
+
+---
+
+# 🧪 Application Verification
+
+Deployment is not considered complete only because the Docker container started.
+
+The workflow performs verification after deployment.
+
+It checks:
+
+- Docker availability
+- App-1 Node.js application
+- App-2 Node.js application
+- Private App-1 → App-2 communication
+- Nginx public application path
+- Database connectivity
+- `/db` endpoint
+- Failover behavior in the dedicated failover workflow
+- Primary recovery after failover testing
+
+This helps prove that the different parts of the architecture can actually communicate with each other.
+
+---
+
+# 🔒 Security Approach
+
+The project includes several security-related practices:
+
+| Area | Implementation |
+|---|---|
+| AWS authentication | GitHub OIDC |
+| AWS credentials | Temporary STS credentials |
+| Database | Private RDS |
+| Database traffic | EC2 SG → RDS SG on `3306` |
+| Database password | GitHub Secret |
+| Terraform state | S3 remote backend |
+| RDS storage | Encryption enabled |
+| Server communication | Private VPC networking |
+| Container registry | Amazon ECR with image scanning |
+
+The current project also uses SSH during the GitHub Actions deployment process.
+
+---
+
+# 🔑 GitHub Variables & Secrets
+
+The workflow uses GitHub repository configuration instead of hardcoding environment-specific values directly into the workflow.
+
+### Variables
+
+```text
+AWS_AMI_ID
+AWS_KEY_NAME
+AWS_ROLE_ARN
+```
+
+### Secrets
+
+```text
+DB_PASSWORD
+EC2_SSH_PRIVATE_KEY
+```
+
+Sensitive secret values are not committed to the repository.
+
+---
+
+# 📂 Project Structure
 
 ```text
 Infra-deploy-aws-2/
@@ -760,15 +586,19 @@ Infra-deploy-aws-2/
 │   └── assets/
 │       ├── hero-animation.svg
 │       ├── architecture.svg
+│       ├── terraform-flow.svg
+│       ├── terraform-state-flow.svg
+│       ├── network-flow.svg
+│       ├── security-group-flow.svg
 │       ├── oidc-flow.svg
+│       ├── cicd-pipeline.svg
 │       ├── container-flow.svg
-│       └── failover-flow.svg
-│
-├── terraform/
-│   ├── main.tf
-│   ├── rds.tf
-│   ├── variables.tf
-│   └── .terraform.lock.hcl
+│       ├── rds-private-flow.svg
+│       ├── nginx-routing-flow.svg
+│       ├── failover-flow.svg
+│       ├── ec2-lifecycle.svg
+│       ├── rds-lifecycle.svg
+│       └── production-evolution.svg
 │
 ├── nodeapp/
 │   ├── public/
@@ -777,8 +607,14 @@ Infra-deploy-aws-2/
 │   │   └── script.js
 │   │
 │   ├── app.js
-│   ├── package.json
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── package.json
+│
+├── terraform/
+│   ├── main.tf
+│   ├── rds.tf
+│   ├── variables.tf
+│   └── .terraform.lock.hcl
 │
 ├── .gitignore
 └── README.md
@@ -786,215 +622,137 @@ Infra-deploy-aws-2/
 
 ---
 
-# 🔑 GitHub Configuration
+# ▶️ How the Project Runs
 
-### Repository Variables
+### Normal Deployment
 
-```text
-AWS_AMI_ID
-AWS_KEY_NAME
-AWS_ROLE_ARN
-```
-
-### Repository Secrets
-
-```text
-DB_PASSWORD
-EC2_SSH_PRIVATE_KEY
-```
-
-Sensitive credentials are not committed directly into the repository.
-
----
-
-# ▶️ Deployment
-
-A normal project change follows:
+A push to the `main` branch starts the normal deployment workflow.
 
 ```bash
-git status
 git add .
 git commit -m "Update project"
 git push origin main
 ```
 
-The push triggers:
+GitHub Actions then handles the infrastructure and application deployment automatically.
 
-```text
-deploy.yml
-```
+After a successful normal deployment, the two EC2 application instances are stopped.
 
-automatically.
+### Failover Test
 
-### Normal Pipeline
+The failover workflow is started manually from:
 
-```text
-PUSH
- │
- ▼
-PROVISION
- │
- ▼
-BUILD
- │
- ▼
-DEPLOY
- │
- ▼
-VERIFY
- │
- ▼
-GREEN
-```
+**GitHub → Actions → Failover Test → Run workflow**
 
-The failover workflow can then be run independently when resilience testing is required.
+This workflow performs the active-passive failover test and recovery verification.
+
+The EC2 instances remain running after the failover test so the environment can be inspected and demonstrated.
 
 ---
 
-# 📊 What This Project Demonstrates
+# ⚠️ Current Architecture Scope
 
-<div align="center">
+The current design demonstrates **application-level active-passive failover**.
 
-| ☁️ AWS | ⚙️ DevOps | 🌐 Networking | 🛡️ Reliability |
-|---|---|---|---|
-| EC2 | Terraform | VPC | Active-Passive |
-| RDS | GitHub Actions | Subnets | Failover Testing |
-| ECR | Docker | Route Tables | Health Checks |
-| IAM / STS | CI/CD | Security Groups | Recovery |
-| S3 | OIDC | Private Networking | Multi-AZ App Placement |
+If the Node.js application on App-1 becomes unavailable while App-1 and Nginx remain running, Nginx can route application traffic to App-2.
 
-</div>
+However, App-1 currently contains the public Nginx entry point.
 
-### End-to-End Engineering Flow
+Because of this, the project does not claim complete infrastructure-level high availability.
 
-```text
-CODE
- ↓
-VERSION CONTROL
- ↓
-CI/CD
- ↓
-AUTHENTICATION
- ↓
-INFRASTRUCTURE AS CODE
- ↓
-AWS NETWORKING
- ↓
-CONTAINER DELIVERY
- ↓
-APPLICATION
- ↓
-PRIVATE DATABASE
- ↓
-REVERSE PROXY
- ↓
-FAILOVER
- ↓
-RECOVERY
-```
-
----
-
-# ⚠️ Architecture Boundary
-
-> [!IMPORTANT]
-> The current architecture demonstrates **application-level active-passive failover**.
->
-> It does **not** claim complete infrastructure-level high availability.
-
-This distinction is important.
-
-Nginx currently runs on **EC2 App-1**, and App-1 is also the public application entry point.
-
-### Scenario 1 — App-1 Container Failure
-
-```text
-              Nginx ✅
-                 │
-        ┌────────┴────────┐
-        │                 │
-        ▼                 ▼
- App-1 Node ❌      App-2 Node ✅
-                       BACKUP
-```
-
-The application can continue through App-2.
-
-### Scenario 2 — Complete App-1 Failure
-
-```text
-Internet
-   │
-   ▼
-App-1 EC2 ❌
-   │
-   └── Nginx ❌
-```
-
-The public entry point is lost.
-
-Therefore, the current design proves **application failover**, while complete host-level high availability remains a production improvement.
+This distinction is important when explaining the project in an interview.
 
 ---
 
 # 🚀 Production Evolution
 
-A production-oriented evolution could use:
+<div align="center">
 
-```text
-                         INTERNET
-                             │
-                             ▼
-                  APPLICATION LOAD BALANCER
-                             │
-                ┌────────────┴────────────┐
-                │                         │
-                ▼                         ▼
-        PRIVATE APP SUBNET        PRIVATE APP SUBNET
-          ap-south-1a               ap-south-1b
-                │                         │
-                ▼                         ▼
-             APP-1                     APP-2
-                │                         │
-                └────────────┬────────────┘
-                             │
-                             ▼
-                        RDS MULTI-AZ
-```
+<img src="docs/assets/production-evolution.svg" width="100%" alt="Production Architecture Evolution">
 
-| Current Architecture | Production Evolution |
+</div>
+
+The current project gives us a strong base that can be evolved further for a larger production environment.
+
+Possible future improvements include:
+
+| Current Project | Future Production Direction |
 |---|---|
-| App-1/Nginx entry point | Application Load Balancer |
-| Two individually managed EC2s | Auto Scaling Group |
-| Public application EC2s | Private application subnets |
-| SSH-based deployment | AWS Systems Manager |
-| HTTP | HTTPS + AWS Certificate Manager |
-| Dynamic public IP | Route 53 DNS + Load Balancer |
+| Nginx entry point on App-1 | Application Load Balancer |
+| Two managed EC2 servers | Auto Scaling Group |
+| Public application servers | Private application subnets |
+| SSH deployment | AWS Systems Manager |
+| HTTP application access | HTTPS with ACM |
+| Public IP access | Route 53 DNS |
 | Single-AZ RDS | RDS Multi-AZ |
-| Workflow health tests | CloudWatch metrics + alarms |
-| Broad CI/CD permissions | Least-privilege IAM |
-| Single environment | Development / Staging / Production |
+| Workflow verification | CloudWatch monitoring and alarms |
+| Current IAM permissions | More restrictive least-privilege IAM |
+| Single project environment | Separate Dev / Stage / Production environments |
+
+These are **future improvements**, not claims about the current infrastructure.
 
 ---
 
-# 🏆 Infrastructure Deployment on AWS
+# 🎯 What I Learned From This Project
+
+This project gave practical experience with:
+
+- Infrastructure as Code
+- AWS networking
+- VPC and subnet design
+- Multi-AZ application placement
+- EC2
+- RDS
+- Amazon ECR
+- Amazon S3 backend
+- Terraform state and locking
+- IAM roles
+- GitHub OIDC
+- AWS STS
+- GitHub Actions
+- CI/CD
+- Docker
+- Nginx
+- Reverse proxying
+- Active-passive application design
+- Security groups
+- Private database connectivity
+- Infrastructure lifecycle automation
+- Application verification
+- Failover testing
+- Recovery testing
+
+---
+
+# 💼 Interview Summary
+
+> **I built an automated AWS infrastructure and CI/CD project using Terraform and GitHub Actions. Terraform creates and manages the AWS infrastructure, including the VPC, subnets, security groups, two EC2 application servers, ECR and a private RDS MySQL database.**
+>
+> **GitHub Actions authenticates with AWS using GitHub OIDC and AWS STS temporary credentials. The workflow runs Terraform, manages the EC2 and RDS lifecycle, builds the Node.js application as a Docker image, pushes it to Amazon ECR and deploys the same image to both EC2 servers.**
+>
+> **Nginx runs on the primary application server and provides active-passive application routing. App-1 is the primary backend and App-2 is the backup. I also created a separate failover workflow that intentionally stops the primary Node.js container, verifies that Nginx routes traffic to App-2, checks database connectivity through the backup server, and then verifies primary recovery.**
+>
+> **This project helped me understand how infrastructure, networking, security, authentication, CI/CD, containers, databases and application resilience work together in an AWS environment.**
+
+---
 
 <div align="center">
 
-### `CODE → AUTOMATE → PROVISION → CONTAINERIZE → DEPLOY → FAILOVER → RECOVER`
+## Infrastructure Deployment on AWS
+
+### `BUILD → AUTOMATE → PROVISION → DEPLOY → VERIFY → FAILOVER → RECOVER`
+
+**Terraform • AWS • GitHub Actions • OIDC • STS • Docker • ECR • EC2 • RDS • Nginx**
 
 <br>
 
-**AWS** • **Terraform** • **GitHub Actions** • **OIDC** • **STS** • **Docker** • **ECR** • **EC2** • **RDS** • **Nginx**
+**Infrastructure created as code.**  
+**Application delivered through automation.**  
+**Failure tested intentionally.**  
+**Recovery verified automatically.**
 
 <br>
 
-> **Infrastructure is not just created.**
->
-> **It is automated, deployed, tested, failed intentionally, and recovered.**
-
-<br>
-
-### ☁️ Built to demonstrate practical Cloud & Infrastructure Engineering
+### ☁️ Cloud & Infrastructure Engineering Project
 
 </div>
