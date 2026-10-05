@@ -1,0 +1,316 @@
+<svg width="1200" height="500" viewBox="0 0 1200 500"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#070B14"/>
+      <stop offset="100%" stop-color="#0D1117"/>
+    </linearGradient>
+
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <marker id="greenArrow"
+            markerWidth="10"
+            markerHeight="10"
+            refX="8"
+            refY="3"
+            orient="auto">
+      <path d="M0 0L0 6L9 3Z" fill="#3FB950"/>
+    </marker>
+
+    <marker id="yellowArrow"
+            markerWidth="10"
+            markerHeight="10"
+            refX="8"
+            refY="3"
+            orient="auto">
+      <path d="M0 0L0 6L9 3Z" fill="#E3B341"/>
+    </marker>
+
+  </defs>
+
+  <rect width="1200" height="500" rx="22" fill="url(#bg)"/>
+
+  <text x="600" y="55"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="27"
+        font-weight="700"
+        fill="#F0F6FC">
+    ACTIVE-PASSIVE FAILOVER TEST
+  </text>
+
+  <text x="600" y="84"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="12"
+        letter-spacing="2"
+        fill="#58A6FF">
+    FAILURE IS SIMULATED • BACKUP IS VERIFIED • PRIMARY IS RECOVERED
+  </text>
+
+  <!-- User -->
+  <rect x="70" y="190" width="160" height="90" rx="15"
+        fill="#111827" stroke="#58A6FF"/>
+
+  <text x="150" y="228"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="17"
+        font-weight="700"
+        fill="#F0F6FC">
+    User
+  </text>
+
+  <text x="150" y="255"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="10"
+        fill="#8B949E">
+    SAME PUBLIC URL
+  </text>
+
+  <!-- Nginx -->
+  <rect x="300" y="190" width="180" height="90" rx="15"
+        fill="#111827" stroke="#58A6FF"/>
+
+  <text x="390" y="228"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="17"
+        font-weight="700"
+        fill="#F0F6FC">
+    Nginx
+  </text>
+
+  <text x="390" y="255"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="10"
+        fill="#58A6FF">
+    APP-1 :80
+  </text>
+
+  <!-- Primary -->
+  <rect x="580" y="125" width="220" height="110" rx="15"
+        fill="#111827">
+
+    <animate
+      attributeName="stroke"
+      values="#3FB950;#3FB950;#F85149;#F85149;#3FB950"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+
+    <animate
+      attributeName="stroke-width"
+      values="2;2;3;3;2"
+      dur="10s"
+      repeatCount="indefinite"/>
+  </rect>
+
+  <text x="690" y="164"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="18"
+        font-weight="700"
+        fill="#F0F6FC">
+    EC2 App-1
+  </text>
+
+  <text x="690" y="191"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11">
+    <animate
+      attributeName="fill"
+      values="#7EE787;#7EE787;#F85149;#F85149;#7EE787"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+
+    PRIMARY NODE :8080
+  </text>
+
+  <!-- Backup -->
+  <rect x="580" y="300" width="220" height="110" rx="15"
+        fill="#111827">
+
+    <animate
+      attributeName="stroke"
+      values="#E3B341;#E3B341;#3FB950;#3FB950;#E3B341"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+
+    <animate
+      attributeName="stroke-width"
+      values="2;2;3;3;2"
+      dur="10s"
+      repeatCount="indefinite"/>
+  </rect>
+
+  <text x="690" y="339"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="18"
+        font-weight="700"
+        fill="#F0F6FC">
+    EC2 App-2
+  </text>
+
+  <text x="690" y="366"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11">
+    <animate
+      attributeName="fill"
+      values="#E3B341;#E3B341;#7EE787;#7EE787;#E3B341"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+
+    BACKUP NODE :8080
+  </text>
+
+  <!-- RDS -->
+  <rect x="930" y="190" width="200" height="90" rx="15"
+        fill="#111827" stroke="#3FB950"/>
+
+  <text x="1030" y="228"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="17"
+        font-weight="700"
+        fill="#F0F6FC">
+    RDS MySQL
+  </text>
+
+  <text x="1030" y="255"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="10"
+        fill="#7EE787">
+    PRIVATE :3306
+  </text>
+
+  <!-- user → nginx -->
+  <path d="M230 235H300"
+        fill="none"
+        stroke="#58A6FF"
+        stroke-width="2"/>
+
+  <circle r="6" fill="#58A6FF" filter="url(#glow)">
+    <animateMotion
+      path="M230 235H300"
+      dur="1.6s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- nginx primary path -->
+  <path d="M480 220 C520 220 535 180 580 180"
+        fill="none"
+        stroke="#3FB950"
+        stroke-width="2"
+        marker-end="url(#greenArrow)">
+
+    <animate
+      attributeName="opacity"
+      values="1;1;0.12;0.12;1"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+  </path>
+
+  <!-- primary packet -->
+  <circle r="6" fill="#3FB950" filter="url(#glow)">
+    <animate
+      attributeName="opacity"
+      values="1;1;0;0;1"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+
+    <animateMotion
+      path="M480 220 C520 220 535 180 580 180"
+      dur="2s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- backup route -->
+  <path d="M480 250 C520 250 535 355 580 355"
+        fill="none"
+        stroke="#E3B341"
+        stroke-width="2"
+        stroke-dasharray="7 6"
+        marker-end="url(#yellowArrow)">
+
+    <animate
+      attributeName="opacity"
+      values="0.15;0.15;1;1;0.15"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+  </path>
+
+  <!-- failover packet -->
+  <circle r="6" fill="#E3B341" filter="url(#glow)">
+    <animate
+      attributeName="opacity"
+      values="0;0;1;1;0"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+
+    <animateMotion
+      path="M480 250 C520 250 535 355 580 355"
+      dur="2s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- primary → RDS -->
+  <path d="M800 180 C850 180 870 220 930 225"
+        fill="none"
+        stroke="#3FB950"
+        stroke-width="2">
+
+    <animate
+      attributeName="opacity"
+      values="1;1;0.15;0.15;1"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+  </path>
+
+  <!-- backup → RDS -->
+  <path d="M800 355 C860 355 870 255 930 245"
+        fill="none"
+        stroke="#3FB950"
+        stroke-width="2">
+
+    <animate
+      attributeName="opacity"
+      values="0.15;0.15;1;1;0.15"
+      keyTimes="0;0.30;0.38;0.72;1"
+      dur="10s"
+      repeatCount="indefinite"/>
+  </path>
+
+  <!-- status timeline -->
+  <text x="600" y="460"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="12"
+        letter-spacing="1.4"
+        fill="#8B949E">
+    PRIMARY ACTIVE  →  FAILURE  →  BACKUP ACTIVE  →  PRIMARY RECOVERY
+  </text>
+
+</svg>

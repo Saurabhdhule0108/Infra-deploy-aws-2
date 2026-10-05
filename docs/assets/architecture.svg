@@ -1,0 +1,705 @@
+<svg width="1400" height="940" viewBox="0 0 1400 940"
+     xmlns="http://www.w3.org/2000/svg"
+     role="img"
+     aria-labelledby="title desc">
+
+  <title id="title">Infrastructure Deployment on AWS - Architecture</title>
+  <desc id="desc">
+    Animated architecture showing GitHub Actions, OIDC, AWS STS,
+    Terraform, Amazon ECR, two EC2 application servers,
+    Nginx active-passive routing and private Amazon RDS MySQL.
+  </desc>
+
+  <defs>
+
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#070B14"/>
+      <stop offset="50%" stop-color="#0D1117"/>
+      <stop offset="100%" stop-color="#090D18"/>
+    </linearGradient>
+
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#58A6FF"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#58A6FF"/>
+    </linearGradient>
+
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3FB950"/>
+      <stop offset="100%" stop-color="#7EE787"/>
+    </linearGradient>
+
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40"
+            fill="none"
+            stroke="#58A6FF"
+            stroke-opacity="0.04"/>
+    </pattern>
+
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+
+    <marker id="arrowBlue"
+            markerWidth="10"
+            markerHeight="10"
+            refX="8"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#58A6FF"/>
+    </marker>
+
+    <marker id="arrowPurple"
+            markerWidth="10"
+            markerHeight="10"
+            refX="8"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#A78BFA"/>
+    </marker>
+
+    <marker id="arrowGreen"
+            markerWidth="10"
+            markerHeight="10"
+            refX="8"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3FB950"/>
+    </marker>
+
+  </defs>
+
+  <!-- BACKGROUND -->
+  <rect width="1400" height="940" rx="26" fill="url(#bg)"/>
+  <rect width="1400" height="940" rx="26" fill="url(#grid)"/>
+
+  <circle cx="700" cy="500" r="400"
+          fill="#58A6FF"
+          opacity="0.025"
+          filter="url(#softGlow)">
+    <animate attributeName="r"
+             values="360;430;360"
+             dur="8s"
+             repeatCount="indefinite"/>
+  </circle>
+
+  <!-- HEADER -->
+  <text x="700" y="55"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="29"
+        font-weight="700"
+        letter-spacing="3"
+        fill="#F0F6FC">
+    INFRASTRUCTURE DEPLOYMENT ON AWS
+  </text>
+
+  <text x="700" y="86"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="12"
+        letter-spacing="3"
+        fill="#58A6FF">
+    AUTOMATED CLOUD DELIVERY • PRIVATE DATA • APPLICATION RESILIENCE
+  </text>
+
+  <!-- CONTROL PLANE -->
+  <rect x="70" y="120"
+        width="1260" height="170"
+        rx="20"
+        fill="#0D1117"
+        stroke="#30363D"/>
+
+  <text x="95" y="150"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="12"
+        letter-spacing="2"
+        fill="#8B949E">
+    AUTOMATION / CONTROL PLANE
+  </text>
+
+  <!-- GitHub -->
+  <g>
+    <rect x="110" y="180"
+          width="180" height="72"
+          rx="14"
+          fill="#111827"
+          stroke="#58A6FF"
+          stroke-opacity="0.5"/>
+
+    <text x="200" y="211"
+          text-anchor="middle"
+          font-family="Inter,Segoe UI,Arial,sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#F0F6FC">
+      GitHub
+    </text>
+
+    <text x="200" y="234"
+          text-anchor="middle"
+          font-family="JetBrains Mono,Consolas,monospace"
+          font-size="11"
+          fill="#8B949E">
+      Source Repository
+    </text>
+  </g>
+
+  <!-- Actions -->
+  <g>
+    <rect x="350" y="180"
+          width="180" height="72"
+          rx="14"
+          fill="#111827"
+          stroke="#58A6FF"
+          stroke-opacity="0.65"/>
+
+    <text x="440" y="211"
+          text-anchor="middle"
+          font-family="Inter,Segoe UI,Arial,sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#F0F6FC">
+      GitHub Actions
+    </text>
+
+    <text x="440" y="234"
+          text-anchor="middle"
+          font-family="JetBrains Mono,Consolas,monospace"
+          font-size="11"
+          fill="#58A6FF">
+      CI/CD ENGINE
+    </text>
+  </g>
+
+  <!-- OIDC / STS -->
+  <g>
+    <rect x="590" y="180"
+          width="180" height="72"
+          rx="14"
+          fill="#111827"
+          stroke="#A78BFA"
+          stroke-opacity="0.7"/>
+
+    <text x="680" y="211"
+          text-anchor="middle"
+          font-family="Inter,Segoe UI,Arial,sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#F0F6FC">
+      OIDC + AWS STS
+    </text>
+
+    <text x="680" y="234"
+          text-anchor="middle"
+          font-family="JetBrains Mono,Consolas,monospace"
+          font-size="11"
+          fill="#C4B5FD">
+      TEMP CREDENTIALS
+    </text>
+  </g>
+
+  <!-- Terraform -->
+  <g>
+    <rect x="830" y="180"
+          width="180" height="72"
+          rx="14"
+          fill="#111827"
+          stroke="#8B5CF6"
+          stroke-opacity="0.8"/>
+
+    <text x="920" y="211"
+          text-anchor="middle"
+          font-family="Inter,Segoe UI,Arial,sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#F0F6FC">
+      Terraform
+    </text>
+
+    <text x="920" y="234"
+          text-anchor="middle"
+          font-family="JetBrains Mono,Consolas,monospace"
+          font-size="11"
+          fill="#A78BFA">
+      INFRASTRUCTURE AS CODE
+    </text>
+  </g>
+
+  <!-- S3 -->
+  <g>
+    <rect x="1070" y="180"
+          width="180" height="72"
+          rx="14"
+          fill="#111827"
+          stroke="#3FB950"
+          stroke-opacity="0.65"/>
+
+    <text x="1160" y="211"
+          text-anchor="middle"
+          font-family="Inter,Segoe UI,Arial,sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#F0F6FC">
+      Amazon S3
+    </text>
+
+    <text x="1160" y="234"
+          text-anchor="middle"
+          font-family="JetBrains Mono,Consolas,monospace"
+          font-size="11"
+          fill="#7EE787">
+      STATE + LOCKING
+    </text>
+  </g>
+
+  <!-- Control-plane paths -->
+  <path d="M290 216 H350"
+        fill="none"
+        stroke="#58A6FF"
+        stroke-width="2"
+        marker-end="url(#arrowBlue)"/>
+
+  <path d="M530 216 H590"
+        fill="none"
+        stroke="#A78BFA"
+        stroke-width="2"
+        marker-end="url(#arrowPurple)"/>
+
+  <path d="M770 216 H830"
+        fill="none"
+        stroke="#A78BFA"
+        stroke-width="2"
+        marker-end="url(#arrowPurple)"/>
+
+  <path d="M1010 216 H1070"
+        fill="none"
+        stroke="#3FB950"
+        stroke-width="2"
+        marker-end="url(#arrowGreen)"/>
+
+  <!-- Moving control packet -->
+  <circle r="5" fill="#58A6FF" filter="url(#glow)">
+    <animateMotion
+      path="M290 216 H350"
+      dur="2s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <circle r="5" fill="#A78BFA" filter="url(#glow)">
+    <animateMotion
+      path="M530 216 H590"
+      dur="2.3s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- AWS CLOUD -->
+  <rect x="70" y="330"
+        width="1260" height="540"
+        rx="24"
+        fill="#0B101B"
+        stroke="#58A6FF"
+        stroke-opacity="0.45"
+        stroke-width="2"/>
+
+  <text x="100" y="365"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="17"
+        font-weight="700"
+        fill="#58A6FF">
+    AWS CLOUD • ap-south-1
+  </text>
+
+  <!-- VPC -->
+  <rect x="100" y="390"
+        width="1200" height="445"
+        rx="20"
+        fill="#0D1117"
+        stroke="#8B5CF6"
+        stroke-opacity="0.45"/>
+
+  <text x="125" y="422"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="13"
+        fill="#C4B5FD">
+    CUSTOM VPC • 10.0.0.0/16
+  </text>
+
+  <!-- ECR -->
+  <g>
+    <rect x="150" y="455"
+          width="190" height="85"
+          rx="15"
+          fill="#111827"
+          stroke="#22D3EE"
+          stroke-opacity="0.75"/>
+
+    <text x="245" y="485"
+          text-anchor="middle"
+          font-family="Inter,Segoe UI,Arial,sans-serif"
+          font-size="17"
+          font-weight="600"
+          fill="#67E8F9">
+      Amazon ECR
+    </text>
+
+    <text x="245" y="510"
+          text-anchor="middle"
+          font-family="JetBrains Mono,Consolas,monospace"
+          font-size="11"
+          fill="#8B949E">
+      DOCKER IMAGE
+    </text>
+
+    <circle cx="315" cy="474" r="5" fill="#3FB950">
+      <animate attributeName="opacity"
+               values="1;0.25;1"
+               dur="1.7s"
+               repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- AZ1 -->
+  <rect x="390" y="455"
+        width="370" height="250"
+        rx="18"
+        fill="#0B1320"
+        stroke="#58A6FF"
+        stroke-opacity="0.45"/>
+
+  <text x="415" y="484"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="12"
+        fill="#58A6FF">
+    AVAILABILITY ZONE • ap-south-1a
+  </text>
+
+  <!-- Public subnet 1 -->
+  <rect x="415" y="505"
+        width="320" height="175"
+        rx="14"
+        fill="#101927"
+        stroke="#58A6FF"
+        stroke-dasharray="6 5"
+        stroke-opacity="0.6"/>
+
+  <text x="435" y="530"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        fill="#8B949E">
+    PUBLIC SUBNET • 10.0.1.0/24
+  </text>
+
+  <!-- App1 -->
+  <rect x="455" y="555"
+        width="240" height="95"
+        rx="14"
+        fill="#111827"
+        stroke="#3FB950"
+        stroke-width="2"
+        stroke-opacity="0.8"/>
+
+  <circle cx="478" cy="578" r="6" fill="#3FB950">
+    <animate attributeName="r"
+             values="5;8;5"
+             dur="2s"
+             repeatCount="indefinite"/>
+  </circle>
+
+  <text x="575" y="580"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="18"
+        font-weight="700"
+        fill="#F0F6FC">
+    EC2 APP-1
+  </text>
+
+  <text x="575" y="606"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        fill="#7EE787">
+    PRIMARY
+  </text>
+
+  <text x="575" y="629"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        fill="#8B949E">
+    NGINX :80 • NODE :8080
+  </text>
+
+  <!-- AZ2 -->
+  <rect x="805" y="455"
+        width="370" height="250"
+        rx="18"
+        fill="#0B1320"
+        stroke="#A78BFA"
+        stroke-opacity="0.45"/>
+
+  <text x="830" y="484"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="12"
+        fill="#A78BFA">
+    AVAILABILITY ZONE • ap-south-1b
+  </text>
+
+  <!-- Public subnet2 -->
+  <rect x="830" y="505"
+        width="320" height="175"
+        rx="14"
+        fill="#101927"
+        stroke="#A78BFA"
+        stroke-dasharray="6 5"
+        stroke-opacity="0.6"/>
+
+  <text x="850" y="530"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        fill="#8B949E">
+    PUBLIC SUBNET • 10.0.4.0/24
+  </text>
+
+  <!-- App2 -->
+  <rect x="870" y="555"
+        width="240" height="95"
+        rx="14"
+        fill="#111827"
+        stroke="#E3B341"
+        stroke-width="2"
+        stroke-opacity="0.8"/>
+
+  <circle cx="893" cy="578" r="6" fill="#E3B341">
+    <animate attributeName="opacity"
+             values="1;0.35;1"
+             dur="2s"
+             repeatCount="indefinite"/>
+  </circle>
+
+  <text x="990" y="580"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="18"
+        font-weight="700"
+        fill="#F0F6FC">
+    EC2 APP-2
+  </text>
+
+  <text x="990" y="606"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        fill="#E3B341">
+    BACKUP
+  </text>
+
+  <text x="990" y="629"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        fill="#8B949E">
+    NODE :8080
+  </text>
+
+  <!-- ECR deployment paths -->
+  <path d="M340 485 C380 485 405 545 455 585"
+        fill="none"
+        stroke="#22D3EE"
+        stroke-width="2"
+        stroke-dasharray="8 7"
+        marker-end="url(#arrowBlue)"/>
+
+  <path d="M340 510 C520 510 700 510 870 585"
+        fill="none"
+        stroke="#22D3EE"
+        stroke-width="2"
+        stroke-dasharray="8 7"
+        marker-end="url(#arrowBlue)"/>
+
+  <circle r="5" fill="#22D3EE" filter="url(#glow)">
+    <animateMotion
+      path="M340 485 C380 485 405 545 455 585"
+      dur="3s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <circle r="5" fill="#22D3EE" filter="url(#glow)">
+    <animateMotion
+      path="M340 510 C520 510 700 510 870 585"
+      dur="4s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Active-passive private path -->
+  <path d="M695 602 H870"
+        fill="none"
+        stroke="#E3B341"
+        stroke-width="2"
+        stroke-dasharray="7 6"
+        marker-end="url(#arrowPurple)"/>
+
+  <text x="782" y="590"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="10"
+        fill="#E3B341">
+    NGINX BACKUP • PRIVATE :8080
+  </text>
+
+  <circle r="5" fill="#E3B341" filter="url(#glow)">
+    <animateMotion
+      path="M695 602 H870"
+      dur="2.6s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- DB layer -->
+  <rect x="390" y="735"
+        width="785" height="75"
+        rx="16"
+        fill="#101620"
+        stroke="#3FB950"
+        stroke-opacity="0.45"/>
+
+  <text x="415" y="758"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="10"
+        fill="#8B949E">
+    PRIVATE DATABASE LAYER • DB SUBNET GROUP • 10.0.2.0/24 + 10.0.3.0/24
+  </text>
+
+  <!-- RDS -->
+  <rect x="630" y="765"
+        width="300" height="70"
+        rx="14"
+        fill="#111827"
+        stroke="#3FB950"
+        stroke-width="2"/>
+
+  <circle cx="658" cy="790" r="6" fill="#3FB950">
+    <animate attributeName="opacity"
+             values="1;0.3;1"
+             dur="1.8s"
+             repeatCount="indefinite"/>
+  </circle>
+
+  <text x="780" y="790"
+        text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="17"
+        font-weight="700"
+        fill="#F0F6FC">
+    Amazon RDS MySQL
+  </text>
+
+  <text x="780" y="814"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        fill="#7EE787">
+    PRIVATE • ENCRYPTED • :3306
+  </text>
+
+  <!-- DB paths -->
+  <path d="M575 650 V715 Q575 780 630 790"
+        fill="none"
+        stroke="#3FB950"
+        stroke-width="2"
+        marker-end="url(#arrowGreen)"/>
+
+  <path d="M990 650 V715 Q990 780 930 790"
+        fill="none"
+        stroke="#3FB950"
+        stroke-width="2"
+        marker-end="url(#arrowGreen)"/>
+
+  <circle r="5" fill="#3FB950" filter="url(#glow)">
+    <animateMotion
+      path="M575 650 V715 Q575 780 630 790"
+      dur="3s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <circle r="5" fill="#3FB950" filter="url(#glow)">
+    <animateMotion
+      path="M990 650 V715 Q990 780 930 790"
+      dur="3.4s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Terraform provisioning path -->
+  <path d="M920 252 V310 Q920 330 900 345"
+        fill="none"
+        stroke="#A78BFA"
+        stroke-width="2"
+        stroke-dasharray="7 6"
+        marker-end="url(#arrowPurple)"/>
+
+  <text x="942" y="315"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="10"
+        fill="#A78BFA">
+    PROVISION
+  </text>
+
+  <!-- Footer status -->
+  <circle cx="105" cy="900" r="5" fill="#3FB950">
+    <animate attributeName="opacity"
+             values="1;0.25;1"
+             dur="1.5s"
+             repeatCount="indefinite"/>
+  </circle>
+
+  <text x="120" y="905"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        letter-spacing="1"
+        fill="#7EE787">
+    INFRASTRUCTURE HEALTHY
+  </text>
+
+  <text x="700" y="905"
+        text-anchor="middle"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        letter-spacing="1"
+        fill="#8B949E">
+    APPLICATION-LEVEL ACTIVE-PASSIVE RESILIENCE
+  </text>
+
+  <text x="1290" y="905"
+        text-anchor="end"
+        font-family="JetBrains Mono,Consolas,monospace"
+        font-size="11"
+        letter-spacing="1"
+        fill="#58A6FF">
+    AP-SOUTH-1
+  </text>
+
+  <!-- Outer border -->
+  <rect x="1" y="1"
+        width="1398" height="938"
+        rx="25"
+        fill="none"
+        stroke="url(#purple)"
+        stroke-opacity="0.28"
+        stroke-width="2"/>
+
+</svg>
