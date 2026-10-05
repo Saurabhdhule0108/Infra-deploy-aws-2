@@ -1,0 +1,169 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070B14"/>
+      <stop offset="0.55" stop-color="#0A1220"/>
+      <stop offset="1" stop-color="#0D1117"/>
+    </linearGradient>
+
+    <linearGradient id="cloudGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#58A6FF"/>
+      <stop offset="0.5" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+
+    <radialGradient id="cloudFill">
+      <stop offset="0" stop-color="#16263A"/>
+      <stop offset="1" stop-color="#0E1726"/>
+    </radialGradient>
+
+    <filter id="cloudGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+  </defs>
+
+  <!-- Background -->
+
+  <rect width="1200" height="360" rx="24" fill="url(#background)"/>
+
+  <!-- Very subtle stars -->
+
+  <g fill="#58A6FF" opacity=".25">
+    <circle cx="120" cy="85" r="1.5"/>
+    <circle cx="220" cy="265" r="1"/>
+    <circle cx="330" cy="75" r="1"/>
+    <circle cx="865" cy="85" r="1.5"/>
+    <circle cx="1010" cy="255" r="1"/>
+    <circle cx="1090" cy="110" r="1.5"/>
+  </g>
+
+  <!-- Subtle data lines -->
+
+  <path d="M90 180H285"
+        stroke="#58A6FF"
+        stroke-width="1"
+        opacity=".25"/>
+
+  <path d="M915 180H1110"
+        stroke="#A78BFA"
+        stroke-width="1"
+        opacity=".25"/>
+
+  <circle r="4" fill="#58A6FF" filter="url(#softGlow)">
+    <animateMotion path="M90 180H285"
+                   dur="3s"
+                   repeatCount="indefinite"/>
+  </circle>
+
+  <circle r="4" fill="#A78BFA" filter="url(#softGlow)">
+    <animateMotion path="M1110 180H915"
+                   dur="3.4s"
+                   repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Cloud glow -->
+
+  <g opacity=".28" filter="url(#cloudGlow)">
+    <ellipse cx="600" cy="187" rx="275" ry="93" fill="#22D3EE"/>
+  </g>
+
+  <!-- Cloud -->
+
+  <path
+    d="
+      M410 235
+      C350 235 325 195 338 158
+      C350 123 380 107 416 111
+      C437 66 480 43 527 55
+      C559 25 613 20 650 51
+      C703 38 753 68 766 115
+      C808 107 850 134 858 174
+      C867 218 830 245 786 245
+      H416
+      C414 245 412 240 410 235
+      Z"
+    fill="url(#cloudFill)"
+    stroke="url(#cloudGradient)"
+    stroke-width="3"
+    filter="url(#cloudGlow)">
+
+    <animate attributeName="stroke-opacity"
+             values=".65;1;.65"
+             dur="4s"
+             repeatCount="indefinite"/>
+
+  </path>
+
+  <!-- Inner cloud identity -->
+
+  <text x="600" y="145"
+        text-anchor="middle"
+        font-family="Segoe UI,Arial"
+        font-size="13"
+        letter-spacing="4"
+        fill="#8B949E">
+    BUILT ON AWS
+  </text>
+
+  <text x="600" y="184"
+        text-anchor="middle"
+        font-family="Segoe UI,Arial"
+        font-size="25"
+        font-weight="700"
+        fill="#F0F6FC">
+    CLOUD &amp; INFRASTRUCTURE
+  </text>
+
+  <text x="600" y="216"
+        text-anchor="middle"
+        font-family="Segoe UI,Arial"
+        font-size="18"
+        font-weight="600"
+        fill="#58A6FF">
+    ENGINEERING PROJECT
+  </text>
+
+  <!-- Status pulse -->
+
+  <circle cx="520" cy="274" r="5"
+          fill="#3FB950"
+          filter="url(#softGlow)">
+    <animate attributeName="opacity"
+             values="1;.25;1"
+             dur="1.6s"
+             repeatCount="indefinite"/>
+  </circle>
+
+  <text x="600" y="279"
+        text-anchor="middle"
+        font-family="Consolas,monospace"
+        font-size="11"
+        letter-spacing="1"
+        fill="#7EE787">
+    INFRASTRUCTURE • AUTOMATION • DELIVERY • RESILIENCE
+  </text>
+
+  <text x="600" y="322"
+        text-anchor="middle"
+        font-family="Consolas,monospace"
+        font-size="10"
+        letter-spacing="2"
+        fill="#484F58">
+    INFRASTRUCTURE DEPLOYMENT ON AWS
+  </text>
+
+</svg>
