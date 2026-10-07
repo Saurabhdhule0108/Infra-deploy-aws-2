@@ -4,1128 +4,404 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Infra Deploy AWS</title>
+
     <meta
         name="description"
-        content="Infrastructure Deployment on AWS - Terraform, GitHub Actions, Docker, EC2, RDS and Nginx."
+        content="Production-style AWS infrastructure project using Terraform, GitHub Actions, Docker, EC2, ECR, Nginx and Amazon RDS."
     >
 
-    <title>Infrastructure Deployment on AWS</title>
-
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
 
     <!-- ======================================================
-         NAVIGATION
+         BACKGROUND
     ======================================================= -->
 
-    <header class="topbar">
-        <div class="nav-container">
+    <div class="background">
+        <div class="grid"></div>
+        <div class="glow glow-one"></div>
+        <div class="glow glow-two"></div>
+        <div class="noise"></div>
+    </div>
 
-            <a class="brand" href="#home" aria-label="Infrastructure Deployment home">
-                <div class="brand-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M7.5 18.5h9.2a4.3 4.3 0 0 0 .7-8.5A6 6 0 0 0 6 8.6a5 5 0 0 0 1.5 9.9Z"/>
-                    </svg>
-                </div>
 
-                <div class="brand-copy">
-                    <strong>InfraDeploy</strong>
-                    <span>AWS Cloud Engineering</span>
-                </div>
+    <!-- ======================================================
+         MAIN PAGE
+    ======================================================= -->
+
+    <main class="page">
+
+        <!-- ==================================================
+             NAVIGATION
+        =================================================== -->
+
+        <nav class="navbar glass">
+
+            <a class="brand" href="/">
+                <span class="brand-icon">◆</span>
+
+                <span>
+                    INFRA<span>DEPLOY</span>
+                </span>
             </a>
 
-            <button
-                class="mobile-menu-button"
-                id="mobileMenuButton"
-                type="button"
-                aria-label="Open navigation"
-                aria-expanded="false"
-            >
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
-            <nav class="navigation" id="navigation" aria-label="Main navigation">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#services" class="nav-link">Services</a>
-                <a href="#database" class="nav-link">Database</a>
-                <a href="#infrastructure" class="nav-link">Infrastructure</a>
-                <a href="#failover" class="nav-link">Failover</a>
-            </nav>
-
-            <div class="system-status">
-                <span class="status-dot" id="globalStatusDot"></span>
-
-                <div>
-                    <strong id="globalStatusText">Checking system</strong>
-                    <span>Live application</span>
-                </div>
+            <div class="nav-links">
+                <a href="#project">Project</a>
+                <a href="#system">System</a>
+                <a href="#users">Users</a>
             </div>
 
-        </div>
-    </header>
+            <div class="nav-status">
+                <span class="status-dot"></span>
+                AWS CLOUD
+            </div>
 
+        </nav>
 
-    <main>
 
         <!-- ==================================================
              HERO
         =================================================== -->
 
-        <section class="hero section-anchor" id="home">
+        <section class="hero" id="project">
 
-            <div class="hero-background">
-                <div class="hero-orb hero-orb-one"></div>
-                <div class="hero-orb hero-orb-two"></div>
-                <div class="hero-grid"></div>
-            </div>
+            <div class="hero-copy">
 
-            <div class="container hero-layout">
-
-                <div class="hero-content">
-
-                    <div class="eyebrow">
-                        <span class="eyebrow-dot"></span>
-                        AWS CLOUD INFRASTRUCTURE PROJECT
-                    </div>
-
-                    <h1>
-                        Automated Infrastructure
-                        <span>Deployment on AWS</span>
-                    </h1>
-
-                    <p class="hero-description">
-                        An end-to-end cloud engineering project combining
-                        Infrastructure as Code, CI/CD, container deployment,
-                        private database connectivity and application resilience.
-                    </p>
-
-                    <div class="hero-actions">
-                        <a href="#database" class="button button-primary">
-                            Explore Live Application
-                            <span>→</span>
-                        </a>
-
-                        <a href="#infrastructure" class="button button-secondary">
-                            View Infrastructure
-                        </a>
-                    </div>
-
-                    <div class="hero-tech-line">
-                        <span>Terraform</span>
-                        <i></i>
-                        <span>GitHub Actions</span>
-                        <i></i>
-                        <span>Docker</span>
-                        <i></i>
-                        <span>AWS</span>
-                    </div>
-
+                <div class="eyebrow">
+                    <span></span>
+                    AWS CLOUD INFRASTRUCTURE
                 </div>
 
+                <h1>
+                    Deploy without
+                    <span>limits.</span>
+                </h1>
 
-                <!-- Interactive deployment architecture. Service hooks are used by script.js. -->
-                <div class="hero-visual" aria-label="Interactive AWS deployment architecture">
-                    <div class="cloud-scene">
-                        <div class="skyline" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-                        <div class="scene-stars" aria-hidden="true"></div>
-                        <div class="aws-cloud">
-                            <div class="cloud-shape"><span>AWS</span></div>
-                            <small><b></b> ap-south-1</small>
-                        </div>
+                <p class="hero-description">
+                    A production-style AWS infrastructure project automated
+                    with Terraform and GitHub Actions, running a containerized
+                    Node.js application connected to Amazon RDS MySQL.
+                </p>
 
-                        <div class="cloud-line cloud-line-left"></div>
-                        <div class="cloud-line cloud-line-center"></div>
-                        <div class="cloud-line cloud-line-right"></div>
-                        <div class="flow-packet packet-one"></div>
-                        <div class="flow-packet packet-two"></div>
-                        <div class="flow-packet packet-three"></div>
+                <div class="hero-actions">
 
-                        <div class="architecture-rail" aria-hidden="true"></div>
-                        <button class="architecture-node node-github" type="button" data-service="github"><span class="node-icon">GH</span><strong>GitHub Actions</strong><small>CI / CD</small></button>
-                        <button class="architecture-node node-terraform" type="button" data-service="terraform"><span class="node-icon terraform-mark">T</span><strong>Terraform</strong><small>Infrastructure as Code</small></button>
-                        <button class="architecture-node node-docker" type="button" data-service="docker"><span class="node-icon">D</span><strong>Docker</strong><small>Container Build</small></button>
-                        <button class="architecture-node node-ec2" type="button" data-service="ec2"><span class="node-icon orange">EC2</span><strong>Amazon EC2</strong><small>Application Layer</small></button>
-                        <button class="architecture-node node-rds" type="button" data-service="rds"><span class="node-icon database-icon">DB</span><strong>Amazon RDS</strong><small>Private MySQL</small></button>
-                    </div>
-                    <p class="visual-hint"><span></span>Select an illuminated service node to explore the deployment</p>
-                </div>
+                    <a href="#users" class="button primary-button">
+                        Manage Users
+                        <span>↗</span>
+                    </a>
 
-            </div>
-        </section>
-
-
-        <!-- ==================================================
-             LIVE STATUS
-        =================================================== -->
-
-        <section class="status-section">
-
-            <div class="container">
-
-                <div class="status-grid">
-
-                    <article class="status-card">
-                        <div class="status-card-header">
-                            <div class="status-icon">◎</div>
-
-                            <div>
-                                <span class="status-label">APPLICATION</span>
-                                <h3>Node.js Service</h3>
-                            </div>
-
-                            <span class="health-badge healthy">
-                                <i></i>
-                                Online
-                            </span>
-                        </div>
-
-                        <p>
-                            Express application running inside a Docker container
-                            on the AWS application layer.
-                        </p>
-
-                        <div class="status-detail">
-                            <span>Runtime</span>
-                            <strong>Node.js :8080</strong>
-                        </div>
-                    </article>
-
-
-                    <article class="status-card" id="databaseStatusCard">
-                        <div class="status-card-header">
-                            <div class="status-icon">▤</div>
-
-                            <div>
-                                <span class="status-label">DATABASE</span>
-                                <h3>Amazon RDS</h3>
-                            </div>
-
-                            <span class="health-badge checking" id="dbHealthBadge">
-                                <i></i>
-                                Checking
-                            </span>
-                        </div>
-
-                        <p id="dbStatusDescription">
-                            Checking live connectivity between the application
-                            and Amazon RDS MySQL.
-                        </p>
-
-                        <div class="status-detail">
-                            <span>Engine</span>
-                            <strong>MySQL :3306</strong>
-                        </div>
-                    </article>
-
-
-                    <article class="status-card">
-                        <div class="status-card-header">
-                            <div class="status-icon">▥</div>
-
-                            <div>
-                                <span class="status-label">COMPUTE</span>
-                                <h3>Application Servers</h3>
-                            </div>
-
-                            <span class="health-badge neutral">
-                                Multi-AZ
-                            </span>
-                        </div>
-
-                        <p>
-                            Two EC2 application servers are distributed across
-                            separate Availability Zones.
-                        </p>
-
-                        <div class="server-mini-list">
-                            <span>
-                                <i class="mini-dot green"></i>
-                                App-1
-                                <small>Primary</small>
-                            </span>
-
-                            <span>
-                                <i class="mini-dot amber"></i>
-                                App-2
-                                <small>Backup</small>
-                            </span>
-                        </div>
-                    </article>
-
-
-                    <article class="status-card">
-                        <div class="status-card-header">
-                            <div class="status-icon">⇄</div>
-
-                            <div>
-                                <span class="status-label">ROUTING</span>
-                                <h3>Nginx</h3>
-                            </div>
-
-                            <span class="health-badge healthy">
-                                <i></i>
-                                Active
-                            </span>
-                        </div>
-
-                        <p>
-                            Reverse proxy routing with App-1 as the primary
-                            backend and App-2 as backup.
-                        </p>
-
-                        <div class="status-detail">
-                            <span>Public Entry</span>
-                            <strong>HTTP :80</strong>
-                        </div>
-                    </article>
+                    <button
+                        class="button secondary-button"
+                        id="hero-db-check"
+                        type="button"
+                    >
+                        Check Database
+                    </button>
 
                 </div>
 
             </div>
-        </section>
 
 
-        <!-- ==================================================
-             SERVICES
-        =================================================== -->
+            <!-- ==============================================
+                 LIVE SYSTEM CARD
+            =============================================== -->
 
-        <section class="section section-anchor" id="services">
+            <aside class="system-card glass" id="system">
 
-            <div class="container">
+                <div class="card-top">
 
-                <div class="section-heading">
                     <div>
-                        <span class="section-kicker">PROJECT TECHNOLOGY</span>
-
-                        <h2>Infrastructure Components</h2>
-
-                        <p>
-                            Select any component to see how it participates in
-                            the deployment architecture.
-                        </p>
+                        <span class="small-label">LIVE ENVIRONMENT</span>
+                        <h2>System status</h2>
                     </div>
 
-                    <div class="section-number">01</div>
-                </div>
-
-
-                <div class="service-grid">
-
-                    <button class="service-card" type="button" data-service="terraform">
-                        <div class="service-icon purple">T</div>
-                        <span class="service-category">INFRASTRUCTURE AS CODE</span>
-                        <h3>Terraform</h3>
-                        <p>
-                            Provisions and manages the AWS infrastructure from code.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                    <button class="service-card" type="button" data-service="github">
-                        <div class="service-icon blue">GH</div>
-                        <span class="service-category">CI/CD</span>
-                        <h3>GitHub Actions</h3>
-                        <p>
-                            Automates infrastructure, build, deployment and verification.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                    <button class="service-card" type="button" data-service="oidc">
-                        <div class="service-icon violet">ID</div>
-                        <span class="service-category">AUTHENTICATION</span>
-                        <h3>OIDC + STS</h3>
-                        <p>
-                            Provides temporary AWS credentials to the workflow.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                    <button class="service-card" type="button" data-service="docker">
-                        <div class="service-icon cyan">D</div>
-                        <span class="service-category">CONTAINERS</span>
-                        <h3>Docker</h3>
-                        <p>
-                            Packages the Node.js application and its dependencies.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                    <button class="service-card" type="button" data-service="ecr">
-                        <div class="service-icon orange">ECR</div>
-                        <span class="service-category">IMAGE REGISTRY</span>
-                        <h3>Amazon ECR</h3>
-                        <p>
-                            Stores the Docker image used by both EC2 servers.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                    <button class="service-card" type="button" data-service="ec2">
-                        <div class="service-icon orange">EC2</div>
-                        <span class="service-category">COMPUTE</span>
-                        <h3>Amazon EC2</h3>
-                        <p>
-                            Runs the Dockerized application across two Availability Zones.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                    <button class="service-card" type="button" data-service="rds">
-                        <div class="service-icon blue">RDS</div>
-                        <span class="service-category">DATABASE</span>
-                        <h3>Amazon RDS</h3>
-                        <p>
-                            Provides the private managed MySQL database.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                    <button class="service-card" type="button" data-service="nginx">
-                        <div class="service-icon green">N</div>
-                        <span class="service-category">ROUTING</span>
-                        <h3>Nginx</h3>
-                        <p>
-                            Routes requests between the primary and backup application.
-                        </p>
-                        <span class="learn-more">Explore component →</span>
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- ==================================================
-             DATABASE / USER CRUD
-        =================================================== -->
-
-        <section class="section section-light section-anchor" id="database">
-
-            <div class="container">
-
-                <div class="section-heading dark-heading">
-                    <div>
-                        <span class="section-kicker">LIVE DATABASE</span>
-
-                        <h2>RDS User Directory</h2>
-
-                        <p>
-                            Create, update and delete records stored in the real
-                            Amazon RDS MySQL database.
-                        </p>
-                    </div>
-
-                    <div class="section-number">02</div>
-                </div>
-
-
-                <div class="database-layout">
-
-                    <!-- Database information -->
-
-                    <aside class="database-panel">
-
-                        <div class="database-visual">
-                            <div class="database-cylinder">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-
-                            <div class="database-live-ring"></div>
-                        </div>
-
-                        <span class="panel-eyebrow">AMAZON RDS</span>
-                        <h3>Private MySQL Database</h3>
-
-                        <p>
-                            Application data is stored in Amazon RDS and accessed
-                            by the Node.js backend through the private VPC network.
-                        </p>
-
-                        <div class="database-specs">
-
-                            <div>
-                                <span>Engine</span>
-                                <strong>MySQL</strong>
-                            </div>
-
-                            <div>
-                                <span>Database</span>
-                                <strong>appdb</strong>
-                            </div>
-
-                            <div>
-                                <span>Port</span>
-                                <strong>3306</strong>
-                            </div>
-
-                            <div>
-                                <span>Access</span>
-                                <strong>Private</strong>
-                            </div>
-
-                        </div>
-
-                        <div class="connection-status" id="connectionStatus">
-                            <span class="connection-dot"></span>
-
-                            <div>
-                                <strong>Checking connection</strong>
-                                <small>GET /db</small>
-                            </div>
-                        </div>
-
-                    </aside>
-
-
-                    <!-- Users -->
-
-                    <div class="users-panel">
-
-                        <div class="users-toolbar">
-
-                            <div>
-                                <span class="table-eyebrow">DATABASE RECORDS</span>
-                                <h3>Users</h3>
-                                <p>
-                                    <span id="userCount">0</span>
-                                    records stored in RDS
-                                </p>
-                            </div>
-
-                            <button
-                                class="button button-primary create-user-button"
-                                id="openCreateUser"
-                                type="button"
-                            >
-                                <span>+</span>
-                                Create User
-                            </button>
-
-                        </div>
-
-
-                        <div class="table-wrapper">
-
-                            <table class="users-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>User</th>
-                                        <th>Email</th>
-                                        <th>Created</th>
-                                        <th class="actions-column">Actions</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="usersTableBody">
-                                    <!-- JavaScript renders users here -->
-                                </tbody>
-                            </table>
-
-
-                            <div class="table-state" id="usersLoadingState">
-                                <div class="spinner"></div>
-                                <strong>Loading users</strong>
-                                <span>Reading records from Amazon RDS...</span>
-                            </div>
-
-
-                            <div class="table-state hidden" id="usersEmptyState">
-                                <div class="empty-icon">＋</div>
-                                <strong>No users yet</strong>
-                                <span>Create the first database record.</span>
-
-                                <button
-                                    class="text-button"
-                                    id="emptyCreateUser"
-                                    type="button"
-                                >
-                                    Create user →
-                                </button>
-                            </div>
-
-
-                            <div class="table-state hidden" id="usersErrorState">
-                                <div class="empty-icon error-icon">!</div>
-                                <strong>Unable to load users</strong>
-                                <span id="usersErrorMessage">
-                                    The application could not read the database.
-                                </span>
-
-                                <button
-                                    class="text-button"
-                                    id="retryUsers"
-                                    type="button"
-                                >
-                                    Try again →
-                                </button>
-                            </div>
-
-                        </div>
-
+                    <div class="live-indicator">
+                        <span></span>
+                        LIVE
                     </div>
 
                 </div>
 
-            </div>
-        </section>
 
+                <div class="status-list">
 
-        <!-- ==================================================
-             INFRASTRUCTURE
-        =================================================== -->
-
-        <section class="section section-anchor" id="infrastructure">
-
-            <div class="container">
-
-                <div class="section-heading">
-                    <div>
-                        <span class="section-kicker">AWS NETWORK</span>
-
-                        <h2>Infrastructure Architecture</h2>
-
-                        <p>
-                            A custom VPC separates the application and database
-                            layers across two Availability Zones.
-                        </p>
-                    </div>
-
-                    <div class="section-number">03</div>
-                </div>
-
-
-                <div class="infra-dashboard">
-
-                    <div class="infra-topline">
+                    <div class="status-row">
                         <div>
-                            <span>AWS REGION</span>
-                            <strong>Asia Pacific (Mumbai)</strong>
+                            <span class="status-title">Application</span>
+                            <span class="status-subtitle">
+                                Node.js · Docker
+                            </span>
                         </div>
+
+                        <div class="status-value success">
+                            <span></span>
+                            ONLINE
+                        </div>
+                    </div>
+
+
+                    <div class="status-row">
 
                         <div>
-                            <span>REGION CODE</span>
-                            <strong>ap-south-1</strong>
+                            <span class="status-title">MySQL RDS</span>
+                            <span class="status-subtitle">
+                                Database connectivity
+                            </span>
                         </div>
 
-                        <div>
-                            <span>VPC</span>
-                            <strong>10.0.0.0/16</strong>
+                        <div
+                            class="status-value checking"
+                            id="database-status"
+                        >
+                            <span></span>
+                            CHECKING
                         </div>
 
-                        <div>
-                            <span>APPLICATION LAYER</span>
-                            <strong>2 Availability Zones</strong>
-                        </div>
                     </div>
 
 
-                    <div class="vpc-shell">
+                    <div class="status-row">
 
-                        <div class="vpc-title">
-                            <div>
-                                <span>AMAZON VPC</span>
-                                <strong>infra-deploy-aws-vpc</strong>
-                            </div>
-
-                            <code>10.0.0.0/16</code>
+                        <div>
+                            <span class="status-title">Region</span>
+                            <span class="status-subtitle">
+                                AWS deployment
+                            </span>
                         </div>
 
-
-                        <div class="availability-grid">
-
-                            <article class="availability-zone">
-                                <div class="zone-header">
-                                    <span>AVAILABILITY ZONE</span>
-                                    <strong>ap-south-1a</strong>
-                                </div>
-
-                                <div class="subnet public-subnet">
-                                    <span class="subnet-label">PUBLIC SUBNET</span>
-                                    <strong>10.0.1.0/24</strong>
-
-                                    <div class="instance-box primary">
-                                        <div class="instance-symbol">EC2</div>
-
-                                        <div>
-                                            <span>APP-1</span>
-                                            <strong>Primary Server</strong>
-                                            <small>Nginx :80 • Node.js :8080</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="subnet private-subnet">
-                                    <span class="subnet-label">PRIVATE DB SUBNET</span>
-                                    <strong>10.0.2.0/24</strong>
-                                </div>
-                            </article>
-
-
-                            <div class="routing-core">
-
-                                <div class="routing-line"></div>
-
-                                <div class="routing-badge">
-                                    <span>NGINX</span>
-                                    <strong>Active</strong>
-                                    <small>Passive Routing</small>
-                                </div>
-
-                                <div class="routing-arrow">→</div>
-
-                                <div class="routing-caption">
-                                    Private backend traffic
-                                    <strong>:8080</strong>
-                                </div>
-
-                            </div>
-
-
-                            <article class="availability-zone">
-                                <div class="zone-header">
-                                    <span>AVAILABILITY ZONE</span>
-                                    <strong>ap-south-1b</strong>
-                                </div>
-
-                                <div class="subnet public-subnet">
-                                    <span class="subnet-label">PUBLIC SUBNET</span>
-                                    <strong>10.0.4.0/24</strong>
-
-                                    <div class="instance-box backup">
-                                        <div class="instance-symbol">EC2</div>
-
-                                        <div>
-                                            <span>APP-2</span>
-                                            <strong>Backup Server</strong>
-                                            <small>Node.js :8080</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="subnet private-subnet">
-                                    <span class="subnet-label">PRIVATE DB SUBNET</span>
-                                    <strong>10.0.3.0/24</strong>
-                                </div>
-                            </article>
-
-                        </div>
-
-
-                        <div class="rds-layer">
-                            <div class="rds-connector left"></div>
-                            <div class="rds-connector right"></div>
-
-                            <div class="rds-box">
-                                <div class="rds-icon">DB</div>
-
-                                <div>
-                                    <span>PRIVATE DATABASE LAYER</span>
-                                    <strong>Amazon RDS MySQL</strong>
-                                    <small>
-                                        appdb • TCP 3306 • Encrypted Storage
-                                    </small>
-                                </div>
-
-                                <div class="private-badge">PRIVATE</div>
-                            </div>
+                        <div class="plain-value">
+                            ap-south-1
                         </div>
 
                     </div>
 
                 </div>
 
-            </div>
+
+                <button
+                    class="database-button"
+                    id="database-check"
+                    type="button"
+                >
+                    <span class="database-button-icon">↻</span>
+                    Check database connection
+                </button>
+
+
+                <p class="database-message" id="database-message">
+                    Running live connectivity check...
+                </p>
+
+            </aside>
+
         </section>
 
 
         <!-- ==================================================
-             FAILOVER
+             TECHNOLOGY FLOW
         =================================================== -->
 
-        <section class="section failover-section section-anchor" id="failover">
+        <section class="technology-strip glass">
 
-            <div class="container">
+            <div class="technology-heading">
+                <span>DEPLOYMENT PIPELINE</span>
+            </div>
 
-                <div class="section-heading">
-                    <div>
-                        <span class="section-kicker">APPLICATION RESILIENCE</span>
+            <div class="technology-flow">
 
-                        <h2>Active-Passive Failover</h2>
+                <div class="technology">
+                    <strong>01</strong>
+                    <span>GitHub</span>
+                </div>
 
-                        <p>
-                            Nginx uses App-1 as the primary backend and App-2 as
-                            the backup application server.
-                        </p>
+                <span class="flow-arrow">→</span>
+
+                <div class="technology">
+                    <strong>02</strong>
+                    <span>Actions</span>
+                </div>
+
+                <span class="flow-arrow">→</span>
+
+                <div class="technology">
+                    <strong>03</strong>
+                    <span>Terraform</span>
+                </div>
+
+                <span class="flow-arrow">→</span>
+
+                <div class="technology">
+                    <strong>04</strong>
+                    <span>ECR</span>
+                </div>
+
+                <span class="flow-arrow">→</span>
+
+                <div class="technology">
+                    <strong>05</strong>
+                    <span>EC2</span>
+                </div>
+
+                <span class="flow-arrow">→</span>
+
+                <div class="technology">
+                    <strong>06</strong>
+                    <span>RDS</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             USER MANAGEMENT
+        =================================================== -->
+
+        <section class="users-section" id="users">
+
+            <!-- CREATE USER -->
+
+            <div class="user-card glass">
+
+                <div class="section-number">01</div>
+
+                <span class="small-label">DATABASE WRITE</span>
+
+                <h2>Create user.</h2>
+
+                <p>
+                    Create a user through the application and store the
+                    record inside Amazon RDS MySQL.
+                </p>
+
+
+                <form id="user-form">
+
+                    <div class="input-group">
+                        <label for="name">NAME</label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Enter name"
+                            maxlength="100"
+                            required
+                        >
                     </div>
 
-                    <div class="section-number">04</div>
+
+                    <div class="input-group">
+                        <label for="email">EMAIL ADDRESS</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="name@example.com"
+                            maxlength="150"
+                            required
+                        >
+                    </div>
+
+
+                    <button
+                        class="create-button"
+                        id="create-user-button"
+                        type="submit"
+                    >
+                        Create User
+                        <span>↗</span>
+                    </button>
+
+                </form>
+
+
+                <div
+                    class="form-message"
+                    id="form-message"
+                    aria-live="polite"
+                ></div>
+
+            </div>
+
+
+            <!-- VIEW USERS -->
+
+            <div class="user-card users-list-card glass">
+
+                <div class="users-header">
+
+                    <div>
+                        <div class="section-number">02</div>
+
+                        <span class="small-label">
+                            DATABASE READ
+                        </span>
+
+                        <h2>RDS users.</h2>
+                    </div>
+
+
+                    <button
+                        class="refresh-button"
+                        id="refresh-users"
+                        type="button"
+                    >
+                        ↻ Refresh
+                    </button>
+
                 </div>
 
 
-                <div class="failover-layout">
+                <div class="users-container" id="users-container">
 
-                    <div class="failover-flow">
+                    <div class="empty-state">
 
-                        <div class="flow-stage user-stage">
-                            <div class="flow-icon">USER</div>
-                            <span>Public Request</span>
-                        </div>
+                        <div class="empty-icon">◇</div>
 
-                        <div class="flow-connection active-line">
-                            <span class="moving-signal"></span>
-                        </div>
+                        <strong>Loading users</strong>
 
-                        <div class="flow-stage nginx-stage">
-                            <div class="flow-icon nginx-icon">N</div>
-                            <strong>Nginx</strong>
-                            <span>Port 80</span>
-                        </div>
-
-                        <div class="backend-paths">
-
-                            <div class="backend-path primary-path">
-                                <div class="path-line">
-                                    <span class="moving-signal"></span>
-                                </div>
-
-                                <article class="backend-card primary-backend">
-                                    <span class="backend-state">
-                                        <i></i>
-                                        PRIMARY
-                                    </span>
-
-                                    <h3>App-1</h3>
-                                    <p>127.0.0.1:8080</p>
-                                    <strong>Normal Traffic</strong>
-                                </article>
-                            </div>
-
-
-                            <div class="backend-path backup-path">
-                                <div class="path-line backup-line"></div>
-
-                                <article class="backend-card backup-backend">
-                                    <span class="backend-state standby">
-                                        <i></i>
-                                        BACKUP
-                                    </span>
-
-                                    <h3>App-2</h3>
-                                    <p>Private IP :8080</p>
-                                    <strong>Failover Target</strong>
-                                </article>
-                            </div>
-
-                        </div>
-
-
-                        <div class="database-flow-line"></div>
-
-                        <div class="flow-stage rds-stage">
-                            <div class="flow-icon">DB</div>
-                            <strong>Amazon RDS</strong>
-                            <span>MySQL :3306</span>
-                        </div>
+                        <span>
+                            Reading records from Amazon RDS...
+                        </span>
 
                     </div>
-
-
-                    <aside class="failover-info">
-
-                        <span class="panel-eyebrow">AUTOMATED TEST</span>
-                        <h3>Failure → Failover → Recovery</h3>
-
-                        <p>
-                            The dedicated GitHub Actions workflow validates that
-                            the backup application can continue serving requests
-                            when the primary Node.js backend becomes unavailable.
-                        </p>
-
-                        <ol class="failover-steps">
-                            <li>
-                                <span>01</span>
-                                Verify primary application and database
-                            </li>
-
-                            <li>
-                                <span>02</span>
-                                Stop the App-1 Node.js container
-                            </li>
-
-                            <li>
-                                <span>03</span>
-                                Nginx routes traffic to App-2
-                            </li>
-
-                            <li>
-                                <span>04</span>
-                                Verify database access through backup
-                            </li>
-
-                            <li>
-                                <span>05</span>
-                                Restore App-1 and verify recovery
-                            </li>
-                        </ol>
-
-                        <div class="workflow-badge">
-                            <span>WORKFLOW</span>
-                            <code>failover-test.yml</code>
-                        </div>
-
-                    </aside>
 
                 </div>
 
             </div>
+
         </section>
+
+
+        <!-- ==================================================
+             FOOTER
+        =================================================== -->
+
+        <footer>
+
+            <div>
+                INFRA<span>DEPLOY</span>
+            </div>
+
+            <p>
+                Terraform · GitHub Actions · Docker · AWS
+            </p>
+
+            <span>ap-south-1</span>
+
+        </footer>
 
     </main>
 
 
-    <!-- ======================================================
-         FOOTER
-    ======================================================= -->
-
-    <footer class="footer">
-
-        <div class="container footer-content">
-
-            <div class="footer-brand">
-                <div class="brand-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M7.5 18.5h9.2a4.3 4.3 0 0 0 .7-8.5A6 6 0 0 0 6 8.6a5 5 0 0 0 1.5 9.9Z"/>
-                    </svg>
-                </div>
-
-                <div>
-                    <strong>Infrastructure Deployment on AWS</strong>
-                    <span>Cloud & Infrastructure Engineering Project</span>
-                </div>
-            </div>
-
-            <div class="footer-stack">
-                <span>Terraform</span>
-                <span>GitHub Actions</span>
-                <span>Docker</span>
-                <span>EC2</span>
-                <span>RDS</span>
-                <span>Nginx</span>
-            </div>
-
-        </div>
-
-    </footer>
-
-
-    <!-- ======================================================
-         SERVICE INFORMATION MODAL
-    ======================================================= -->
-
-    <div class="modal-backdrop hidden" id="serviceModal" aria-hidden="true">
-
-        <div
-            class="modal service-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="serviceModalTitle"
-        >
-
-            <button
-                class="modal-close"
-                id="closeServiceModal"
-                type="button"
-                aria-label="Close information"
-            >
-                ×
-            </button>
-
-            <div class="modal-service-icon" id="serviceModalIcon">AWS</div>
-
-            <span class="modal-kicker" id="serviceModalCategory">
-                PROJECT COMPONENT
-            </span>
-
-            <h2 id="serviceModalTitle">Service</h2>
-
-            <p class="modal-introduction" id="serviceModalDescription"></p>
-
-            <div class="modal-section">
-                <span>ROLE IN THIS PROJECT</span>
-                <p id="serviceModalRole"></p>
-            </div>
-
-            <div class="modal-section">
-                <span>PROJECT FLOW</span>
-                <div class="flow-code" id="serviceModalFlow"></div>
-            </div>
-
-            <div class="modal-facts" id="serviceModalFacts"></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         CREATE / EDIT USER MODAL
-    ======================================================= -->
-
-    <div class="modal-backdrop hidden" id="userModal" aria-hidden="true">
-
-        <div
-            class="modal user-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="userModalTitle"
-        >
-
-            <button
-                class="modal-close"
-                id="closeUserModal"
-                type="button"
-                aria-label="Close user form"
-            >
-                ×
-            </button>
-
-            <span class="modal-kicker">AMAZON RDS RECORD</span>
-            <h2 id="userModalTitle">Create User</h2>
-
-            <p class="modal-introduction" id="userModalDescription">
-                This record will be stored in the Amazon RDS MySQL database.
-            </p>
-
-            <form id="userForm" novalidate>
-
-                <input type="hidden" id="editingUserId">
-
-                <div class="form-group">
-                    <label for="userName">Full Name</label>
-
-                    <input
-                        id="userName"
-                        name="name"
-                        type="text"
-                        maxlength="100"
-                        autocomplete="name"
-                        placeholder="Enter full name"
-                        required
-                    >
-
-                    <span class="field-error" id="nameError"></span>
-                </div>
-
-
-                <div class="form-group">
-                    <label for="userEmail">Email Address</label>
-
-                    <input
-                        id="userEmail"
-                        name="email"
-                        type="email"
-                        maxlength="150"
-                        autocomplete="email"
-                        placeholder="name@example.com"
-                        required
-                    >
-
-                    <span class="field-error" id="emailError"></span>
-                </div>
-
-
-                <div class="form-message hidden" id="userFormMessage"></div>
-
-
-                <div class="form-actions">
-                    <button
-                        class="button button-secondary dark-button"
-                        id="cancelUserForm"
-                        type="button"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        class="button button-primary"
-                        id="saveUserButton"
-                        type="submit"
-                    >
-                        <span id="saveUserButtonText">Create User</span>
-                    </button>
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         DELETE CONFIRMATION
-    ======================================================= -->
-
-    <div class="modal-backdrop hidden" id="deleteModal" aria-hidden="true">
-
-        <div
-            class="modal confirm-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="deleteModalTitle"
-        >
-
-            <div class="delete-warning">!</div>
-
-            <span class="modal-kicker danger-text">DELETE DATABASE RECORD</span>
-            <h2 id="deleteModalTitle">Delete User?</h2>
-
-            <p class="modal-introduction">
-                This will permanently remove
-                <strong id="deleteUserName">this user</strong>
-                from the Amazon RDS database.
-            </p>
-
-            <div class="form-actions">
-                <button
-                    class="button button-secondary dark-button"
-                    id="cancelDelete"
-                    type="button"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    class="button button-danger"
-                    id="confirmDelete"
-                    type="button"
-                >
-                    Delete User
-                </button>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         TOAST NOTIFICATION
-    ======================================================= -->
-
-    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
-
-
-    <script src="script.js"></script>
+    <script src="/script.js"></script>
 
 </body>
-</html> 
+</html>
