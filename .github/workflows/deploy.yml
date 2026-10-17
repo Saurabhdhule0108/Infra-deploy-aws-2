@@ -1,58 +1,78 @@
+
 name: CI/CD with Terraform
+
 on:
   push:
     branches:
       - main
+
 permissions:
   id-token: write
   contents: read
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
     env:
       TF_VAR_ami_id: ${{ vars.AWS_AMI_ID }}
       TF_VAR_key_name: ${{ vars.AWS_KEY_NAME }}
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+
       AWS_REGION: ap-south-1
       RDS_IDENTIFIER: infra-deploy-aws-mysql
       ECR_REGISTRY: 659364970665.dkr.ecr.ap-south-1.amazonaws.com
       ECR_REPOSITORY: infra-deploy-aws-app
+
     steps:
+
       # =====================================================
       # SOURCE CODE
       # =====================================================
+
       - name: Checkout repository
         uses: actions/checkout@v6
+
       # =====================================================
       # AWS OIDC AUTHENTICATION
       # =====================================================
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ap-south-1
+
       - name: Verify AWS identity
         run: aws sts get-caller-identity
+
       # =====================================================
       # TERRAFORM
       # =====================================================
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
+
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
+
       - name: Terraform Validate
         working-directory: terraform
         run: terraform validate
+
       - name: Terraform Plan
         working-directory: terraform
         run: terraform plan
+
       - name: Terraform Apply
         working-directory: terraform
         run: terraform apply -auto-approve
+
       # =====================================================
       # TERRAFORM OUTPUTS
       # =====================================================
+
       - name: Get Terraform outputs
         working-directory: terraform
         run: |
@@ -60,395 +80,430 @@ jobs:
           EC2_INSTANCE_2_ID=$(terraform output -raw instance_2_id)
           RDS_ENDPOINT=$(terraform output -raw rds_endpoint)
           RDS_PORT=$(terraform output -raw rds_port)
+
           echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> "$GITHUB_ENV"
           echo "EC2_INSTANCE_2_ID=$EC2_INSTANCE_2_ID" >> "$GITHUB_ENV"
           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> "$GITHUB_ENV"
           echo "RDS_PORT=$RDS_PORT" >> "$GITHUB_ENV"
+
           echo "App-1 ID: $EC2_INSTANCE_ID"
           echo "App-2 ID: $EC2_INSTANCE_2_ID"
           echo "RDS Endpoint: $RDS_ENDPOINT"
+
       # =====================================================
       # RDS LIFECYCLE
       # =====================================================
+
       - name: Check and start RDS if required
         run: |
           echo "Checking RDS state..."
-          RDS_STATUS=$(aws rds describe-db-instances \\
-            --db-instance-identifier "$RDS_IDENTIFIER" \\
-            --query "DBInstances[0].DBInstanceStatus" \\
-            --output text)
+
+          RDS_STATUS=$(aws rds describe-db-instances --db-instance-identifier "$RDS_IDENTIFIER" --query "DBInstances[0].DBInstanceStatus" --output text)
+
           echo "Current RDS state: $RDS_STATUS"
+
           if [ "$RDS_STATUS" = "available" ]; then
             echo "RDS is already available."
+
           elif [ "$RDS_STATUS" = "stopped" ]; then
             echo "RDS is stopped. Starting database..."
-            aws rds start-db-instance \\
-              --db-instance-identifier "$RDS_IDENTIFIER"
+            aws rds start-db-instance --db-instance-identifier "$RDS_IDENTIFIER"
+
           elif [ "$RDS_STATUS" = "starting" ]; then
             echo "RDS is already starting."
+
           elif [ "$RDS_STATUS" = "stopping" ]; then
             echo "RDS is currently stopping."
             echo "Waiting until RDS is completely stopped..."
-            aws rds wait db-instance-stopped \\
-              --db-instance-identifier "$RDS_IDENTIFIER"
+
+            aws rds wait db-instance-stopped --db-instance-identifier "$RDS_IDENTIFIER"
+
             echo "RDS stopped. Starting it again..."
-            aws rds start-db-instance \\
-              --db-instance-identifier "$RDS_IDENTIFIER"
+            aws rds start-db-instance --db-instance-identifier "$RDS_IDENTIFIER"
+
           else
             echo "RDS is currently in state: $RDS_STATUS"
             echo "Waiting for RDS to become available."
           fi
+
       - name: Wait for RDS to become available
         run: |
           echo "Waiting for RDS: $RDS_IDENTIFIER"
-          aws rds wait db-instance-available \\
-            --db-instance-identifier "$RDS_IDENTIFIER"
-          RDS_STATUS=$(aws rds describe-db-instances \\
-            --db-instance-identifier "$RDS_IDENTIFIER" \\
-            --query "DBInstances[0].DBInstanceStatus" \\
-            --output text)
+
+          aws rds wait db-instance-available --db-instance-identifier "$RDS_IDENTIFIER"
+
+          RDS_STATUS=$(aws rds describe-db-instances --db-instance-identifier "$RDS_IDENTIFIER" --query "DBInstances[0].DBInstanceStatus" --output text)
+
           echo "RDS final state: $RDS_STATUS"
+
           if [ "$RDS_STATUS" != "available" ]; then
             echo "ERROR: RDS is not available."
             exit 1
           fi
+
           echo "RDS is ready for application deployment."
+
       # =====================================================
       # EC2 LIFECYCLE
       # =====================================================
+
       - name: Check and start both EC2 instances
         run: |
           for INSTANCE_ID in "$EC2_INSTANCE_ID" "$EC2_INSTANCE_2_ID"; do
-            EC2_STATE=$(aws ec2 describe-instances \\
-              --instance-ids "$INSTANCE_ID" \\
-              --query "Reservations[0].Instances[0].State.Name" \\
-              --output text)
+
+            EC2_STATE=$(aws ec2 describe-instances --instance-ids "$INSTANCE_ID" --query "Reservations[0].Instances[0].State.Name" --output text)
+
             echo "$INSTANCE_ID state: $EC2_STATE"
+
             if [ "$EC2_STATE" = "stopped" ]; then
               echo "Starting $INSTANCE_ID..."
-              aws ec2 start-instances \\
-                --instance-ids "$INSTANCE_ID"
+              aws ec2 start-instances --instance-ids "$INSTANCE_ID"
+
             elif [ "$EC2_STATE" = "running" ]; then
               echo "$INSTANCE_ID is already running."
+
             else
               echo "$INSTANCE_ID is currently $EC2_STATE."
             fi
+
           done
+
       - name: Wait for both EC2 instances
         run: |
           echo "Waiting for App-1 and App-2..."
-          aws ec2 wait instance-running \\
-            --instance-ids \\
-            "$EC2_INSTANCE_ID" \\
-            "$EC2_INSTANCE_2_ID"
-          aws ec2 wait instance-status-ok \\
-            --instance-ids \\
-            "$EC2_INSTANCE_ID" \\
-            "$EC2_INSTANCE_2_ID"
+
+          aws ec2 wait instance-running --instance-ids "$EC2_INSTANCE_ID" "$EC2_INSTANCE_2_ID"
+
+          aws ec2 wait instance-status-ok --instance-ids "$EC2_INSTANCE_ID" "$EC2_INSTANCE_2_ID"
+
           echo "Both EC2 instances are healthy."
+
       # =====================================================
-      # GET CURRENT IPS
+      # GET CURRENT EC2 IPS
       # =====================================================
+
       - name: Get EC2 network information
         run: |
-          EC2_PUBLIC_IP=$(aws ec2 describe-instances \\
-            --instance-ids "$EC2_INSTANCE_ID" \\
-            --query "Reservations[0].Instances[0].PublicIpAddress" \\
-            --output text)
-          EC2_PRIVATE_IP=$(aws ec2 describe-instances \\
-            --instance-ids "$EC2_INSTANCE_ID" \\
-            --query "Reservations[0].Instances[0].PrivateIpAddress" \\
-            --output text)
-          EC2_PUBLIC_IP_2=$(aws ec2 describe-instances \\
-            --instance-ids "$EC2_INSTANCE_2_ID" \\
-            --query "Reservations[0].Instances[0].PublicIpAddress" \\
-            --output text)
-          EC2_PRIVATE_IP_2=$(aws ec2 describe-instances \\
-            --instance-ids "$EC2_INSTANCE_2_ID" \\
-            --query "Reservations[0].Instances[0].PrivateIpAddress" \\
-            --output text)
+          EC2_PUBLIC_IP=$(aws ec2 describe-instances --instance-ids "$EC2_INSTANCE_ID" --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+
+          EC2_PRIVATE_IP=$(aws ec2 describe-instances --instance-ids "$EC2_INSTANCE_ID" --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
+
+          EC2_PUBLIC_IP_2=$(aws ec2 describe-instances --instance-ids "$EC2_INSTANCE_2_ID" --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+
+          EC2_PRIVATE_IP_2=$(aws ec2 describe-instances --instance-ids "$EC2_INSTANCE_2_ID" --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
+
           if [ -z "$EC2_PUBLIC_IP" ] || [ "$EC2_PUBLIC_IP" = "None" ]; then
             echo "ERROR: App-1 does not have a public IP."
             exit 1
           fi
+
           if [ -z "$EC2_PUBLIC_IP_2" ] || [ "$EC2_PUBLIC_IP_2" = "None" ]; then
             echo "ERROR: App-2 does not have a public IP."
             exit 1
           fi
+
           echo "EC2_PUBLIC_IP=$EC2_PUBLIC_IP" >> "$GITHUB_ENV"
           echo "EC2_PRIVATE_IP=$EC2_PRIVATE_IP" >> "$GITHUB_ENV"
           echo "EC2_PUBLIC_IP_2=$EC2_PUBLIC_IP_2" >> "$GITHUB_ENV"
           echo "EC2_PRIVATE_IP_2=$EC2_PRIVATE_IP_2" >> "$GITHUB_ENV"
-          echo "App-1 public IP:  $EC2_PUBLIC_IP"
+
+          echo "App-1 public IP: $EC2_PUBLIC_IP"
           echo "App-1 private IP: $EC2_PRIVATE_IP"
-          echo "App-2 public IP:  $EC2_PUBLIC_IP_2"
+          echo "App-2 public IP: $EC2_PUBLIC_IP_2"
           echo "App-2 private IP: $EC2_PRIVATE_IP_2"
+
       # =====================================================
       # SSH
       # =====================================================
+
       - name: Prepare SSH key
+        env:
+          EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
+          printf '%s\n' "$EC2_SSH_PRIVATE_KEY" > ec2-key.pem
           chmod 600 ec2-key.pem
+
       - name: Wait for Docker on both EC2 instances
         run: |
           for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
+
             echo "Waiting for Docker on $SERVER_IP..."
             READY=false
+
             for i in {1..30}; do
-              if ssh \\
-                -o StrictHostKeyChecking=no \\
-                -o ConnectTimeout=10 \\
-                -i ec2-key.pem \\
-                ubuntu@"$SERVER_IP" \\
-                "sudo docker info >/dev/null 2>&1"; then
+
+              if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ec2-key.pem ubuntu@"$SERVER_IP" "sudo docker info >/dev/null 2>&1"; then
                 READY=true
                 echo "Docker ready on $SERVER_IP."
                 break
               fi
+
               echo "Waiting 10 seconds..."
               sleep 10
             done
+
             if [ "$READY" != "true" ]; then
               echo "ERROR: Docker not ready on $SERVER_IP."
               exit 1
             fi
+
           done
+
       # =====================================================
-      # BUILD + PUSH IMAGE
+      # BUILD AND PUSH DOCKER IMAGE
       # =====================================================
+
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region "$AWS_REGION" | \\
-          docker login \\
-            --username AWS \\
-            --password-stdin \\
-            "$ECR_REGISTRY"
+          aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+
       - name: Build Docker image
         run: |
-          docker build \\
-            -t "$ECR_REPOSITORY" \\
-            ./nodeapp
+          docker build -t "$ECR_REPOSITORY" ./nodeapp
+
       - name: Tag Docker image
         run: |
-          docker tag \\
-            "$ECR_REPOSITORY:latest" \\
-            "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+          docker tag "$ECR_REPOSITORY:latest" "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
       - name: Push Docker image to ECR
         run: |
-          docker push \\
-            "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
       # =====================================================
-      # ECR LOGIN ON EC2
+      # ECR LOGIN ON BOTH EC2 INSTANCES
       # =====================================================
+
       - name: Login to ECR on both EC2 instances
         run: |
           for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
+
             echo "Logging $SERVER_IP into ECR..."
-            aws ecr get-login-password --region "$AWS_REGION" | \\
-            ssh \\
-              -o StrictHostKeyChecking=no \\
-              -i ec2-key.pem \\
-              ubuntu@"$SERVER_IP" \\
-              "sudo docker login \\
-                --username AWS \\
-                --password-stdin \\
-                $ECR_REGISTRY"
+
+            aws ecr get-login-password --region "$AWS_REGION" | ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$SERVER_IP" "sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
+
           done
+
       # =====================================================
       # DEPLOY APPLICATION
       # =====================================================
+
       - name: Deploy application to both EC2 instances
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           for SERVER_IP in "$EC2_PUBLIC_IP" "$EC2_PUBLIC_IP_2"; do
+
             echo "Deploying application to $SERVER_IP..."
-            ssh \\
-              -o StrictHostKeyChecking=no \\
-              -i ec2-key.pem \\
-              ubuntu@"$SERVER_IP" \\
-              "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest && \\
-               sudo docker stop infra-deploy-aws-app || true; \\
-               sudo docker rm infra-deploy-aws-app || true; \\
-               sudo docker run \\
-                 -d \\
-                 --restart unless-stopped \\
-                 --name infra-deploy-aws-app \\
-                 -p 8080:8080 \\
-                 -e DB_HOST='$RDS_ENDPOINT' \\
-                 -e DB_PORT='$RDS_PORT' \\
-                 -e DB_USER='adminuser' \\
-                 -e DB_PASSWORD='$DB_PASSWORD' \\
-                 -e DB_NAME='appdb' \\
-                 $ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+            ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$SERVER_IP" "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+            ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$SERVER_IP" "sudo docker stop infra-deploy-aws-app || true"
+
+            ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$SERVER_IP" "sudo docker rm infra-deploy-aws-app || true"
+
+            docker_args=(
+              run
+              -d
+              --restart unless-stopped
+              --name infra-deploy-aws-app
+              -p 8080:8080
+              -e "DB_HOST=$RDS_ENDPOINT"
+              -e "DB_PORT=$RDS_PORT"
+              -e "DB_USER=adminuser"
+              -e "DB_PASSWORD=$DB_PASSWORD"
+              -e "DB_NAME=appdb"
+              "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+            )
+
+            printf -v remote_command '%q ' "${docker_args[@]}"
+
+            ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$SERVER_IP" "sudo docker $remote_command"
+
           done
+
       # =====================================================
       # VERIFY BOTH APPLICATION SERVERS
       # =====================================================
+
       - name: Verify Node.js application on App-1
         run: |
-          ssh \\
-            -o StrictHostKeyChecking=no \\
-            -i ec2-key.pem \\
-            ubuntu@"$EC2_PUBLIC_IP" \\
-            "for i in {1..12}; do
-               if curl --fail --silent http://127.0.0.1:8080 >/dev/null; then
-                 echo 'App-1 Node.js application is healthy.'
-                 exit 0
-               fi
-               echo 'Waiting for App-1 application...'
-               sleep 5
-             done
-             exit 1"
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$EC2_PUBLIC_IP" 'bash -s' <<'REMOTE'
+          for i in {1..12}; do
+            if curl --fail --silent http://127.0.0.1:8080 >/dev/null; then
+              echo "App-1 Node.js application is healthy."
+              exit 0
+            fi
+
+            echo "Waiting for App-1 application..."
+            sleep 5
+          done
+
+          exit 1
+          REMOTE
+
       - name: Verify Node.js application on App-2
         run: |
-          ssh \\
-            -o StrictHostKeyChecking=no \\
-            -i ec2-key.pem \\
-            ubuntu@"$EC2_PUBLIC_IP_2" \\
-            "for i in {1..12}; do
-               if curl --fail --silent http://127.0.0.1:8080 >/dev/null; then
-                 echo 'App-2 Node.js application is healthy.'
-                 exit 0
-               fi
-               echo 'Waiting for App-2 application...'
-               sleep 5
-             done
-             exit 1"
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$EC2_PUBLIC_IP_2" 'bash -s' <<'REMOTE'
+          for i in {1..12}; do
+            if curl --fail --silent http://127.0.0.1:8080 >/dev/null; then
+              echo "App-2 Node.js application is healthy."
+              exit 0
+            fi
+
+            echo "Waiting for App-2 application..."
+            sleep 5
+          done
+
+          exit 1
+          REMOTE
+
       - name: Verify private connection from App-1 to App-2
         run: |
-          echo "Testing App-1 -> App-2 using private IP..."
-          ssh \\
-            -o StrictHostKeyChecking=no \\
-            -i ec2-key.pem \\
-            ubuntu@"$EC2_PUBLIC_IP" \\
-            "curl \\
-              --fail \\
-              --silent \\
-              --show-error \\
-              http://$EC2_PRIVATE_IP_2:8080 >/dev/null"
+          echo "Testing App-1 to App-2 using private IP..."
+
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$EC2_PUBLIC_IP" "curl --fail --silent --show-error http://$EC2_PRIVATE_IP_2:8080 >/dev/null"
+
           echo "Private App-1 to App-2 connection successful."
+
       # =====================================================
-      # NGINX
+      # NGINX ACTIVE-PASSIVE
       # =====================================================
+
       - name: Install Nginx on App-1
         run: |
-          ssh \\
-            -o StrictHostKeyChecking=no \\
-            -i ec2-key.pem \\
-            ubuntu@"$EC2_PUBLIC_IP" \\
-            "sudo apt-get update -y && \\
-             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx"
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$EC2_PUBLIC_IP" "sudo apt-get update -y && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx"
+
       - name: Configure Nginx active-passive
         run: |
-          ssh \\
-            -o StrictHostKeyChecking=no \\
-            -i ec2-key.pem \\
-            ubuntu@"$EC2_PUBLIC_IP" \\
-            "sudo tee /etc/nginx/sites-available/infra-deploy-aws-app > /dev/null <<'NGINXEOF'
+          cat > nginx-app.conf <<'NGINX'
           upstream application_backend {
               server 127.0.0.1:8080 max_fails=2 fail_timeout=10s;
-              server $EC2_PRIVATE_IP_2:8080 backup;
+              server BACKUP_PRIVATE_IP:8080 backup;
           }
+
           server {
               listen 80 default_server;
               listen [::]:80 default_server;
+
               server_name _;
+
               location / {
                   proxy_pass http://application_backend;
+
                   proxy_http_version 1.1;
-                  proxy_set_header Host \\$host;
-                  proxy_set_header X-Real-IP \\$remote_addr;
-                  proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-                  proxy_set_header X-Forwarded-Proto \\$scheme;
+
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
                   proxy_connect_timeout 5s;
                   proxy_read_timeout 60s;
                   proxy_send_timeout 60s;
               }
           }
-          NGINXEOF
+          NGINX
+
+          sed -i "s/BACKUP_PRIVATE_IP/$EC2_PRIVATE_IP_2/g" nginx-app.conf
+
+          scp -o StrictHostKeyChecking=no -i ec2-key.pem nginx-app.conf ubuntu@"$EC2_PUBLIC_IP":/tmp/infra-deploy-aws-app.conf
+
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$EC2_PUBLIC_IP" 'bash -s' <<'REMOTE'
+          set -e
+
+          sudo cp /tmp/infra-deploy-aws-app.conf /etc/nginx/sites-available/infra-deploy-aws-app
+
           sudo rm -f /etc/nginx/sites-enabled/default
-          sudo ln -sfn \\
-            /etc/nginx/sites-available/infra-deploy-aws-app \\
-            /etc/nginx/sites-enabled/infra-deploy-aws-app
+
+          sudo ln -sfn /etc/nginx/sites-available/infra-deploy-aws-app /etc/nginx/sites-enabled/infra-deploy-aws-app
+
           sudo nginx -t
+
           sudo systemctl enable nginx
-          sudo systemctl restart nginx"
+          sudo systemctl restart nginx
+          REMOTE
+
       - name: Verify Nginx
         run: |
-          ssh \\
-            -o StrictHostKeyChecking=no \\
-            -i ec2-key.pem \\
-            ubuntu@"$EC2_PUBLIC_IP" \\
-            "sudo systemctl is-active nginx && sudo nginx -t"
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@"$EC2_PUBLIC_IP" "sudo systemctl is-active nginx && sudo nginx -t"
+
       # =====================================================
       # PUBLIC APPLICATION VERIFICATION
       # =====================================================
+
       - name: Verify application through Nginx
         run: |
           echo "Checking http://$EC2_PUBLIC_IP"
+
           for i in {1..12}; do
-            if curl \\
-              --fail \\
-              --silent \\
-              --show-error \\
-              "http://$EC2_PUBLIC_IP" > /dev/null; then
+
+            if curl --fail --silent --show-error "http://$EC2_PUBLIC_IP" > /dev/null; then
               echo "Application verification successful."
               exit 0
             fi
+
             echo "Application not ready. Waiting 5 seconds..."
             sleep 5
           done
+
           echo "ERROR: Application verification failed."
           exit 1
+
       - name: Verify RDS connection through Nginx
         run: |
-          echo "Testing application -> RDS..."
+          echo "Testing application to RDS..."
+
           for i in {1..12}; do
-            if curl \\
-              --fail \\
-              --silent \\
-              --show-error \\
-              "http://$EC2_PUBLIC_IP/db"; then
+
+            if curl --fail --silent --show-error "http://$EC2_PUBLIC_IP/db"; then
               echo ""
               echo "RDS verification successful."
               exit 0
             fi
+
             echo "RDS connection not ready. Waiting 5 seconds..."
             sleep 5
           done
+
           echo "ERROR: RDS verification failed."
           exit 1
+
       # =====================================================
-      # ANSIBLE CONNECTIVITY VERIFICATION (NON-DESTRUCTIVE)
+      # ANSIBLE CONNECTIVITY VERIFICATION
       # =====================================================
+
       - name: Prepare verified SSH host keys for Ansible
         env:
           APP1_SSH_HOST_KEY: ${{ vars.APP1_SSH_HOST_KEY }}
           APP2_SSH_HOST_KEY: ${{ vars.APP2_SSH_HOST_KEY }}
-        run: bash ansible/prepare-ssh.sh
+        run: |
+          bash ansible/prepare-ssh.sh
+
       - name: Install Ansible
         run: |
           sudo apt-get update
           sudo apt-get install -y ansible
+
       - name: Generate Ansible inventory
         working-directory: ansible
-        run: bash generate-inventory.sh
+        run: |
+          bash generate-inventory.sh
+
       - name: Verify both EC2 instances using Ansible
         working-directory: ansible
         run: |
           ansible-playbook -i inventory.ini ansible-deploy.yml --private-key ../ec2-key.pem
+
       # =====================================================
       # STOP EC2 AFTER SUCCESS
       # RDS REMAINS RUNNING
       # =====================================================
+
       - name: Stop both EC2 instances after successful deployment
         run: |
           echo "Deployment completed successfully."
-          aws ec2 stop-instances \\
-            --instance-ids \\
-            "$EC2_INSTANCE_ID" \\
-            "$EC2_INSTANCE_2_ID"
+
+          aws ec2 stop-instances --instance-ids "$EC2_INSTANCE_ID" "$EC2_INSTANCE_2_ID"
+
           echo "App-1 and App-2 stop requests sent."
           echo "RDS remains running."
