@@ -2,3 +2,9 @@
 *.tfstate
 *.tfstate.*
 .terraform.tfstate.lock.info
+
+# Ansible generated files
+ansible/inventory.ini
+ansible/known_hosts
+ansible/*.pem
+ansible/*.retry

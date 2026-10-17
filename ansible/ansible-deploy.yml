@@ -1,0 +1,9 @@
+
+---
+- name: Verify application servers
+  hosts: app_servers
+  gather_facts: false
+
+  tasks:
+    - name: Check Ansible connectivity
+      ansible.builtin.ping:

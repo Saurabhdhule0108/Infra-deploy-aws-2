@@ -1,0 +1,12 @@
+# GitHub Actions workflows
+.github/workflows/*.yml text eol=lf
+.github/workflows/*.yaml text eol=lf
+
+# Ansible YAML and configuration
+ansible/*.yml text eol=lf
+ansible/*.yaml text eol=lf
+ansible/*.cfg text eol=lf
+ansible/*.ini text eol=lf
+
+# Linux shell scripts
+*.sh text eol=lf
