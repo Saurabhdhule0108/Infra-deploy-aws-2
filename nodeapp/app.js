@@ -1,6 +1,8 @@
+
 const express = require("express");
 const mysql = require("mysql2/promise");
 const path = require("path");
+const os = require("os");
 
 const app = express();
 const PORT = 8080;
@@ -46,6 +48,19 @@ async function initializeDatabase() {
         console.error("Database initialization failed:", error.message);
     }
 }
+
+// =========================================================
+// APPLICATION HEALTH CHECK
+// =========================================================
+
+// The hostname identifies the Docker container serving the request.
+// App-1 and App-2 have different container hostnames.
+app.get("/health", (req, res) => {
+    res.json({
+        status: "healthy",
+        hostname: os.hostname()
+    });
+});
 
 // =========================================================
 // DATABASE HEALTH CHECK

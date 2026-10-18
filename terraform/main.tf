@@ -1,3 +1,4 @@
+
 # ============================================================
 # TERRAFORM CONFIGURATION
 # ============================================================
@@ -18,7 +19,6 @@ terraform {
   }
 }
 
-
 # ============================================================
 # AWS PROVIDER
 # ============================================================
@@ -26,7 +26,6 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
-
 
 # ============================================================
 # VPC
@@ -41,7 +40,6 @@ resource "aws_vpc" "main" {
     Name = "infra-deploy-aws-vpc"
   }
 }
-
 
 # ============================================================
 # PUBLIC APPLICATION SUBNET 1 - AZ 1
@@ -58,7 +56,6 @@ resource "aws_subnet" "public" {
   }
 }
 
-
 # ============================================================
 # PUBLIC APPLICATION SUBNET 2 - AZ 2
 # ============================================================
@@ -73,7 +70,6 @@ resource "aws_subnet" "public_2" {
     Name = "infra-deploy-aws-public-subnet-2"
   }
 }
-
 
 # ============================================================
 # PRIVATE DATABASE SUBNET 1 - AZ 1
@@ -90,7 +86,6 @@ resource "aws_subnet" "db_private_1" {
   }
 }
 
-
 # ============================================================
 # PRIVATE DATABASE SUBNET 2 - AZ 2
 # ============================================================
@@ -106,7 +101,6 @@ resource "aws_subnet" "db_private_2" {
   }
 }
 
-
 # ============================================================
 # INTERNET GATEWAY
 # ============================================================
@@ -118,7 +112,6 @@ resource "aws_internet_gateway" "main" {
     Name = "infra-deploy-aws-igw"
   }
 }
-
 
 # ============================================================
 # PUBLIC ROUTE TABLE
@@ -137,7 +130,6 @@ resource "aws_route_table" "public" {
   }
 }
 
-
 # ============================================================
 # PUBLIC SUBNET 1 ROUTE TABLE ASSOCIATION
 # ============================================================
@@ -147,7 +139,6 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-
 # ============================================================
 # PUBLIC SUBNET 2 ROUTE TABLE ASSOCIATION
 # ============================================================
@@ -156,7 +147,6 @@ resource "aws_route_table_association" "public_2" {
   subnet_id      = aws_subnet.public_2.id
   route_table_id = aws_route_table.public.id
 }
-
 
 # ============================================================
 # EC2 SECURITY GROUP
@@ -176,7 +166,7 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # GitHub Actions connects through SSH for deployment.
+  # SSH access for GitHub Actions Ansible runner.
   ingress {
     description = "SSH"
     from_port   = 22
@@ -185,8 +175,7 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Internal application traffic between EC2 application servers.
-  # Source is this same security group, NOT the internet.
+  # Private Node.js traffic between application servers.
   ingress {
     description = "Node.js between application servers"
     from_port   = 8080
@@ -207,9 +196,8 @@ resource "aws_security_group" "ec2" {
   }
 }
 
-
 # ============================================================
-# APPLICATION EC2 INSTANCE 1
+# APPLICATION EC2 INSTANCE 1 - PRIMARY
 # ============================================================
 
 resource "aws_instance" "app" {
@@ -219,25 +207,22 @@ resource "aws_instance" "app" {
   vpc_security_group_ids = [aws_security_group.ec2.id]
   key_name               = var.key_name
 
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update -y
-              apt-get install -y docker.io
-              systemctl enable docker
-              systemctl start docker
-              usermod -aG docker ubuntu
-              EOF
+  # Docker and application setup are managed by Ansible.
+  # No EC2 user_data is required.
 
   user_data_replace_on_change = false
+
+  lifecycle {
+    prevent_destroy = true
+  }
 
   tags = {
     Name = "infra-deploy-aws-app-1"
   }
 }
 
-
 # ============================================================
-# APPLICATION EC2 INSTANCE 2
+# APPLICATION EC2 INSTANCE 2 - BACKUP
 # ============================================================
 
 resource "aws_instance" "app_2" {
@@ -247,22 +232,19 @@ resource "aws_instance" "app_2" {
   vpc_security_group_ids = [aws_security_group.ec2.id]
   key_name               = var.key_name
 
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update -y
-              apt-get install -y docker.io
-              systemctl enable docker
-              systemctl start docker
-              usermod -aG docker ubuntu
-              EOF
+  # Docker and application setup are managed by Ansible.
+  # No EC2 user_data is required.
 
   user_data_replace_on_change = false
+
+  lifecycle {
+    prevent_destroy = true
+  }
 
   tags = {
     Name = "infra-deploy-aws-app-2"
   }
 }
-
 
 # ============================================================
 # ECR REPOSITORY
@@ -280,7 +262,6 @@ resource "aws_ecr_repository" "app" {
     Name = "infra-deploy-aws-app"
   }
 }
-
 
 # ============================================================
 # OUTPUTS

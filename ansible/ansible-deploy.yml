@@ -1,12 +1,141 @@
 
 ---
-- name: Verify application servers
+# ============================================================
+# ANSIBLE - DOCKER AND APPLICATION DEPLOYMENT
+# ============================================================
+
+- name: Configure and deploy both application servers
   hosts: app_servers
+  become: true
+  gather_facts: false
+
+  vars:
+    app_name: infra-deploy-aws-app
+    ecr_registry: "{{ lookup('env', 'ECR_REGISTRY') }}"
+    ecr_repository: "{{ lookup('env', 'ECR_REPOSITORY') }}"
+    app_image: "{{ ecr_registry }}/{{ ecr_repository }}:latest"
+
+  tasks:
+    - name: Verify Ansible connectivity
+      ansible.builtin.ping:
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+        update_cache: true
+
+    - name: Enable and start Docker
+      ansible.builtin.systemd_service:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Add ubuntu user to Docker group
+      ansible.builtin.user:
+        name: ubuntu
+        groups: docker
+        append: true
+
+    # AWS CLI runs on the GitHub Actions runner.
+    # The ECR token is securely passed to Docker on EC2.
+
+    - name: Authenticate Docker with Amazon ECR
+      ansible.builtin.command:
+        argv:
+          - docker
+          - login
+          - --username
+          - AWS
+          - --password-stdin
+          - "{{ ecr_registry }}"
+        stdin: "{{ lookup('pipe', 'aws ecr get-login-password --region ap-south-1') }}"
+      no_log: true
+      changed_when: false
+
+    - name: Pull latest application image
+      ansible.builtin.command:
+        argv:
+          - docker
+          - pull
+          - "{{ app_image }}"
+      register: image_pull
+      changed_when: "'Downloaded newer image' in image_pull.stdout"
+
+    - name: Inspect existing application container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - inspect
+          - "{{ app_name }}"
+      register: existing_container
+      failed_when: false
+      changed_when: false
+
+    - name: Remove existing application container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - rm
+          - -f
+          - "{{ app_name }}"
+      when: existing_container.rc == 0
+
+    - name: Deploy application container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - run
+          - -d
+          - --restart
+          - unless-stopped
+          - --name
+          - "{{ app_name }}"
+          - -p
+          - "8080:8080"
+          - -e
+          - "DB_HOST={{ lookup('env', 'RDS_ENDPOINT') }}"
+          - -e
+          - "DB_PORT={{ lookup('env', 'RDS_PORT') }}"
+          - -e
+          - "DB_USER=adminuser"
+          - -e
+          - "DB_PASSWORD={{ lookup('env', 'DB_PASSWORD') }}"
+          - -e
+          - "DB_NAME=appdb"
+          - "{{ app_image }}"
+      no_log: true
+
+    - name: Verify Node.js application
+      ansible.builtin.uri:
+        url: http://127.0.0.1:8080/
+        status_code: 200
+      register: app_health
+      retries: 12
+      delay: 5
+      until: app_health.status == 200
+
+# ============================================================
+# VERIFY PRIVATE CONNECTION BETWEEN APPLICATION SERVERS
+# ============================================================
+
+- name: Verify private application connectivity
+  hosts: primary
   gather_facts: false
 
   tasks:
-    - name: Check Ansible connectivity
-      ansible.builtin.ping:
+    - name: Verify App-1 can reach App-2 privately
+      ansible.builtin.uri:
+        url: "http://{{ backup_private_ip }}:8080/"
+        status_code: 200
+      register: backup_health
+      retries: 6
+      delay: 5
+      until: backup_health.status == 200
+
+# ============================================================
+# NGINX - ACTIVE/PASSIVE REVERSE PROXY
+# ============================================================
 
 - name: Configure Nginx on primary application server
   hosts: primary
@@ -62,6 +191,15 @@
       register: nginx_status
       changed_when: false
       failed_when: nginx_status.stdout != "active"
+
+    - name: Verify application through Nginx
+      ansible.builtin.uri:
+        url: http://127.0.0.1/
+        status_code: 200
+      register: nginx_health
+      retries: 6
+      delay: 5
+      until: nginx_health.status == 200
 
   handlers:
     - name: Restart Nginx
