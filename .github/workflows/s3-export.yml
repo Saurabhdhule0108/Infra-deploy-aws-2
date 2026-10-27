@@ -1,0 +1,156 @@
+
+name: RDS to S3 Export
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  export-data:
+    name: Export RDS users to S3
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ap-south-1
+      S3_BUCKET: infra-deploy-aws-2-app-data-2026
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.2
+
+      - name: Get App-1 instance ID
+        id: instance
+        shell: bash
+        run: |
+          terraform -chdir=terraform init -input=false
+          INSTANCE_ID=$(terraform -chdir=terraform output -raw instance_id)
+          echo "instance_id=$INSTANCE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Start App-1
+        run: |
+          aws ec2 start-instances \
+            --instance-ids "${{ steps.instance.outputs.instance_id }}"
+
+          aws ec2 wait instance-running \
+            --instance-ids "${{ steps.instance.outputs.instance_id }}"
+
+      - name: Configure SSH
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          INSTANCE_ID: ${{ steps.instance.outputs.instance_id }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+
+          APP_IP=$(aws ec2 describe-instances \
+            --instance-ids "$INSTANCE_ID" \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)
+
+          if [ -z "$APP_IP" ] || [ "$APP_IP" = "None" ]; then
+            echo "App-1 public IP not found."
+            exit 1
+          fi
+
+          echo "APP_IP=$APP_IP" >> "$GITHUB_ENV"
+          ssh-keyscan -H "$APP_IP" >> ~/.ssh/known_hosts
+
+      - name: Create database export script
+        shell: bash
+        run: |
+          cat > s3-export.js <<'EOF'
+          const fs = require('fs');
+          const mysql = require('mysql2/promise');
+
+          function csv(value) {
+            const text = String(value ?? '');
+            return '"' + text.replace(/"/g, '""') + '"';
+          }
+
+          async function main() {
+            const connection = await mysql.createConnection({
+              host: process.env.DB_HOST,
+              port: Number(process.env.DB_PORT || 3306),
+              user: process.env.DB_USER,
+              password: process.env.DB_PASSWORD,
+              database: process.env.DB_NAME,
+              connectTimeout: 15000
+            });
+
+            try {
+              const [rows] = await connection.execute(
+                'SELECT id, name, email, created_at FROM users ORDER BY id'
+              );
+
+              const lines = [
+                ['id', 'name', 'email', 'created_at'].join(','),
+                ...rows.map(row => [
+                  csv(row.id),
+                  csv(row.name),
+                  csv(row.email),
+                  csv(row.created_at instanceof Date
+                    ? row.created_at.toISOString()
+                    : row.created_at)
+                ].join(','))
+              ];
+
+              fs.writeFileSync(
+                '/app/users-export.csv',
+                lines.join('\n') + '\n',
+                'utf8'
+              );
+
+              console.log(`Export prepared: ${rows.length} user records.`);
+            } finally {
+              await connection.end();
+            }
+          }
+
+          main().catch(error => {
+            console.error('Export failed:', error.message);
+            process.exit(1);
+          });
+          EOF
+
+      - name: Copy export script to App-1
+        run: |
+          scp -i ~/.ssh/ec2_key \
+            s3-export.js \
+            ubuntu@"$APP_IP":/tmp/s3-export.js
+
+      - name: Export RDS data and upload to S3
+        shell: bash
+        run: |
+          ssh -i ~/.ssh/ec2_key ubuntu@"$APP_IP" \
+            "set -e
+             docker cp /tmp/s3-export.js infra-deploy-aws-app:/app/s3-export.js
+             docker exec -w /app infra-deploy-aws-app node /app/s3-export.js
+             docker cp infra-deploy-aws-app:/app/users-export.csv /tmp/users-export.csv
+             EXPORT_KEY=exports/users-\$(date -u +%Y%m%d-%H%M%S).csv
+             aws s3 cp /tmp/users-export.csv s3://${S3_BUCKET}/\$EXPORT_KEY
+             aws s3 ls s3://${S3_BUCKET}/\$EXPORT_KEY
+             echo 'RDS export uploaded and verified.'"
+
+      - name: Stop App-1 to control EC2 costs
+        if: always() && steps.instance.outputs.instance_id != ''
+        run: |
+          aws ec2 stop-instances \
+            --instance-ids "${{ steps.instance.outputs.instance_id }}"
