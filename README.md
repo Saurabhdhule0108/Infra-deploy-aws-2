@@ -142,7 +142,7 @@ Terraform provisions the infrastructure, Ansible configures the servers, and Git
 ### Infrastructure in AWS
 
 <p align="center">
-  <img src="docs/screenshots/ec2-infrastructure.png" width="850" alt="EC2 application infrastructure">
+  <img src="docs/assets/screenshots/ec2-infrastructure.png" width="850" alt="EC2 application infrastructure">
 </p>
 
 <p align="center"><em>Figure 2 — Application instances in the Amazon EC2 console.</em></p>
@@ -248,7 +248,7 @@ The workflow may also run automatically when its configured trigger conditions a
 ### Deployment evidence
 
 <p align="center">
-  <img src="docs/screenshots/deployment-success.png" width="900" alt="Successful GitHub Actions deployment">
+  <img src="docs/assets/screenshots/deployment-success.png" width="900" alt="Successful GitHub Actions deployment">
 </p>
 
 <p align="center"><em>Figure 3 — A successful deployment workflow run.</em></p>
@@ -272,7 +272,7 @@ The application container listens on port `8080`. The configured web entry point
 ### Container registry evidence
 
 <p align="center">
-  <img src="docs/screenshots/docker-ecr.png" width="850" alt="Amazon ECR repository and image">
+  <img src="docs/assets/screenshots/docker-ecr.png" width="850" alt="Amazon ECR repository and image">
 </p>
 
 <p align="center"><em>Figure 4 — The application image stored in Amazon ECR.</em></p>
@@ -302,7 +302,7 @@ The database is named `appdb`, and the application uses the `users` table. Secur
 ### Running application
 
 <p align="center">
-  <img src="docs/screenshots/running-application.png" width="850" alt="Running Node.js application">
+  <img src="docs/assets/screenshots/running-application.png" width="850" alt="Running Node.js application">
 </p>
 
 <p align="center"><em>Figure 5 — The deployed application running in the browser.</em></p>
@@ -310,7 +310,7 @@ The database is named `appdb`, and the application uses the `users` table. Secur
 ### User records retrieved from RDS
 
 <p align="center">
-  <img src="docs/screenshots/application-users.png" width="850" alt="User records displayed by the application">
+  <img src="docs/assets/screenshots/application-users.png" width="850" alt="User records displayed by the application">
 </p>
 
 <p align="center"><em>Figure 6 — User records retrieved through the application.</em></p>
@@ -365,7 +365,7 @@ The EC2 IAM role is intended to restrict access to the required data operations,
 ### Import and export evidence
 
 <p align="center">
-  <img src="docs/screenshots/s3-import-export.png" width="850" alt="S3 import and export files">
+  <img src="docs/assets/screenshots/s3-import-export.png" width="850" alt="S3 import and export files">
 </p>
 
 <p align="center"><em>Figure 7 — The S3 bucket and its import and export data.</em></p>
