@@ -1,86 +1,110 @@
-
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" fill="none" role="img" aria-labelledby="title desc">
   <title id="title">AWS Infrastructure Deployment and Automation</title>
-  <desc id="desc">A cinematic animated AWS project banner. The project name remains centered while deployment concepts appear one by one with glowing impact effects.</desc>
+  <desc id="desc">A cinematic animated cloud engineering banner with a persistent project title, glowing network connections, cloud infrastructure, server racks, data nodes, and changing technical concepts.</desc>
 
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="420" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#050916"/>
+      <stop stop-color="#091525"/>
       <stop offset=".52" stop-color="#101B35"/>
-      <stop offset="1" stop-color="#170F30"/>
+      <stop offset="1" stop-color="#172541"/>
     </linearGradient>
-
     <linearGradient id="titleGradient" x1="250" y1="0" x2="950" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#7DEBFF"/>
-      <stop offset=".5" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#B5A1FF"/>
+      <stop stop-color="#F59E0B"/>
+      <stop offset=".48" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FB7185"/>
     </linearGradient>
-
     <linearGradient id="spectrum" x1="100" y1="0" x2="1100" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#43D9FF"/>
-      <stop offset=".34" stop-color="#8D7CFF"/>
-      <stop offset=".67" stop-color="#4AF0C1"/>
-      <stop offset="1" stop-color="#FFBE70"/>
+      <stop stop-color="#F59E0B"/>
+      <stop offset=".35" stop-color="#FDBA74"/>
+      <stop offset=".68" stop-color="#FB7185"/>
+      <stop offset="1" stop-color="#FBBF24"/>
     </linearGradient>
-
-    <radialGradient id="centerGlow">
-      <stop stop-color="#347DFF" stop-opacity=".30"/>
-      <stop offset="1" stop-color="#347DFF" stop-opacity="0"/>
+    <linearGradient id="networkGradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B" stop-opacity=".05"/>
+      <stop offset=".5" stop-color="#FDBA74"/>
+      <stop offset="1" stop-color="#FB7185" stop-opacity=".12"/>
+    </linearGradient>
+    <linearGradient id="serverGold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FBBF24" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity=".04"/>
+    </linearGradient>
+    <linearGradient id="serverPink" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FB7185" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#FB7185" stop-opacity=".035"/>
+    </linearGradient>
+    <radialGradient id="ambientGlow">
+      <stop stop-color="#F59E0B" stop-opacity=".13"/>
+      <stop offset=".55" stop-color="#FB7185" stop-opacity=".045"/>
+      <stop offset="1" stop-color="#091525" stop-opacity="0"/>
     </radialGradient>
-
     <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
-      <path d="M32 0H0V32" stroke="#8EBFFF" stroke-opacity=".07"/>
-      <circle cx="0" cy="0" r="1.2" fill="#A9D7FF" fill-opacity=".22"/>
+      <path d="M32 0H0V32" stroke="#A9BEDB" stroke-opacity=".065"/>
+      <circle cx="0" cy="0" r="1.2" fill="#FBBF24" fill-opacity=".2"/>
     </pattern>
-
     <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
-      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
 
-    <filter id="bigGlow" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="12" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+    <g id="cloudIcon">
+      <path d="M-34 12H31C43 12 48 3 44-7C41-16 33-20 23-19C19-34-1-38-12-26C-17-20-19-15-18-10C-34-12-44-4-43 4C-42 9-39 12-34 12Z"
+            fill="#101B35" fill-opacity=".82" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M-25 2H25" stroke="currentColor" stroke-opacity=".45" stroke-width="1.2"/>
+      <circle cx="-17" cy="2" r="2.3" fill="#FBBF24"/>
+      <circle cx="-7" cy="2" r="2.3" fill="#FDBA74"/>
+      <circle cx="3" cy="2" r="2.3" fill="#FB7185"/>
+    </g>
+
+    <g id="serverRack">
+      <rect x="-27" y="-43" width="54" height="86" rx="6" fill="#0B1729" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="-21" y="-36" width="42" height="19" rx="3" fill="url(#serverGold)" stroke="currentColor" stroke-opacity=".5"/>
+      <rect x="-21" y="-9" width="42" height="19" rx="3" fill="url(#serverPink)" stroke="currentColor" stroke-opacity=".5"/>
+      <rect x="-21" y="18" width="42" height="19" rx="3" fill="url(#serverGold)" stroke="currentColor" stroke-opacity=".5"/>
+      <circle cx="-14" cy="-26.5" r="2.2" fill="#FBBF24" filter="url(#glow)"/>
+      <circle cx="-14" cy=".5" r="2.2" fill="#FB7185" filter="url(#glow)"/>
+      <circle cx="-14" cy="27.5" r="2.2" fill="#FBBF24" filter="url(#glow)"/>
+      <path d="M-7-26.5H14M-7 .5H14M-7 27.5H14" stroke="#A9BEDB" stroke-opacity=".65" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
 
     <style>
       text {
         font-family: Inter, "Segoe UI", Arial, sans-serif;
       }
-
       .eyebrow {
-        fill: #83E9FF;
+        fill: #FBBF24;
         font-size: 12px;
         font-weight: 700;
         letter-spacing: 4px;
       }
-
       .project {
         fill: url(#titleGradient);
         font-size: 36px;
         font-weight: 850;
         letter-spacing: 1px;
       }
-
       .projectSub {
         fill: #A9BEDB;
         font-size: 12px;
         letter-spacing: 3px;
       }
-
       .concept {
         opacity: 0;
         transform-box: fill-box;
         transform-origin: center;
-        animation: conceptSequence 16s linear infinite;
+        animation-duration: 16s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
       }
-
       .conceptName {
         font-size: 27px;
         font-weight: 850;
@@ -88,102 +112,13 @@
         text-anchor: middle;
         fill: #FFFFFF;
       }
-
       .conceptDetail {
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 3px;
         text-anchor: middle;
-        fill: #A8C5E8;
+        fill: #C4D2E4;
       }
-
-      .c1 { --slot: 0%; }
-      .c2 { --slot: 12.5%; }
-      .c3 { --slot: 25%; }
-      .c4 { --slot: 37.5%; }
-      .c5 { --slot: 50%; }
-      .c6 { --slot: 62.5%; }
-      .c7 { --slot: 75%; }
-      .c8 { --slot: 87.5%; }
-
-      .concept {
-        animation-name: conceptSequence;
-        animation-duration: 16s;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-      }
-
-      .c1 { animation-delay: 0s; }
-      .c2 { animation-delay: 0s; }
-      .c3 { animation-delay: 0s; }
-      .c4 { animation-delay: 0s; }
-      .c5 { animation-delay: 0s; }
-      .c6 { animation-delay: 0s; }
-      .c7 { animation-delay: 0s; }
-      .c8 { animation-delay: 0s; }
-
-      .beam {
-        stroke-dasharray: 5 12;
-        animation: beamFlow 2.2s linear infinite;
-      }
-
-      .beamReverse {
-        stroke-dasharray: 3 13;
-        animation: beamFlowReverse 3s linear infinite;
-      }
-
-      .orbit {
-        transform-box: fill-box;
-        transform-origin: center;
-        animation: orbit 18s linear infinite;
-      }
-
-      .float {
-        animation: float 4s ease-in-out infinite;
-      }
-
-      .pulse {
-        animation: pulse 2s ease-in-out infinite;
-      }
-
-      .ring {
-        transform-box: fill-box;
-        transform-origin: center;
-        animation: ring 2s ease-out infinite;
-      }
-
-      .spark {
-        animation: spark 2.5s ease-in-out infinite;
-      }
-
-      @keyframes conceptSequence {
-        0% {
-          opacity: 0;
-          transform: scale(.72) translateY(12px);
-        }
-        1.5% {
-          opacity: 1;
-          transform: scale(1.10) translateY(0);
-        }
-        3% {
-          opacity: 1;
-          transform: scale(1) translateY(0);
-        }
-        10% {
-          opacity: 1;
-          transform: scale(1) translateY(0);
-        }
-        12.5% {
-          opacity: 0;
-          transform: scale(1.16) translateY(-7px);
-        }
-        100% {
-          opacity: 0;
-          transform: scale(.8) translateY(10px);
-        }
-      }
-
-      /* Each concept gets its own 12.5% window of the 16-second cycle. */
       .c1 { animation-name: concept1; }
       .c2 { animation-name: concept2; }
       .c3 { animation-name: concept3; }
@@ -192,88 +127,124 @@
       .c6 { animation-name: concept6; }
       .c7 { animation-name: concept7; }
       .c8 { animation-name: concept8; }
-
+      .beam {
+        stroke-dasharray: 5 12;
+        animation: beamFlow 2.2s linear infinite;
+      }
+      .beamReverse {
+        stroke-dasharray: 3 13;
+        animation: beamFlowReverse 3s linear infinite;
+      }
+      .orbit {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: orbit 22s linear infinite;
+      }
+      .float {
+        animation: float 4s ease-in-out infinite;
+      }
+      .pulse {
+        animation: pulse 2s ease-in-out infinite;
+      }
+      .spark {
+        animation: spark 2.5s ease-in-out infinite;
+      }
+      .node {
+        fill: #FBBF24;
+        filter: url(#glow);
+        animation: nodePulse 2.4s ease-in-out infinite;
+      }
+      .nodePink {
+        fill: #FB7185;
+        filter: url(#glow);
+        animation: nodePulse 3s ease-in-out infinite;
+      }
+      .sideInfra {
+        opacity: .82;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: float 5s ease-in-out infinite;
+      }
+      .sideLabel {
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        fill: #A9BEDB;
+        text-anchor: middle;
+      }
       @keyframes concept1 {
         0%, 1.5% { opacity: 0; transform: scale(.72) translateY(12px); }
-        3% { opacity: 1; transform: scale(1.1); }
+        3% { opacity: 1; transform: scale(1.08); }
         4.5%, 10% { opacity: 1; transform: scale(1); }
         12.5%, 100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
       @keyframes concept2 {
         0%, 12.5% { opacity: 0; transform: scale(.72) translateY(12px); }
-        14% { opacity: 1; transform: scale(1.1); }
+        14% { opacity: 1; transform: scale(1.08); }
         15.5%, 22.5% { opacity: 1; transform: scale(1); }
         25%, 100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
       @keyframes concept3 {
         0%, 25% { opacity: 0; transform: scale(.72) translateY(12px); }
-        26.5% { opacity: 1; transform: scale(1.1); }
+        26.5% { opacity: 1; transform: scale(1.08); }
         28%, 35% { opacity: 1; transform: scale(1); }
         37.5%, 100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
       @keyframes concept4 {
         0%, 37.5% { opacity: 0; transform: scale(.72) translateY(12px); }
-        39% { opacity: 1; transform: scale(1.1); }
+        39% { opacity: 1; transform: scale(1.08); }
         40.5%, 47.5% { opacity: 1; transform: scale(1); }
         50%, 100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
       @keyframes concept5 {
         0%, 50% { opacity: 0; transform: scale(.72) translateY(12px); }
-        51.5% { opacity: 1; transform: scale(1.1); }
+        51.5% { opacity: 1; transform: scale(1.08); }
         53%, 60% { opacity: 1; transform: scale(1); }
         62.5%, 100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
       @keyframes concept6 {
         0%, 62.5% { opacity: 0; transform: scale(.72) translateY(12px); }
-        64% { opacity: 1; transform: scale(1.1); }
+        64% { opacity: 1; transform: scale(1.08); }
         65.5%, 72.5% { opacity: 1; transform: scale(1); }
         75%, 100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
       @keyframes concept7 {
         0%, 75% { opacity: 0; transform: scale(.72) translateY(12px); }
-        76.5% { opacity: 1; transform: scale(1.1); }
+        76.5% { opacity: 1; transform: scale(1.08); }
         78%, 85% { opacity: 1; transform: scale(1); }
         87.5%, 100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
       @keyframes concept8 {
         0%, 87.5% { opacity: 0; transform: scale(.72) translateY(12px); }
-        89% { opacity: 1; transform: scale(1.1); }
+        89% { opacity: 1; transform: scale(1.08); }
         90.5%, 97.5% { opacity: 1; transform: scale(1); }
         100% { opacity: 0; transform: scale(1.12) translateY(-5px); }
       }
-
       @keyframes beamFlow {
         to { stroke-dashoffset: -68; }
       }
-
       @keyframes beamFlowReverse {
         to { stroke-dashoffset: 64; }
       }
-
       @keyframes orbit {
         to { transform: rotate(360deg); }
       }
-
       @keyframes float {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-6px); }
+        50% { transform: translateY(-4px); }
       }
-
       @keyframes pulse {
         0%, 100% { opacity: .55; }
         50% { opacity: 1; }
       }
-
-      @keyframes ring {
-        0% { opacity: .9; transform: scale(.35); }
-        100% { opacity: 0; transform: scale(1.8); }
-      }
-
       @keyframes spark {
-        0%, 100% { opacity: .25; }
+        0%, 100% { opacity: .2; }
         50% { opacity: 1; }
       }
-
+      @keyframes nodePulse {
+        0%, 100% { opacity: .45; }
+        50% { opacity: 1; }
+      }
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {
           animation-duration: 0.001ms !important;
@@ -283,19 +254,20 @@
     </style>
   </defs>
 
-  <!-- Cinematic background -->
+  <!-- Background and technical texture -->
   <rect width="1200" height="420" rx="22" fill="url(#bg)"/>
   <rect width="1200" height="420" rx="22" fill="url(#grid)"/>
-  <ellipse cx="600" cy="185" rx="490" ry="250" fill="url(#centerGlow)"/>
-  <rect x="1" y="1" width="1198" height="418" rx="21" stroke="#799BCB" stroke-opacity=".36"/>
+  <ellipse cx="600" cy="205" rx="500" ry="250" fill="url(#ambientGlow)"/>
+  <rect x="1" y="1" width="1198" height="418" rx="21" stroke="#799BCB" stroke-opacity=".3"/>
 
-  <!-- Moving background lights -->
-  <g class="orbit" opacity=".55">
-    <circle cx="600" cy="205" r="185" stroke="#57CFFF" stroke-opacity=".16" stroke-dasharray="3 12"/>
-    <circle cx="600" cy="205" r="225" stroke="#A18AFF" stroke-opacity=".13" stroke-dasharray="2 17"/>
+  <!-- Subtle moving technical network -->
+  <g class="orbit" opacity=".3">
+    <path d="M170 205L260 160L345 205L260 250Z" stroke="#FBBF24" stroke-opacity=".3" stroke-dasharray="3 9"/>
+    <path d="M855 205L940 160L1030 205L940 250Z" stroke="#FB7185" stroke-opacity=".3" stroke-dasharray="3 9"/>
   </g>
 
-  <g fill="#A8E8FF">
+  <!-- Decorative sparks -->
+  <g fill="#FBBF24">
     <circle class="spark" cx="100" cy="80" r="2"/>
     <circle class="spark" cx="190" cy="300" r="1.5"/>
     <circle class="spark" cx="325" cy="65" r="1.6"/>
@@ -306,98 +278,223 @@
     <circle class="spark" cx="1110" cy="265" r="1.5"/>
   </g>
 
-  <!-- Animated network lines -->
+  <!-- Flowing connections -->
   <g fill="none" stroke-width="1.5">
-    <path d="M0 130H190L240 180H350" stroke="#56DFFF" stroke-opacity=".35" class="beam"/>
-    <path d="M1200 130H1010L960 180H850" stroke="#A68AFF" stroke-opacity=".4" class="beamReverse"/>
-    <path d="M0 290H210L260 250H380" stroke="#58E8CB" stroke-opacity=".28" class="beamReverse"/>
-    <path d="M1200 290H990L940 250H820" stroke="#5B9CFF" stroke-opacity=".3" class="beam"/>
+    <path d="M0 130H190L240 180H350" stroke="#F59E0B" stroke-opacity=".42" class="beam"/>
+    <path d="M1200 130H1010L960 180H850" stroke="#FB7185" stroke-opacity=".42" class="beamReverse"/>
+    <path d="M0 290H210L260 250H380" stroke="#FDBA74" stroke-opacity=".3" class="beamReverse"/>
+    <path d="M1200 290H990L940 250H820" stroke="#FB7185" stroke-opacity=".32" class="beam"/>
   </g>
 
-  <!-- Persistent top label -->
+  <!-- Left-side infrastructure -->
+  <g class="sideInfra">
+    <g color="#FBBF24" filter="url(#softGlow)" opacity=".12">
+      <circle cx="150" cy="195" r="65" fill="#FBBF24"/>
+    </g>
+    <g color="#FBBF24" transform="translate(150 112)">
+      <use href="#cloudIcon"/>
+    </g>
+    <text x="150" y="142" class="sideLabel">CLOUD INFRA</text>
+
+    <g transform="translate(94 222) scale(.72)" color="#FBBF24">
+      <use href="#serverRack"/>
+    </g>
+    <g transform="translate(164 222) scale(.72)" color="#FB7185">
+      <use href="#serverRack"/>
+    </g>
+    <text x="129" y="263" class="sideLabel">COMPUTE NODES</text>
+
+    <g stroke="#FBBF24" stroke-opacity=".68" stroke-width="1.4" fill="none">
+      <path d="M150 125V163L129 179V190"/>
+      <path d="M129 190V195H94V191"/>
+      <path d="M129 195H164V191"/>
+      <path d="M94 253V278H129"/>
+      <path d="M164 253V278H129"/>
+      <path d="M129 278V294H204"/>
+    </g>
+    <circle cx="150" cy="163" r="2.8" class="node"/>
+    <circle cx="129" cy="195" r="2.8" class="node"/>
+    <circle cx="129" cy="278" r="2.5" class="nodePink"/>
+
+    <g fill="none" stroke="#FDBA74" stroke-opacity=".5" stroke-width="1.2">
+      <path d="M52 174H73L83 184"/>
+      <path d="M52 184H68"/>
+      <path d="M52 194H76"/>
+      <path d="M183 164H208L220 152H242"/>
+      <path d="M183 174H202L214 162H238"/>
+    </g>
+    <g fill="#FBBF24">
+      <circle cx="52" cy="174" r="2"/>
+      <circle cx="52" cy="184" r="1.5"/>
+      <circle cx="52" cy="194" r="1.5"/>
+      <circle cx="242" cy="152" r="2"/>
+    </g>
+    <g class="pulse" fill="#FB7185">
+      <circle cx="216" cy="162" r="2"/>
+    </g>
+  </g>
+
+  <!-- Right-side infrastructure -->
+  <g class="sideInfra">
+    <g color="#FB7185" filter="url(#softGlow)" opacity=".12">
+      <circle cx="1050" cy="195" r="65" fill="#FB7185"/>
+    </g>
+    <g color="#FB7185" transform="translate(1050 112)">
+      <use href="#cloudIcon"/>
+    </g>
+    <text x="1050" y="142" class="sideLabel">AWS SERVICES</text>
+
+    <g transform="translate(1006 222) scale(.72)" color="#FB7185">
+      <use href="#serverRack"/>
+    </g>
+    <g transform="translate(1076 222) scale(.72)" color="#FBBF24">
+      <use href="#serverRack"/>
+    </g>
+    <text x="1041" y="263" class="sideLabel">DATA &amp; SERVICES</text>
+
+    <g stroke="#FB7185" stroke-opacity=".68" stroke-width="1.4" fill="none">
+      <path d="M1050 125V163L1041 179V190"/>
+      <path d="M1041 190V195H1006V191"/>
+      <path d="M1041 195H1076V191"/>
+      <path d="M1006 253V278H1041"/>
+      <path d="M1076 253V278H1041"/>
+      <path d="M1041 278V294H996"/>
+    </g>
+    <circle cx="1050" cy="163" r="2.8" class="nodePink"/>
+    <circle cx="1041" cy="195" r="2.8" class="nodePink"/>
+    <circle cx="1041" cy="278" r="2.5" class="node"/>
+
+    <g fill="none" stroke="#FB7185" stroke-opacity=".5" stroke-width="1.2">
+      <path d="M1148 174H1127L1117 184"/>
+      <path d="M1148 184H1132"/>
+      <path d="M1148 194H1124"/>
+      <path d="M1017 164H992L980 152H958"/>
+      <path d="M1017 174H998L986 162H962"/>
+    </g>
+    <g fill="#FB7185">
+      <circle cx="1148" cy="174" r="2"/>
+      <circle cx="1148" cy="184" r="1.5"/>
+      <circle cx="1148" cy="194" r="1.5"/>
+      <circle cx="958" cy="152" r="2"/>
+    </g>
+    <g class="pulse" fill="#FBBF24">
+      <circle cx="984" cy="162" r="2"/>
+    </g>
+  </g>
+
+  <!-- Connected central data nodes -->
+  <g fill="none" stroke="url(#networkGradient)" stroke-width="1.6">
+    <path d="M420 222L475 204L520 225L565 207"/>
+    <path d="M780 222L725 204L680 225L635 207"/>
+    <path d="M475 204L485 244L520 225"/>
+    <path d="M725 204L715 244L680 225"/>
+    <path d="M520 225L550 249L600 238L650 249L680 225"/>
+    <path d="M550 249L565 207"/>
+    <path d="M650 249L635 207"/>
+  </g>
   <g>
-    <circle cx="370" cy="54" r="3.5" fill="#58E8C6" filter="url(#glow)" class="pulse"/>
-    <text x="600" y="58" text-anchor="middle" class="eyebrow">REAL-WORLD CLOUD ENGINEERING PROJECT</text>
-    <circle cx="830" cy="54" r="3.5" fill="#58E8C6" filter="url(#glow)" class="pulse"/>
+    <circle class="node" cx="420" cy="222" r="3"/>
+    <circle class="nodePink" cx="475" cy="204" r="3"/>
+    <circle class="node" cx="520" cy="225" r="3.5"/>
+    <circle class="nodePink" cx="565" cy="207" r="2.8"/>
+    <circle class="node" cx="780" cy="222" r="3"/>
+    <circle class="nodePink" cx="725" cy="204" r="3"/>
+    <circle class="node" cx="680" cy="225" r="3.5"/>
+    <circle class="nodePink" cx="635" cy="207" r="2.8"/>
+    <circle class="node" cx="485" cy="244" r="2.5"/>
+    <circle class="nodePink" cx="715" cy="244" r="2.5"/>
+    <circle class="node" cx="550" cy="249" r="3"/>
+    <circle class="nodePink" cx="600" cy="238" r="3.5"/>
+    <circle class="node" cx="650" cy="249" r="3"/>
   </g>
 
-  <!-- Project name remains visible throughout -->
+  <!-- Animated data particles -->
+  <g>
+    <circle r="3" fill="#FBBF24" filter="url(#glow)">
+      <animateMotion dur="3.4s" repeatCount="indefinite" path="M420 222L475 204L520 225L565 207"/>
+    </circle>
+    <circle r="2.5" fill="#FB7185" filter="url(#glow)">
+      <animateMotion dur="4s" repeatCount="indefinite" path="M780 222L725 204L680 225L635 207"/>
+    </circle>
+    <circle r="2.5" fill="#FDBA74" filter="url(#glow)">
+      <animateMotion dur="3.8s" repeatCount="indefinite" path="M485 244L520 225L550 249L600 238L650 249"/>
+    </circle>
+  </g>
+
+  <!-- Persistent project label -->
+  <g>
+    <circle cx="370" cy="54" r="3.5" fill="#FBBF24" filter="url(#glow)" class="pulse"/>
+    <text x="600" y="58" text-anchor="middle" class="eyebrow">REAL-WORLD CLOUD ENGINEERING PROJECT</text>
+    <circle cx="830" cy="54" r="3.5" fill="#FB7185" filter="url(#glow)" class="pulse"/>
+  </g>
+
+  <!-- Persistent project title -->
   <g class="float">
     <text x="600" y="126" text-anchor="middle" class="project">AWS INFRASTRUCTURE</text>
     <text x="600" y="169" text-anchor="middle" class="project">DEPLOYMENT &amp; AUTOMATION</text>
     <text x="600" y="195" text-anchor="middle" class="projectSub">BUILD  ·  AUTOMATE  ·  VERIFY  ·  RECOVER</text>
   </g>
 
-  <!-- Impact flash behind each changing concept -->
-  <circle cx="600" cy="258" r="56" fill="#53CFFF" opacity=".035" class="pulse"/>
-  <circle cx="600" cy="258" r="39" stroke="#6DE8FF" stroke-width="1.5" opacity=".35" class="ring"/>
-  <circle cx="600" cy="258" r="39" stroke="#B19AFF" stroke-width="1.5" opacity=".25" class="ring"/>
-
   <!-- 1: Deployment -->
   <g class="concept c1">
-    <text x="600" y="260" class="conceptName" fill="#77E8FF" filter="url(#glow)">DEPLOYMENT</text>
-    <text x="600" y="284" class="conceptDetail">GITHUB ACTIONS · CI/CD PIPELINE</text>
+    <text x="600" y="275" class="conceptName" fill="#FDBA74" filter="url(#glow)">DEPLOYMENT</text>
+    <text x="600" y="299" class="conceptDetail">GITHUB ACTIONS · CI/CD PIPELINE</text>
   </g>
 
   <!-- 2: Terraform -->
   <g class="concept c2">
-    <text x="600" y="260" class="conceptName" fill="#B2A0FF" filter="url(#glow)">TERRAFORM</text>
-    <text x="600" y="284" class="conceptDetail">INFRASTRUCTURE AS CODE</text>
+    <text x="600" y="275" class="conceptName" fill="#FBBF24" filter="url(#glow)">TERRAFORM</text>
+    <text x="600" y="299" class="conceptDetail">INFRASTRUCTURE AS CODE</text>
   </g>
 
   <!-- 3: Networking -->
   <g class="concept c3">
-    <text x="600" y="260" class="conceptName" fill="#69D8FF" filter="url(#glow)">AWS NETWORKING</text>
-    <text x="600" y="284" class="conceptDetail">VPC · SUBNETS · SECURITY GROUPS</text>
+    <text x="600" y="275" class="conceptName" fill="#FDBA74" filter="url(#glow)">AWS NETWORKING</text>
+    <text x="600" y="299" class="conceptDetail">VPC · SUBNETS · SECURITY GROUPS</text>
   </g>
 
   <!-- 4: Containers -->
   <g class="concept c4">
-    <text x="600" y="260" class="conceptName" fill="#75F0C7" filter="url(#glow)">DOCKER &amp; ECR</text>
-    <text x="600" y="284" class="conceptDetail">BUILD · STORE · RUN CONTAINERS</text>
+    <text x="600" y="275" class="conceptName" fill="#FB7185" filter="url(#glow)">DOCKER &amp; ECR</text>
+    <text x="600" y="299" class="conceptDetail">BUILD · STORE · RUN CONTAINERS</text>
   </g>
 
   <!-- 5: Configuration management -->
   <g class="concept c5">
-    <text x="600" y="260" class="conceptName" fill="#FFC985" filter="url(#glow)">ANSIBLE</text>
-    <text x="600" y="284" class="conceptDetail">CONFIGURATION AUTOMATION</text>
+    <text x="600" y="275" class="conceptName" fill="#FBBF24" filter="url(#glow)">ANSIBLE</text>
+    <text x="600" y="299" class="conceptDetail">CONFIGURATION AUTOMATION</text>
   </g>
 
   <!-- 6: Database -->
   <g class="concept c6">
-    <text x="600" y="260" class="conceptName" fill="#76F2D1" filter="url(#glow)">RDS &amp; MYSQL</text>
-    <text x="600" y="284" class="conceptDetail">DYNAMIC APPLICATION DATA</text>
+    <text x="600" y="275" class="conceptName" fill="#FDBA74" filter="url(#glow)">RDS &amp; MYSQL</text>
+    <text x="600" y="299" class="conceptDetail">DYNAMIC APPLICATION DATA</text>
   </g>
 
   <!-- 7: S3 integration -->
   <g class="concept c7">
-    <text x="600" y="260" class="conceptName" fill="#7CCBFF" filter="url(#glow)">S3 DATA INTEGRATION</text>
-    <text x="600" y="284" class="conceptDetail">CSV IMPORT · DATABASE EXPORT</text>
+    <text x="600" y="275" class="conceptName" fill="#FB7185" filter="url(#glow)">S3 DATA INTEGRATION</text>
+    <text x="600" y="299" class="conceptDetail">CSV IMPORT · DATABASE EXPORT</text>
   </g>
 
   <!-- 8: Failover -->
   <g class="concept c8">
-    <text x="600" y="260" class="conceptName" fill="#C1A5FF" filter="url(#glow)">FAILOVER &amp; RECOVERY</text>
-    <text x="600" y="284" class="conceptDetail">VERIFY · SWITCH · RESTORE</text>
+    <text x="600" y="275" class="conceptName" fill="#FBBF24" filter="url(#glow)">FAILOVER &amp; RECOVERY</text>
+    <text x="600" y="299" class="conceptDetail">VERIFY · SWITCH · RESTORE</text>
   </g>
 
   <!-- Continuous lower timeline -->
   <g>
     <path d="M100 338H1100" stroke="#7392BD" stroke-opacity=".3"/>
-    <path d="M100 338H1100" stroke="url(#spectrum)" stroke-width="2" stroke-opacity=".8" class="beam"/>
-    <circle cx="100" cy="338" r="4" fill="#5FE6FF" filter="url(#glow)"/>
-    <circle cx="350" cy="338" r="4" fill="#A18AFF" filter="url(#glow)"/>
-    <circle cx="600" cy="338" r="4" fill="#59E6C0" filter="url(#glow)"/>
-    <circle cx="850" cy="338" r="4" fill="#A18AFF" filter="url(#glow)"/>
-    <circle cx="1100" cy="338" r="4" fill="#FFC985" filter="url(#glow)"/>
+    <path d="M100 338H1100" stroke="url(#spectrum)" stroke-width="2" stroke-opacity=".9" class="beam"/>
+    <circle cx="100" cy="338" r="4" fill="#F59E0B" filter="url(#glow)"/>
+    <circle cx="350" cy="338" r="4" fill="#FDBA74" filter="url(#glow)"/>
+    <circle cx="600" cy="338" r="4" fill="#FB7185" filter="url(#glow)"/>
+    <circle cx="850" cy="338" r="4" fill="#FDBA74" filter="url(#glow)"/>
+    <circle cx="1100" cy="338" r="4" fill="#FBBF24" filter="url(#glow)"/>
   </g>
 
   <!-- Bottom signature -->
-  <text x="600" y="377" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="3" fill="#A6BCD9">
-    TERRAFORM  ·  AUTOMATION  ·  CONTAINERS  ·  DATA  ·  RESILIENCE
-  </text>
-
-  <text x="600" y="399" text-anchor="middle" font-size="9" letter-spacing="2" fill="#607B9F">
-    AWS CLOUD ENGINEERING PORTFOLIO
-  </text>
+  <text x="600" y="377" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="3" fill="#C4D2E4">TERRAFORM  ·  AUTOMATION  ·  CONTAINERS  ·  DATA  ·  RESILIENCE</text>
+  <text x="600" y="399" text-anchor="middle" font-size="9" letter-spacing="2" fill="#8096B4">AWS CLOUD ENGINEERING PORTFOLIO</text>
 </svg>
