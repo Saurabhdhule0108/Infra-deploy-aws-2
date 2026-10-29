@@ -1,0 +1,106 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550" role="img" aria-labelledby="title desc">
+  <title id="title">Ansible Server Configuration</title>
+  <desc id="desc">Ansible runs from a control node over SSH to configure Docker and the application on both EC2 servers, and Nginx on the primary server.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#091525"/>
+      <stop offset="100%" stop-color="#172541"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0 0 L6 3 L0 6 Z" fill="#fbbf24"/>
+    </marker>
+    <style>
+      text{font-family:Arial,Helvetica,sans-serif;fill:#edf5ff}
+      .title{font-size:24px;font-weight:700}
+      .muted{font-size:14px;fill:#a9bfd9}
+      .label{font-size:17px;font-weight:700}
+      .body{font-size:14px;fill:#cbd9e9}
+      .small{font-size:12px;fill:#a9bfd9}
+      .panel{fill:#122943;stroke:#4a6e91;stroke-width:1.5}
+      .primary{fill:#163449;stroke:#38bdf8;stroke-width:1.5}
+      .standby{fill:#1d2942;stroke:#818cf8;stroke-width:1.5}
+      .line{fill:none;stroke:#fbbf24;stroke-width:2.5;stroke-dasharray:7 6;marker-end:url(#arrow);animation:flow 1.4s linear infinite}
+      .icon{fill:none;stroke:#fbbf24;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+      @keyframes flow{to{stroke-dashoffset:-26}}
+      @keyframes glow{0%,100%{opacity:.65}50%{opacity:1}}
+      .pulse{animation:glow 2s ease-in-out infinite}
+      @media(prefers-reduced-motion:reduce){.line,.pulse{animation:none}}
+    </style>
+  </defs>
+
+  <rect width="1000" height="550" rx="20" fill="url(#bg)"/>
+
+  <text x="30" y="42" class="title">ANSIBLE · SERVER CONFIGURATION</text>
+  <text x="30" y="68" class="muted">Configure consistently • Run repeatably • No agent required on managed hosts</text>
+
+  <!-- Control node -->
+  <rect x="30" y="103" width="245" height="174" rx="15" fill="#2b2630" stroke="#fbbf24" stroke-width="1.6"/>
+  <rect x="30" y="103" width="245" height="9" rx="4" fill="url(#accent)"/>
+  <circle cx="61" cy="143" r="15" class="icon"/>
+  <path d="M53 143h16m-8-8v16" class="icon"/>
+  <text x="86" y="143" class="label">Ansible Control</text>
+  <text x="49" y="178" class="body">Inventory → target hosts</text>
+  <text x="49" y="201" class="body">Playbook → desired tasks</text>
+  <text x="49" y="224" class="body">SSH → secure remote access</text>
+  <rect x="49" y="240" width="207" height="23" rx="11" fill="#44351f"/>
+  <text x="152" y="256" text-anchor="middle" font-size="12" font-weight="700">ansible-deploy.yml</text>
+
+  <!-- SSH routes -->
+  <path d="M275 163 H315 V145 H345" class="line"/>
+  <path d="M315 163 V335 H345" class="line"/>
+  <text x="286" y="132" class="small">SSH</text>
+  <text x="286" y="322" class="small">SSH</text>
+
+  <!-- App-1 -->
+  <rect x="350" y="101" width="325" height="168" rx="14" class="primary"/>
+  <text x="371" y="130" class="label">EC2 · App-1</text>
+  <rect x="371" y="146" width="283" height="43" rx="9" class="panel"/>
+  <text x="512" y="173" text-anchor="middle" class="body">Install / start Docker</text>
+  <rect x="371" y="197" width="283" height="43" rx="9" class="panel"/>
+  <text x="512" y="224" text-anchor="middle" class="body">Run application container</text>
+  <rect x="371" y="246" width="283" height="17" rx="8" fill="#174967"/>
+  <text x="512" y="259" text-anchor="middle" font-size="11" font-weight="700">Configure Nginx reverse proxy</text>
+
+  <!-- App-2 -->
+  <rect x="350" y="291" width="325" height="168" rx="14" class="standby"/>
+  <text x="371" y="320" class="label">EC2 · App-2</text>
+  <rect x="371" y="336" width="283" height="43" rx="9" class="panel"/>
+  <text x="512" y="363" text-anchor="middle" class="body">Install / start Docker</text>
+  <rect x="371" y="387" width="283" height="43" rx="9" class="panel"/>
+  <text x="512" y="414" text-anchor="middle" class="body">Run application container</text>
+  <text x="512" y="448" text-anchor="middle" class="small">Standby application server</text>
+
+  <!-- Results -->
+  <path d="M675 185 H710" class="line"/>
+  <path d="M675 375 H710" class="line"/>
+
+  <rect x="715" y="115" width="255" height="124" rx="13" fill="#12342f" stroke="#4ade80" stroke-width="1.5"/>
+  <circle cx="742" cy="143" r="10" fill="none" stroke="#4ade80" stroke-width="2" class="pulse"/>
+  <path d="M737 143l4 4 7-9" fill="none" stroke="#4ade80" stroke-width="2"/>
+  <text x="762" y="148" class="label">App-1 ready</text>
+  <text x="735" y="178" class="body">Docker + app running</text>
+  <text x="735" y="200" class="body">Nginx routes HTTP :80</text>
+  <text x="735" y="222" class="small">Reverse proxy to :8080</text>
+
+  <rect x="715" y="309" width="255" height="124" rx="13" fill="#192a43" stroke="#818cf8" stroke-width="1.5"/>
+  <circle cx="742" cy="337" r="10" fill="none" stroke="#818cf8" stroke-width="2" class="pulse"/>
+  <path d="M737 337l4 4 7-9" fill="none" stroke="#818cf8" stroke-width="2"/>
+  <text x="762" y="342" class="label">App-2 ready</text>
+  <text x="735" y="372" class="body">Docker + app running</text>
+  <text x="735" y="394" class="body">Available as fallback</text>
+  <text x="735" y="416" class="small">Same application setup</text>
+
+  <!-- Key benefits -->
+  <rect x="30" y="480" width="940" height="48" rx="12" fill="#101f34" stroke="#344d6c"/>
+  <text x="48" y="500" font-size="13" font-weight="700" fill="#fbbf24">WHY ANSIBLE?</text>
+  <text x="166" y="500" class="body">Agentless over SSH</text>
+  <text x="370" y="500" class="body">Repeatable playbooks</text>
+  <text x="592" y="500" class="body">Consistent server setup</text>
+  <text x="812" y="500" class="body">Less manual work</text>
+  <text x="30" y="543" class="small">Terraform creates infrastructure • Ansible configures the operating systems and services.</text>
+</svg>

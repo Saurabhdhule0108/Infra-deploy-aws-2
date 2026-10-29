@@ -1,0 +1,208 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700" role="img" aria-labelledby="title desc">
+  <title id="title">S3 and RDS Data Integration</title>
+  <desc id="desc">A manual GitHub Actions import workflow moves a CSV from S3 through EC2 into RDS MySQL. A separate export workflow queries RDS through EC2 and writes a timestamped CSV to S3.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#121d31"/>
+    </linearGradient>
+    <linearGradient id="s3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffcf70"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="ec2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8cc8ff"/>
+      <stop offset="100%" stop-color="#4386ef"/>
+    </linearGradient>
+    <linearGradient id="db" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9fe9cf"/>
+      <stop offset="100%" stop-color="#20a779"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000000" flood-opacity=".25"/>
+    </filter>
+    <marker id="arrowIn" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#fbbf24"/>
+    </marker>
+    <marker id="arrowOut" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#5ee6b3"/>
+    </marker>
+    <style>
+      text { font-family: Inter, Segoe UI, Arial, sans-serif; }
+      .heading { fill:#f8fafc; font-size:25px; font-weight:750; }
+      .subheading { fill:#aebdd0; font-size:12px; }
+      .card-title { fill:#f8fafc; font-size:15px; font-weight:700; }
+      .body { fill:#d3deeb; font-size:12px; }
+      .muted { fill:#91a4bc; font-size:11px; }
+      .tiny { fill:#b5c4d6; font-size:10px; }
+      .pill { fill:#15243a; stroke:#30445e; stroke-width:1; }
+      .in-line { fill:none; stroke:#fbbf24; stroke-width:3; stroke-linecap:round; stroke-dasharray:7 7; marker-end:url(#arrowIn); }
+      .out-line { fill:none; stroke:#5ee6b3; stroke-width:3; stroke-linecap:round; stroke-dasharray:7 7; marker-end:url(#arrowOut); }
+      .flow { animation: travel 1.4s linear infinite; }
+      .flow-reverse { animation: travel 1.4s linear infinite; }
+      .pulse { animation: pulse 2.4s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+      @keyframes travel { to { stroke-dashoffset:-28; } }
+      @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.58; } }
+      @media (prefers-reduced-motion: reduce) {
+        .flow, .flow-reverse, .pulse { animation:none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1100" height="700" rx="22" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1098" height="698" rx="21" fill="none" stroke="#34445b"/>
+
+  <!-- Header -->
+  <text x="36" y="43" class="heading">S3 ↔ RDS DATA INTEGRATION</text>
+  <text x="37" y="66" class="subheading">CSV import and database export · AWS ap-south-1 · EC2 acts as the bridge</text>
+  <rect x="875" y="25" width="187" height="31" rx="15" fill="#19372f" stroke="#2d8064"/>
+  <circle cx="892" cy="40.5" r="4" fill="#5ee6b3"/>
+  <text x="904" y="45" fill="#aaf4d9" font-size="11" font-weight="700">MANUAL WORKFLOWS</text>
+
+  <!-- Import workflow band -->
+  <rect x="28" y="88" width="1044" height="225" rx="17" fill="#151f31" stroke="#39475c"/>
+  <rect x="43" y="101" width="96" height="25" rx="12" fill="#47351a" stroke="#85621e"/>
+  <text x="91" y="118" text-anchor="middle" fill="#ffd982" font-size="11" font-weight="750">01 · IMPORT</text>
+  <text x="151" y="118" class="card-title">S3 CSV → EC2 processing → RDS MySQL</text>
+  <text x="1045" y="117" text-anchor="end" class="muted">s3-import.yml</text>
+
+  <!-- Import S3 -->
+  <g filter="url(#shadow)">
+    <rect x="49" y="143" width="240" height="125" rx="13" fill="#202b3d" stroke="#8b6a2d"/>
+    <rect x="49" y="143" width="240" height="5" rx="2.5" fill="url(#s3)"/>
+  </g>
+  <g transform="translate(64 158)">
+    <path d="M10 1 L24 7 L24 25 L10 31 L-4 25 L-4 7 Z" fill="none" stroke="#ffc85a" stroke-width="2"/>
+    <path d="M-4 7 L10 14 L24 7 M10 14 L10 31" fill="none" stroke="#ffc85a" stroke-width="1.5"/>
+  </g>
+  <text x="101" y="174" class="card-title">Amazon S3</text>
+  <text x="65" y="199" class="body">Bucket: app-data-2026</text>
+  <rect x="64" y="210" width="207" height="26" rx="6" fill="#3c301c"/>
+  <text x="76" y="227" fill="#ffdc93" font-size="11" font-weight="650">imports/users.csv</text>
+  <text x="65" y="253" class="muted">Stores the input file</text>
+
+  <!-- Import arrow -->
+  <path d="M290 205 H405" class="in-line flow"/>
+  <rect x="301" y="169" width="94" height="24" rx="12" class="pill"/>
+  <text x="348" y="185" text-anchor="middle" class="tiny">Download CSV</text>
+
+  <!-- EC2 import processing -->
+  <g filter="url(#shadow)">
+    <rect x="410" y="143" width="280" height="125" rx="13" fill="#1b2c44" stroke="#4f8fd5"/>
+    <rect x="410" y="143" width="280" height="5" rx="2.5" fill="url(#ec2)"/>
+  </g>
+  <g transform="translate(426 159)" stroke="#8fcaff" stroke-width="1.7" fill="none">
+    <rect x="0" y="0" width="25" height="20" rx="3"/>
+    <path d="M5 6 H20 M5 11 H16 M5 16 H19"/>
+    <path d="M4 24 H21"/>
+  </g>
+  <text x="462" y="174" class="card-title">EC2 · App-1</text>
+  <text x="426" y="199" class="body">Import script / app logic</text>
+  <text x="426" y="219" class="body">1. Read CSV rows</text>
+  <text x="426" y="237" class="body">2. Validate name and email</text>
+  <text x="426" y="255" class="body">3. Insert / upsert in a transaction</text>
+
+  <!-- Import arrow to DB -->
+  <path d="M691 205 H806" class="in-line flow"/>
+  <rect x="706" y="169" width="87" height="24" rx="12" class="pill"/>
+  <text x="749" y="185" text-anchor="middle" class="tiny">SQL writes</text>
+
+  <!-- RDS -->
+  <g filter="url(#shadow)">
+    <rect x="811" y="143" width="240" height="125" rx="13" fill="#1b302f" stroke="#329d79"/>
+    <rect x="811" y="143" width="240" height="5" rx="2.5" fill="url(#db)"/>
+  </g>
+  <g transform="translate(827 158)">
+    <ellipse cx="13" cy="5" rx="13" ry="5" fill="none" stroke="#72e2b7" stroke-width="1.8"/>
+    <path d="M0 5 V24 C0 31 26 31 26 24 V5 M0 14 C0 21 26 21 26 14" fill="none" stroke="#72e2b7" stroke-width="1.8"/>
+  </g>
+  <text x="865" y="174" class="card-title">Amazon RDS</text>
+  <text x="827" y="199" class="body">MySQL · appdb</text>
+  <rect x="827" y="210" width="207" height="26" rx="6" fill="#183c34"/>
+  <text x="839" y="227" fill="#aaf4d9" font-size="11" font-weight="650">users table · live records</text>
+  <text x="827" y="253" class="muted">Private database · TCP 3306</text>
+
+  <rect x="49" y="279" width="1002" height="22" rx="7" fill="#282a2c"/>
+  <text x="550" y="294" text-anchor="middle" fill="#f4d69a" font-size="11">Trigger manually in GitHub Actions → choose csv_key (default: imports/users.csv) → validate import → stop App-1 after success</text>
+
+  <!-- Export workflow band -->
+  <rect x="28" y="328" width="1044" height="225" rx="17" fill="#151f31" stroke="#39475c"/>
+  <rect x="43" y="341" width="96" height="25" rx="12" fill="#173b32" stroke="#2d8064"/>
+  <text x="91" y="358" text-anchor="middle" fill="#aaf4d9" font-size="11" font-weight="750">02 · EXPORT</text>
+  <text x="151" y="358" class="card-title">RDS MySQL → EC2 processing → S3 CSV</text>
+  <text x="1045" y="357" text-anchor="end" class="muted">s3-export.yml</text>
+
+  <!-- Export DB -->
+  <g filter="url(#shadow)">
+    <rect x="49" y="383" width="240" height="125" rx="13" fill="#1b302f" stroke="#329d79"/>
+    <rect x="49" y="383" width="240" height="5" rx="2.5" fill="url(#db)"/>
+  </g>
+  <g transform="translate(65 398)">
+    <ellipse cx="13" cy="5" rx="13" ry="5" fill="none" stroke="#72e2b7" stroke-width="1.8"/>
+    <path d="M0 5 V24 C0 31 26 31 26 24 V5 M0 14 C0 21 26 21 26 14" fill="none" stroke="#72e2b7" stroke-width="1.8"/>
+  </g>
+  <text x="103" y="414" class="card-title">Amazon RDS</text>
+  <text x="65" y="439" class="body">MySQL · appdb</text>
+  <rect x="64" y="450" width="207" height="26" rx="6" fill="#183c34"/>
+  <text x="76" y="467" fill="#aaf4d9" font-size="11" font-weight="650">SELECT from users</text>
+  <text x="65" y="493" class="muted">Source of live records</text>
+
+  <!-- Export arrow -->
+  <path d="M290 445 H405" class="out-line flow-reverse"/>
+  <rect x="301" y="409" width="94" height="24" rx="12" class="pill"/>
+  <text x="348" y="425" text-anchor="middle" class="tiny">Query rows</text>
+
+  <!-- EC2 export -->
+  <g filter="url(#shadow)">
+    <rect x="410" y="383" width="280" height="125" rx="13" fill="#1b2c44" stroke="#4f8fd5"/>
+    <rect x="410" y="383" width="280" height="5" rx="2.5" fill="url(#ec2)"/>
+  </g>
+  <g transform="translate(426 399)" stroke="#8fcaff" stroke-width="1.7" fill="none">
+    <rect x="0" y="0" width="25" height="20" rx="3"/>
+    <path d="M5 6 H20 M5 11 H16 M5 16 H19"/>
+    <path d="M4 24 H21"/>
+  </g>
+  <text x="462" y="414" class="card-title">EC2 · App-1</text>
+  <text x="426" y="439" class="body">Export script</text>
+  <text x="426" y="459" class="body">1. Query database rows</text>
+  <text x="426" y="477" class="body">2. Convert rows to CSV</text>
+  <text x="426" y="495" class="body">3. Add timestamp to filename</text>
+
+  <!-- Export arrow -->
+  <path d="M691 445 H806" class="out-line flow-reverse"/>
+  <rect x="706" y="409" width="87" height="24" rx="12" class="pill"/>
+  <text x="749" y="425" text-anchor="middle" class="tiny">Upload CSV</text>
+
+  <!-- Export S3 -->
+  <g filter="url(#shadow)">
+    <rect x="811" y="383" width="240" height="125" rx="13" fill="#202b3d" stroke="#8b6a2d"/>
+    <rect x="811" y="383" width="240" height="5" rx="2.5" fill="url(#s3)"/>
+  </g>
+  <g transform="translate(827 398)">
+    <path d="M10 1 L24 7 L24 25 L10 31 L-4 25 L-4 7 Z" fill="none" stroke="#ffc85a" stroke-width="2"/>
+    <path d="M-4 7 L10 14 L24 7 M10 14 L10 31" fill="none" stroke="#ffc85a" stroke-width="1.5"/>
+  </g>
+  <text x="865" y="414" class="card-title">Amazon S3</text>
+  <text x="827" y="439" class="body">Bucket: app-data-2026</text>
+  <rect x="827" y="450" width="207" height="26" rx="6" fill="#3c301c"/>
+  <text x="839" y="467" fill="#ffdc93" font-size="11" font-weight="650">exports/users-*.csv</text>
+  <text x="827" y="493" class="muted">Stores the output file</text>
+
+  <rect x="49" y="519" width="1002" height="22" rx="7" fill="#202e2c"/>
+  <text x="550" y="534" text-anchor="middle" fill="#aaf4d9" font-size="11">Trigger manually in GitHub Actions → query users → create timestamped CSV → upload to S3 → stop App-1 after success</text>
+
+  <!-- Security and architecture notes -->
+  <rect x="28" y="569" width="500" height="105" rx="14" fill="#172438" stroke="#354b67"/>
+  <text x="46" y="592" fill="#d8e8ff" font-size="13" font-weight="750">SECURE ACCESS · EC2 IAM ROLE</text>
+  <text x="46" y="614" class="body">infra-deploy-aws-2-ec2-s3-role</text>
+  <text x="46" y="634" class="body">• List bucket · read imports/* · write exports/*</text>
+  <text x="46" y="653" class="muted">No broad S3 access required; database access stays private.</text>
+
+  <rect x="543" y="569" width="529" height="105" rx="14" fill="#172438" stroke="#354b67"/>
+  <text x="561" y="592" fill="#d8e8ff" font-size="13" font-weight="750">REMEMBER THE DIFFERENCE</text>
+  <text x="561" y="614" class="body">S3 = files (CSV imports and exports)</text>
+  <text x="561" y="634" class="body">RDS = live relational records (MySQL tables)</text>
+  <text x="561" y="653" class="muted">EC2 connects both services; S3 does not connect directly to RDS.</text>
+</svg>

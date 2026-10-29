@@ -1,0 +1,112 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" role="img" aria-labelledby="title desc">
+  <title id="title">Docker and Amazon ECR Deployment</title>
+  <desc id="desc">Build a Docker image, push it to Amazon ECR, pull it onto EC2, and run a container containing the Node.js Express application on port 8080 connected to RDS MySQL.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#091525"/>
+      <stop offset="100%" stop-color="#132641"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0 0 L6 3 L0 6 Z" fill="#60c9fa"/>
+    </marker>
+    <marker id="greenArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0 0 L6 3 L0 6 Z" fill="#4ade80"/>
+    </marker>
+    <style>
+      text{font-family:Arial,Helvetica,sans-serif;fill:#edf5ff}
+      .title{font-size:24px;font-weight:700}
+      .muted{font-size:14px;fill:#a9bfd9}
+      .label{font-size:16px;font-weight:700}
+      .body{font-size:13px;fill:#cbd9e9}
+      .step{fill:#132943;stroke:#3f7098;stroke-width:1.4}
+      .flow{fill:none;stroke:#60c9fa;stroke-width:2.5;stroke-dasharray:7 6;marker-end:url(#arrow);animation:flow 1.4s linear infinite}
+      .data{fill:none;stroke:#4ade80;stroke-width:2.5;stroke-dasharray:7 6;marker-end:url(#greenArrow);animation:flow 1.4s linear infinite}
+      .tile{fill:#142d48;stroke:#5685ac;stroke-width:1.4}
+      .tileText{font-size:14px;font-weight:700}
+      @keyframes flow{to{stroke-dashoffset:-28}}
+      @media(prefers-reduced-motion:reduce){.flow,.data{animation:none}}
+    </style>
+  </defs>
+
+  <rect width="1000" height="600" rx="20" fill="url(#bg)"/>
+
+  <text x="30" y="42" class="title">DOCKER → AMAZON ECR → EC2</text>
+  <text x="30" y="67" class="muted">Build once • Store the image • Run the container</text>
+
+  <!-- Sequential workflow -->
+  <rect x="30" y="91" width="205" height="73" rx="12" class="step"/>
+  <text x="132" y="116" text-anchor="middle" class="label">1 · Build</text>
+  <text x="132" y="138" text-anchor="middle" class="body">Dockerfile → Image</text>
+  <text x="132" y="154" text-anchor="middle" class="body">GitHub Actions</text>
+
+  <path d="M235 127 H267" class="flow"/>
+
+  <rect x="273" y="91" width="205" height="73" rx="12" class="step"/>
+  <text x="375" y="116" text-anchor="middle" class="label">2 · Push</text>
+  <text x="375" y="138" text-anchor="middle" class="body">Tag image</text>
+  <text x="375" y="154" text-anchor="middle" class="body">Amazon ECR</text>
+
+  <path d="M478 127 H510" class="flow"/>
+
+  <rect x="516" y="91" width="205" height="73" rx="12" class="step"/>
+  <text x="618" y="116" text-anchor="middle" class="label">3 · Pull</text>
+  <text x="618" y="138" text-anchor="middle" class="body">EC2 downloads</text>
+  <text x="618" y="154" text-anchor="middle" class="body">the image from ECR</text>
+
+  <path d="M721 127 H753" class="flow"/>
+
+  <rect x="759" y="91" width="211" height="73" rx="12" fill="#12342f" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="864" y="116" text-anchor="middle" class="label">4 · Run</text>
+  <text x="864" y="138" text-anchor="middle" class="body">Docker container</text>
+  <text x="864" y="154" text-anchor="middle" class="body">EC2 • port 8080</text>
+
+  <!-- Large container frame -->
+  <rect x="83" y="205" width="834" height="284" rx="18" fill="#0c1d30" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="83" y="205" width="834" height="49" rx="16" fill="#153b59"/>
+  <path d="M83 238 V254 H917 V238" fill="#153b59"/>
+  <text x="108" y="236" font-size="20" font-weight="700">DOCKER CONTAINER</text>
+  <rect x="754" y="216" width="137" height="26" rx="13" fill="#1b4d69" stroke="#5ccfff"/>
+  <text x="822" y="234" text-anchor="middle" font-size="13" font-weight="700">PORT :8080</text>
+
+  <!-- Container contents -->
+  <rect x="111" y="274" width="231" height="91" rx="12" class="tile"/>
+  <text x="226" y="300" text-anchor="middle" class="tileText">Application files</text>
+  <text x="226" y="323" text-anchor="middle" class="body">app.js</text>
+  <text x="226" y="344" text-anchor="middle" class="body">package.json</text>
+
+  <rect x="384" y="274" width="231" height="91" rx="12" class="tile"/>
+  <text x="499" y="300" text-anchor="middle" class="tileText">Node.js 22</text>
+  <text x="499" y="323" text-anchor="middle" class="body">JavaScript runtime</text>
+  <text x="499" y="344" text-anchor="middle" class="body">Runs the application</text>
+
+  <rect x="657" y="274" width="231" height="91" rx="12" class="tile"/>
+  <text x="772" y="300" text-anchor="middle" class="tileText">Express.js</text>
+  <text x="772" y="323" text-anchor="middle" class="body">HTTP routes / API</text>
+  <text x="772" y="344" text-anchor="middle" class="body">Users • Health • DB</text>
+
+  <!-- Internal sequential flow -->
+  <path d="M342 320 H379" class="flow"/>
+  <path d="M615 320 H652" class="flow"/>
+
+  <rect x="111" y="391" width="777" height="68" rx="12" fill="#10283e" stroke="#426888"/>
+  <text x="132" y="416" class="label">Container runtime</text>
+  <text x="132" y="439" class="body">Docker runs the image as an isolated container on EC2.</text>
+  <text x="867" y="416" text-anchor="end" class="label">Environment variables</text>
+  <text x="867" y="439" text-anchor="end" class="body">DB host • database • credentials</text>
+
+  <!-- Database connection -->
+  <path d="M500 489 V517 H735" class="data"/>
+  <rect x="738" y="499" width="232" height="74" rx="12" fill="#12342f" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="854" y="524" text-anchor="middle" class="label">Amazon RDS MySQL</text>
+  <text x="854" y="546" text-anchor="middle" class="body">Outside the container</text>
+  <text x="854" y="563" text-anchor="middle" class="body">Private connection :3306</text>
+
+  <!-- Registry note -->
+  <rect x="30" y="512" width="660" height="61" rx="12" fill="#111f34" stroke="#3e5876"/>
+  <text x="48" y="537" class="label">Amazon ECR · Image registry</text>
+  <text x="48" y="558" class="body">Stores versioned container images for EC2 to pull during deployment.</text>
+
+  <text x="30" y="590" class="muted">Same application image can run on App-1 and App-2.</text>
+</svg>
