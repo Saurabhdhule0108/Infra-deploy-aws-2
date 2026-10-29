@@ -92,23 +92,7 @@ Infra-deploy-aws-2/
 ├── docs/
 │   ├── assets/
 │   │   └── animations/
-│   │       ├── cloud-engineering.svg
-│   │       ├── aws-architecture.svg
-│   │       ├── terraform-provisioning.svg
-│   │       ├── cicd-pipeline.svg
-│   │       ├── docker-ecr-deployment.svg
-│   │       ├── ansible-configuration.svg
-│   │       ├── application-database.svg
-│   │       ├── s3-rds-integration.svg
-│   │       └── active-passive-failover.svg
 │   └── screenshots/
-│       ├── deployment-success.png
-│       ├── ec2-infrastructure.png
-│       ├── docker-ecr.png
-│       ├── running-application.png
-│       ├── application-rds.png
-│       ├── s3-import-export.png
-│       └── application-users.png
 ├── nodeapp/
 │   ├── app.js
 │   ├── Dockerfile
@@ -151,7 +135,7 @@ Terraform provisions the infrastructure, Ansible configures the servers, and Git
 | **AWS IAM** | Controls access to AWS resources. |
 | **GitHub Actions** | Automates deployment, data operations, and failover testing. |
 
-![EC2 Infrastructure](docs/screenshots/ec2-infrastructure.png)
+![EC2 Infrastructure](docs/assets/screenshots/ec2-infrastructure.png)
 
 ## 🏗️ Terraform Infrastructure
 
@@ -235,7 +219,7 @@ The workflow can also run automatically when its configured trigger conditions a
 
 **Deployment workflow:** [Open Deploy workflow](https://github.com/Saurabhdhule0108/Infra-deploy-aws-2/actions/workflows/deploy.yml)
 
-![Successful CI/CD Deployment](docs/screenshots/deployment-success.png)
+![Successful CI/CD Deployment](docs/assets/screenshots/deployment-success.png)
 
 ## 🐳 Docker and Amazon ECR
 
@@ -249,7 +233,7 @@ The deployment process builds the application image, pushes it to the `infra-dep
 
 The application container listens on port `8080`. The configured web entry point and Nginx routing expose the application through HTTP port `80`.
 
-![Docker and Amazon ECR](docs/screenshots/docker-ecr.png)
+![Docker and Amazon ECR](docs/assets/screenshots/docker-ecr.png)
 
 ## 🗄️ Application and RDS Integration
 
@@ -276,11 +260,9 @@ The database is named `appdb`, and the application uses the `users` table. Datab
 - Separation between the application and data tiers.
 - Database connectivity checks and basic operational troubleshooting.
 
-![Running Application](docs/screenshots/running-application.png)
+![Running Application](docs/assets/screenshots/running-application.png)
 
-![Application and RDS Integration](docs/screenshots/application-rds.png)
-
-![Users Retrieved from RDS](docs/screenshots/application-users.png)
+![Users Retrieved from RDS](docs/assets/screenshots/application-users.png)
 
 ## 🔄 S3 and RDS Data Automation
 
@@ -322,7 +304,9 @@ The EC2 role, `infra-deploy-aws-2-ec2-s3-role`, is intended to limit access to t
 
 Open the relevant workflow in GitHub Actions, select **Run workflow** when available, provide any required inputs, and review the logs.
 
-![S3 Import and Export](docs/screenshots/s3-import-export.png)
+![S3 Import and Export](docs/assets/screenshots/s3-import-export.png)
+
+![Application and RDS Integration](docs/assets/screenshots/application-rds.png)
 
 ## 🛡️ Active-Passive Failover Testing
 
